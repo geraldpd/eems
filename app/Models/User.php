@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -21,7 +22,8 @@ class User extends Authenticatable
         'firstname',
         'lastname',
         'email',
-        'mobile_number'
+        'mobile_number',
+        'password'
     ];
 
     /**
@@ -42,4 +44,28 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * The attributes that should appended
+     *
+     * @var array
+     */
+    protected $appends = [
+        'fullname'
+    ];
+
+    public function setFirstnameAttribute($value)
+    {
+        $this->attributes['firstname'] = Str::lower($value);
+    }
+
+    public function setLastnameAttribute($value)
+    {
+        $this->attributes['lastname'] = Str::lower($value);
+    }
+
+    public function getFullnameAttribute()
+    {
+        return Str::title("$this->firtname $this->lastname");
+    }
 }
