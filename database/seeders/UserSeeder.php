@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
 				'firstname' => $role,
                 'lastname' => $role,
                 'mobile_number' => '900000000'.rand(0,9),
-				'email' => $role.'@'.config('app.name').'.com',
+				'email' => Str::lower($role.'@'.config('app.name').'.com'),
 				'email_verified_at' => Carbon::now(),
 				'password' => bcrypt('password'),
                 'remember_token' => Str::random(10),
