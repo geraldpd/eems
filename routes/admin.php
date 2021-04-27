@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
-//use Admin\HomeController;
-
 Auth::routes(['register' => false]);
 
-Route::group( ['middleware' => 'admin'], function() {
-    Route::get('/', HomeController::class);
-    Route::get('/home', HomeController::class);
+
+Route::group([
+    'middleware' => ['admin', 'verified'],
+], function(){
+    Route::get('/', HomeController::class);\
+
+    Route::resource('users', UserController::class);
 });

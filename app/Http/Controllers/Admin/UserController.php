@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -12,9 +13,20 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $users = User::with('roles')
+            ->whereHas('roles', function($roles){
+                $roles->whereIn('name', ['organizer', 'attendee']);
+            })
+            ->get();
+
+        $users = $users->mapToGroups(function ($user) {
+            return [$user['roles'][0]['name'] => $user];
+        })
+        ->all();
+
+        return view('admin.user.index', compact('users'));
     }
 
     /**

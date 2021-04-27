@@ -26,7 +26,7 @@ class Admin
 
         if (in_array($role_id, [2, 3]))
         {
-            return redirect()->route('home');
+            return redirect()->route('/admin');
         }
 
         return $next($request);

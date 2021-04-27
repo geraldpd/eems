@@ -68,4 +68,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return Str::title("$this->firtname $this->lastname");
     }
+
+    public function getRoleAttribute()
+    {
+        return Str::title("$this->firtname $this->lastname");
+    }
 }
