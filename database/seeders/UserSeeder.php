@@ -16,11 +16,11 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-    	foreach(config('eems.roles') as $role) {
+    	foreach(config('eems.roles') as $index => $role) {
 	        $user = User::create([
 				'firstname' => $role,
                 'lastname' => $role,
-                'mobile_number' => '900000000'.rand(0,9),
+                'mobile_number' => '900000000'.$index,
 				'email' => Str::lower($role.'@'.config('app.name').'.com'),
 				'email_verified_at' => Carbon::now(),
 				'password' => bcrypt('password'),

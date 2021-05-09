@@ -89,7 +89,7 @@
                     </div>
                 </li>
             @endguest
-        </ul>
+          </ul>
 
         </div>
       </nav>
