@@ -21,7 +21,7 @@ class CreateEventsTable extends Migration
             $table->string('type');
             $table->text('description');
             $table->text('location');
-            $table->text('documents');
+            $table->text('documents')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
