@@ -22,8 +22,8 @@ class CreateEventsTable extends Migration
             $table->text('description');
             $table->text('location');
             $table->text('documents')->nullable();
-            $table->dateTime('schedule_from');
-            $table->dateTime('schedule_to');
+            $table->dateTime('schedule_start');
+            $table->dateTime('schedule_end');
             $table->string('status');
             $table->timestamps();
             $table->softDeletes();

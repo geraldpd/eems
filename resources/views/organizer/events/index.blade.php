@@ -24,6 +24,7 @@
         $(function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
+                selectable: true,
                 initialView: 'dayGridMonth',
                 events: [
                     {
@@ -34,11 +35,21 @@
                     }
                 ],
                 eventClick: function(info) {
-                    alert('Event: ' + info.event.title);
-                    alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-                    alert('View: ' + info.view.type);
+                    console.log('Event: ' + info.event.title);
+                    console.log('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+                    console.log('View: ' + info.view.type);
 
                     console.log(info.el)
+                },
+                dateClick: function(info) {
+                    console.log('dateClick', info);
+                    //return;
+                    window.location.href = `{{ route('organizer.events.create') }}?date=${info.dateStr}`;
+
+                },
+                select: function(info) {
+                    //this is also applicable to multiple day selections
+                    return //!console.log('select', arguments)
                 }
             });
             calendar.render();

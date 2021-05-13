@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EventRequest;
 use App\Models\Category;
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,10 +28,11 @@ class EventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $categories = Category::all();
-        return view('organizer.events.create', compact('categories'));
+        $date = Carbon::parse($request->date);
+        return view('organizer.events.create', compact('categories', 'date'));
     }
 
     /**
@@ -38,9 +41,11 @@ class EventController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(EventRequest $request)
+    //public function store(Request $request)
     {
-        //
+        dd($request->validated());
+        Event::create();
     }
 
     /**
@@ -50,6 +55,17 @@ class EventController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Event $event)
+    {
+        //
+    }
+
+    /**
+     * Display all resource of the selected date.
+     *
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\Http\Response
+     */
+    public function showAll()
     {
         //
     }

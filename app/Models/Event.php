@@ -9,6 +9,19 @@ class Event extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'organizer_id',
+        'category_id',
+        'name',
+        'type',
+        'description',
+        'location',
+        'documents',
+        'schedule_start',
+        'schedule_end',
+        'status',
+    ];
+
     public function organizer()
     {
         return $this->belongsTo(User::class);
