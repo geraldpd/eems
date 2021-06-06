@@ -31,7 +31,8 @@ class EventController extends Controller
     public function create(Request $request)
     {
         $categories = Category::all();
-        $date = Carbon::parse($request->date);
+        $date = $request->date ? Carbon::parse($request->date) : Carbon::now();
+
         return view('organizer.events.create', compact('categories', 'date'));
     }
 
@@ -44,8 +45,23 @@ class EventController extends Controller
     public function store(EventRequest $request)
     //public function store(Request $request)
     {
-        dd($request->validated());
-        Event::create();
+        $data = collect($request->validated());
+
+        //TODO assuming that the day is singel day
+        $schedule_start = Carbon::parse($request->schedule_start);
+        $schedule_end = Carbon::parse($request->schedule_end);
+        $date = Carbon::parse($request->date);
+
+        $event_data = $data->merge([
+            'organizer_id' => Auth::user()->id,
+            'schedule_start' => $date->copy()->setHour($schedule_start->hour)->setMinute($schedule_start->minute),
+            'schedule_end' => $date->copy()->setHour($schedule_end->hour)->setMinute($schedule_end->minute),
+            'status' => Event::Pending,
+        ]);
+
+        Event::create($event_data->all());
+
+        return redirect()->route('organizer.events.index')->with('success', 'Event Successfully Created');
     }
 
     /**

@@ -31,8 +31,9 @@ class EventRequest extends FormRequest
             'description' => ['required'],
             'location' => ['required'],
             'documents' => ['nulllable'],
-            //'schedule_from' => ['required'],
-            //'schedule_to' => ['required'],
+            //'schedule_start' => ['required'], //?range and single day
+            //'schedule_end' => ['required'], //?range and single day
+            'date' => ['required'], //! Not in the fillable and table, but is added in the form
             //'status' => ['required'],
         ];
     }

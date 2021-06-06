@@ -9,6 +9,11 @@ class Event extends Model
 {
     use HasFactory;
 
+    const Pending = 'Pending'; //initial status
+    const Active = 'Active';
+    const Done = 'Done';
+    const Cancelled = 'Cancelled';
+
     protected $fillable = [
         'organizer_id',
         'category_id',

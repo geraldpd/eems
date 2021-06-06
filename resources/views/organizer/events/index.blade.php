@@ -3,10 +3,11 @@
 @section('content')
     <div class="container">
 
-        @foreach($events as $event)
-            {{ $loop->iteration }}
-            <br>
-        @endforeach
+        @if(session()->has('success'))
+            <div class="alert alert-success">
+                {{ session()->get('success') }}
+            </div>
+        @endif
 
         <div id='calendar'></div>
 
@@ -22,8 +23,7 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js'></script>
     <script type="text/javascript">
         $(function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            var calendar = new FullCalendar.Calendar($('#calendar').get(0), {
                 selectable: true,
                 initialView: 'dayGridMonth',
                 events: [
