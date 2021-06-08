@@ -19,7 +19,16 @@ class EventController extends Controller
      */
     public function index()
     {
-            $events = Auth::user()->events;
+            $events = Auth::user()->events->map(function($event) {
+                return [
+                    'id' => $event->id,
+                    'title' => $event->name,
+                    'start' => $event->schedule_start,
+                    'end' => $event->schedule_end,
+                    'event' => $event
+                ];
+            });
+
             return view('organizer.events.index', compact('events'));
     }
 
@@ -43,11 +52,10 @@ class EventController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(EventRequest $request)
-    //public function store(Request $request)
     {
         $data = collect($request->validated());
 
-        //TODO assuming that the day is singel day
+        //TODO assuming that the date picked is single day
         $schedule_start = Carbon::parse($request->schedule_start);
         $schedule_end = Carbon::parse($request->schedule_end);
         $date = Carbon::parse($request->date);
