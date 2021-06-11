@@ -27,6 +27,15 @@ class Event extends Model
         'status',
     ];
 
+    protected $casts = [
+        'schedule_start' => 'date',
+        'schedule_end' => 'date'
+    ];
+
+    protected $appends = [
+        'group_date',
+    ];
+
     public function organizer()
     {
         return $this->belongsTo(User::class);
@@ -35,5 +44,10 @@ class Event extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function getGroupDateAttribute()
+    {
+        return $this->schedule_start->format('d-m-y');
     }
 }

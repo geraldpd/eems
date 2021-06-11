@@ -27,6 +27,8 @@ class EventController extends Controller
                     'end' => $event->schedule_end,
                     'event' => $event
                 ];
+            })->groupBy(function ($item, $key) {
+                return $item['event']->schedule_start->format('Y-m-d');
             });
 
             return view('organizer.events.index', compact('events'));

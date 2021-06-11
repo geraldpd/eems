@@ -79,8 +79,11 @@
             <main class="py-4">
                 @yield('content')
             </main>
+
+            @stack('modals')
         </div>
 
+        <script src="{{ asset('js/app.js') }}" defer></script>
         <script src="{{ asset('js/jquery.js') }}"></script>
         @stack('scripts')
     </body>
