@@ -16,7 +16,7 @@
 
 @push('modals')
     <div class="modal fade" id="date-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title date-title"></h5>
@@ -25,11 +25,25 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="date-events"></div>
+                    <div class="date-events">
+                        <div class="event row">
+                            <div class="col-md-6">
+                                <span>Location</span>
+                                <h2>Name</h2>
+                                <p>
+                                    <span>start</span> - <span>end</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>Category: <b>Category</b></p>
+                                <p>Type: <b>type</b></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <a href="#" class="btn btn-primary add-event-button">Add Event</a>
                 </div>
             </div>
         </div>

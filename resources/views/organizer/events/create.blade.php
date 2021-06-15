@@ -10,7 +10,7 @@
     <form method="POST" action="{{ route('organizer.events.store') }}">
       @csrf
 
-      <input type="text" name="date" value="{{ $date }}">
+      <input type="hidden" name="date" value="{{ $date }}">
 
       <div class="row">
         <div class="col-md-6 form-group">
@@ -76,7 +76,10 @@
         <input type="text" class="form-control" placeholder="documents">
       </div>
 
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <div style="form-group">
+        <a href="{{ route('organizer.events.index') }}" class="float-righ btn btn-secondary">Cancel</a>
+        <button type="submit" class="float-righ btn btn-primary">Submit</button>
+      </div>
 
       @if ($errors->any())
           <div class="alert alert-danger">

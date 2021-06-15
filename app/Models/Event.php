@@ -28,8 +28,8 @@ class Event extends Model
     ];
 
     protected $casts = [
-        'schedule_start' => 'date',
-        'schedule_end' => 'date'
+        'schedule_start' => 'datetime:Y-m-d H:i:s',
+        'schedule_end' => 'datetime:Y-m-d H:i:s'
     ];
 
     protected $appends = [

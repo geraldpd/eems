@@ -19,12 +19,12 @@ class EventController extends Controller
      */
     public function index()
     {
-            $events = Auth::user()->events->map(function($event) {
+            $events = Auth::user()->events()->with('category')->get()->map(function($event) {
                 return [
                     'id' => $event->id,
                     'title' => $event->name,
-                    'start' => $event->schedule_start,
-                    'end' => $event->schedule_end,
+                    'start' => $event->schedule_start->format('Y-m-d'),
+                    'end' => $event->schedule_end->format('Y-m-d'),
                     'event' => $event
                 ];
             })->groupBy(function ($item, $key) {
@@ -104,7 +104,7 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        //
+        dd($event);
     }
 
     /**
