@@ -41,10 +41,33 @@ class EventController extends Controller
      */
     public function create(Request $request)
     {
+        $date_range = explode(' to ', $request->date);
+        $default_event_min_time =  config('eems.default_event_min_time');
+
+        if(count($date_range) > 1) {
+            return redirect()->route('organizer.events.index')->with('message', 'Multi date event creation coming soon!');
+        }
+
         $categories = Category::all();
         $date = $request->date ? Carbon::parse($request->date) : Carbon::now();
 
-        return view('organizer.events.create', compact('categories', 'date'));
+        if($date->copy()->startOfDay() < Carbon::now()->startOfDay()) {
+            return redirect()->route('organizer.events.index')->with('message', 'Cannot add events on past dates');
+        }
+
+        $min_sched = [
+            'start' => $default_event_min_time['start'],
+            'end' => $default_event_min_time['end'],
+        ];
+
+        if($date->copy()->startOfDay() == Carbon::now()->startOfDay()) {
+            $min_sched = [
+                'start' => Carbon::now()->addHour()->toTimeString(),
+                'end' => Carbon::now()->addHours(2)->toTimeString()
+            ];
+        }
+
+        return view('organizer.events.create', compact('categories', 'date', 'min_sched'));
     }
 
     /**
@@ -71,7 +94,7 @@ class EventController extends Controller
 
         Event::create($event_data->all());
 
-        return redirect()->route('organizer.events.index')->with('success', 'Event Successfully Created');
+        return redirect()->route('organizer.events.index')->with('message', 'Event Successfully Created');
     }
 
     /**
@@ -104,7 +127,17 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        dd($event);
+        //disable editing events that is almost about to start
+        if($event->schedule_start < Carbon::now()->addHour()) {
+
+            return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
+
+        }
+
+        $categories = Category::all();
+        $event->load('category');
+
+        return view('organizer.events.edit', compact('event','categories'));
     }
 
     /**
@@ -114,10 +147,19 @@ class EventController extends Controller
      * @param  \App\Models\Event  $event
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Event $event)
+    public function update(EventRequest $request, Event $event)
     {
-        //
+        //disable editing events that is almost about to start
+        if($event->schedule_start < Carbon::now()->addHour()) {
+
+            return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
+
+        }
+
+        dd($request->validated());
     }
+
+    //? RESCHEDULE MEHTOD
 
     /**
      * Remove the specified resource from storage.

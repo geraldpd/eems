@@ -3,10 +3,10 @@
 @section('content')
     <div class="container">
 
-        @if(session()->has('success'))
-        <div class="alert alert-success">
-            {{ session()->get('success') }}
-        </div>
+        @if(session()->has('message'))
+            <div class="alert alert-info">
+                {{ session()->get('message') }}
+            </div>
         @endif
 
         <div id='calendar'></div>
