@@ -24,7 +24,6 @@ class EventRequest extends FormRequest
     public function rules()
     {
         return [
-            //'organizer_id' => ['exists:users,id'],
             'category_id' => ['required'],
             'name' => ['required'],
             'type' => ['required'],

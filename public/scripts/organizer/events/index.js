@@ -4,9 +4,7 @@ $(function() {
         date: $('#date-modal')
     }
 
-    const dates = {
-        now: moment()
-    }
+    const moment_format = 'YYYY-MM-DD';
 
     const events = Object.values(config.events).map(event => Object.values(event)).flat();
 
@@ -24,60 +22,59 @@ $(function() {
             //console.log(info.el)
         },
         dateClick: function(info) { //single date
-            dateModal(events, info, info.dateStr);
+
+            let events = config.events[info.dateStr] ?? false
+                ? constructEventList(config.events[info.dateStr])
+                : '<h3>No event scheduled for this date!</h3>';
+
+            dateModal(info, events);
         },
         select: function(info) { //multi date
-            return;
-            selected_date = `${info.startStr} to ${info.endStr}`;
-            dateModal(events, info, selected_date);
+            let start = moment(info.startStr).add(1, 'days').format(moment_format); //full calendar adds 1 day to info.endStr so we need to add 1 day to start to compensate
+            let end = moment(info.endStr).format(moment_format);
+
+            if(start == end) {
+                return;
+            }
+
+            let selected_dates = constructListOfIntervals(info.startStr, info.endStr, 'days');
+
+            let events = $.map(selected_dates, date => {
+                if(!config.events[date]) {
+                    return;
+                }
+
+                return `<h3>${date}</h3> <div class="col-md-12"> ${constructEventList(config.events[date])}</div> `
+            }).join('<br>');
+
+            dateModal(info, events)
         }
     });
 
-    function dateModal(data, info, selected_date)
+    function dateModal(info, events)
     {
         modals.date.modal('show');
-        modals.date.find('.date-title').text(`Events for ${selected_date}`);
-        modals.date.find('.add-event-button').attr('href', `${config.routes.create}?date=${selected_date}`);
+        modals.date.find('.date-title').text(`Events for ${info.dateStr}`);
+        modals.date.find('.add-event-button').attr('href', `${config.routes.create}?date=${info.dateStr}`);
+        modals.date.find('.date-events').html(events);
+    }
 
-        let events = config.events[info.dateStr] ?? false;
-
-        if(!events) {
-            modals.date.find('.date-events').html('<h3>No event scheduled for this date!</h3>');
-
-            return;
-        };
-
+    function constructEventList(events) {
         let event_row = event => {
             let date_formater = (date) => ({time: moment(date).format('hh:mm A'), day: moment(date).format('MMMM D YYYY')});
 
             /*
-                check if the start of the event is in the past
+                check if the the event is scheduled today or was in the past
                 *TRUE - do not render the edit button
                 !FALSE - render the edit button redirecting to the edit page
             */
-            let edit_button = moment().diff(event.schedule_start, 'days') > 0 ? '' : `<a href="${config.routes.edit.replace('resource_id', event.id)}" class="btn btn-primary">view</a>`;
-
-            /*
-                check if the the scheduled event is set to the current date
-            */
-            if(edit_button && moment(event.schedule_start).format('MM-DD-Y') == moment().format('MM-DD-Y')) {
-
-                /*
-                    add 1 hour to the current time and compare it to the start of the event
-                    *TRUE - when the start of the event is not yet close to the current hour, render the button
-                    !FALSE - do not allow editing of the event
-                */
-                edit_button = moment().add(1, 'hours').diff(event.schedule_start, 'hours') < 0 ? edit_button : '';
-
-            }
-
-            //? SHOULD THE EDIT BUTTON JUST BE HIDDEN WHEN THE EVENT DATE IS THE CURRENT DATE?
+            let edit_button = moment().diff(event.schedule_start, 'days') >= 0 ? '' : `<a href="${config.routes.edit.replace('resource_id', event.id)}" class="btn btn-primary">view</a>`;
 
             return `
                 <div class="event row">
                     <div class="col-md-9">
                         <small>${event.location}</small>
-                        <h2 style="padding:0px;">${event.name}</h2>
+                        <strong class="lead">${event.name}</strong>
                         <p>
                             <strong>${date_formater(event.schedule_start).time}</strong> ${date_formater(event.schedule_start).day}
                             </br>
@@ -93,9 +90,22 @@ $(function() {
 
         };
 
-        let date_events = events.map(data => event_row(data.event)).join('<hr>');
+        return events.map(data => event_row(data.event)).join('<hr>');
+    }
 
-        modals.date.find('.date-events').html(date_events);
+    function constructListOfIntervals(start, end, interval) {
+        const intervals = {};
+
+        while (moment(end).diff(start, interval) > 0) {
+          const current_end = moment(moment(start).add(1, interval)).format(moment_format);
+
+          Object.assign(intervals, { [start]: current_end });
+
+          start = current_end;
+        }
+
+        //return intervals;
+        return Object.keys(intervals);
     }
 
     calendar.render();
