@@ -26,7 +26,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="date-events">
-                        <div class="event row">
+                        <div class="event row container">
                             <div class="col-md-6">
                                 <span>Location</span>
                                 <h2>Name</h2>
@@ -52,6 +52,14 @@
 
 @push('styles')
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.css' rel='stylesheet' />
+    <style>
+        .event {
+            background-color: #e6e6e642;
+            margin-right: 5px;
+            margin-left: 5px;
+            border-radius: 12px;
+        }
+    </style>
 @endpush
 
 @push('scripts')

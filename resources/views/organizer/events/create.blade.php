@@ -26,7 +26,7 @@
       <div class="row">
         <div class="col-md-6 form-group">
           <label for="name">Start of Event</label>
-          <input type="time" id="schedule_start" name="schedule_start" value="{{ old('schedule_start') ?? $min_sched['start'] }}" class="form-control" required>
+          <input type="time" max="23:29" id="schedule_start" name="schedule_start" value="{{ old('schedule_start') ?? $min_sched['start'] }}" class="form-control" required>
 
           @if ($errors->has('schedule_start'))
           <small class="help-block text-danger">
@@ -131,5 +131,6 @@
 @endsection
 
 @push('scripts')
+  <script src="{{ asset('plugins/moment.js') }}"></script>
   <script src="{{ asset('scripts/organizer/events/create.js') }}"></script>
 @endpush

@@ -128,6 +128,13 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
+        //disable editing events that has passed its scheduled date
+        if($event->schedule_start->isPast()) {
+
+            return redirect()->route('organizer.events.index')->with('message', "Event $event->name has passed its scheduled date, editing is no longer allowed.");
+
+        }
+
         //disable editing events that is almost about to start
         if($event->schedule_start < Carbon::now()->addHour()) {
 
@@ -155,11 +162,13 @@ class EventController extends Controller
             return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
         }
 
-        if($event->organizer_id != Auth::user()-id) {
+        if($event->organizer_id != Auth::user()->id) {
             return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
         }
 
         $event->update($request->validated());
+
+        return redirect()->route('organizer.events.index')->with('message', 'Event Successfully Updated');
     }
 
     //? RESCHEDULE METHOD

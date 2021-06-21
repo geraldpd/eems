@@ -5,8 +5,9 @@
 
         <div class="float-right">
             <a href="{{ route('organizer.events.index') }}"" class="btn btn-link">Events</a>
-            &nbsp;
-            <a href="{{ route('organizer.events.edit', [$event->id]) }}"" class="btn btn-link">Edit Event</a>
+            @if(!$event->schedule_start->isPast())
+                <a href="{{ route('organizer.events.edit', [$event->id]) }}" class="btn btn-link">Edit Event</a>
+            @endif
         </div>
 
         <br>

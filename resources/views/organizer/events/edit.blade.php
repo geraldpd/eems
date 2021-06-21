@@ -101,7 +101,7 @@
 
       <div class="float-right">
         <a href="{{ route('organizer.events.index') }}" class="btn btn-link">Cancel</a>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Update</button>
       </div>
     </form>
 

@@ -75,24 +75,27 @@ $(function() {
                 *TRUE - do not render the edit button
                 !FALSE - render the edit button redirecting to the edit page
             */
-            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a href="${config.routes.edit.replace('resource_id', event.id)}" class="btn btn-link">edit</a>`;
+            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a class="float-right btn btn-link" href="${config.routes.edit.replace('resource_id', event.id)}">edit</a>`;
 
             return `
                 <div class="event row">
-                    <div class="col-md-9">
-                        <small>${event.location}</small>
-                        <strong class="lead">${event.name}</strong>
+                    <div class="col-md-8">
+                        <h2>${event.name}</h2>
                         <p>
-                            <strong>${date_formater(event.schedule_start).time}</strong> ${date_formater(event.schedule_start).day}
-                            </br>
-                            <strong>${date_formater(event.schedule_end).time}</strong> ${date_formater(event.schedule_end).day}
+                            Location: <b>${event.location}</b>
+                            <br>
+                            Category: <b>${event.category.name}</b>
+                            <br>
+                            Type: <b>${event.type}</b>
                         </p>
                     </div>
-                    <div class="col-md-3">
-                        <p>Category: <b>${event.category.name}</b></p>
-                        <p>Type: <b>${event.type}</b></p>
-                        <a href="${config.routes.show.replace('resource_id', event.id)}" class="btn btn-link">view</a>
-                        ${edit_button}
+                    <div class="col-md-4">
+                        <br>
+                        <p>
+                            <h4 class="float-right"><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
+                            <a class="float-right btn btn-link" href="${config.routes.show.replace('resource_id', event.id)}">view</a>
+                            ${edit_button}
+                        </p>
                     </div>
                 </div>`;
 
