@@ -3,6 +3,10 @@
 @section('content')
   <div class="container">
 
+    <div class="float-right">
+        <a href="{{ route('organizer.events.show', [$event->id]) }}" class="btn btn-link">See preview</a>
+    </div>
+
     <form method="POST" action="{{ route('organizer.events.update', [$event->id]) }}">
       @method('PUT')
       @csrf
@@ -95,11 +99,10 @@
         @endif
       </div>
 
-      <div style="form-group">
-        <a href="{{ route('organizer.events.index') }}" class="float-righ btn btn-secondary">Cancel</a>
-        <button type="submit" class="float-righ btn btn-primary">Submit</button>
+      <div class="float-right">
+        <a href="{{ route('organizer.events.index') }}" class="btn btn-link">Cancel</a>
+        <button type="submit" class="btn btn-primary">Submit</button>
       </div>
-
     </form>
 
   </div>

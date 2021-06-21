@@ -120,8 +120,8 @@
         @endif
       </div>
 
-      <div style="form-group">
-        <a href="{{ route('organizer.events.index') }}" class="float-righ btn btn-secondary">Cancel</a>
+      <div class="float-right">
+        <a href="{{ route('organizer.events.index') }}" class="float-righ btn btn-link">Cancel</a>
         <button type="submit" class="float-righ btn btn-primary">Submit</button>
       </div>
 

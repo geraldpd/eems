@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\EventRequest;
+use App\Http\Requests\Event\StoreRequest;
+use App\Http\Requests\Event\UpdateRequest;
 use App\Models\Category;
 use App\Models\Event;
 use Carbon\Carbon;
@@ -76,13 +77,13 @@ class EventController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(EventRequest $request)
+    public function store(StoreRequest $request)
     {
         $data = collect($request->validated());
 
         //TODO assuming that the date picked is single day
-        $schedule_start = Carbon::parse($request->schedule_start);
-        $schedule_end = Carbon::parse($request->schedule_end);
+        $schedule_start = Carbon::parse($request->schedule_start); //refers to the TIME only not the date
+        $schedule_end = Carbon::parse($request->schedule_end); //refers to the TIME only not the date
         $date = Carbon::parse($request->date);
 
         $event_data = $data->merge([
@@ -105,7 +106,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //
+        return view('organizer.events.show', compact('event'));
     }
 
     /**
@@ -147,19 +148,27 @@ class EventController extends Controller
      * @param  \App\Models\Event  $event
      * @return \Illuminate\Http\Response
      */
-    public function update(EventRequest $request, Event $event)
+    public function update(UpdateRequest $request, Event $event)
     {
         //disable editing events that is almost about to start
         if($event->schedule_start < Carbon::now()->addHour()) {
-
             return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
-
         }
 
-        dd($request->validated());
+        if($event->organizer_id != Auth::user()-id) {
+            return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
+        }
+
+        $event->update($request->validated());
     }
 
-    //? RESCHEDULE MEHTOD
+    //? RESCHEDULE METHOD
+    /*
+        public function reschedule(Event $event)
+        {
+            //
+        }
+    */
 
     /**
      * Remove the specified resource from storage.
