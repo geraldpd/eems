@@ -19,9 +19,9 @@
 
       <div class="form-group">
         <label for="name">Name of this event</label>
-        <input type="text" name="name" value="{{ $event->name }}" class="form-control" placeholder="Give this event a name!" autofocus>
+        <input type="text" name="name" value="{{ $event->name }}" class="form-control" placeholder="Give this event a name!" autofocus required>
 
-        @if ($errors->has('text'))
+        @if ($errors->has('name'))
         <small class="help-block text-danger">
           <strong>{{ $errors->first('name') }}</strong>
         </small>

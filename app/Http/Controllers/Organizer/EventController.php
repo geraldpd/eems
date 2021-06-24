@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Organizer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\StoreRequest;
 use App\Http\Requests\Event\UpdateRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Event;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+
+use App\Mail\EventInvitation;
+use Illuminate\Support\Facades\Mail;
 
 class EventController extends Controller
 {
@@ -20,19 +23,21 @@ class EventController extends Controller
      */
     public function index()
     {
-            $events = Auth::user()->events()->with('category')->get()->map(function($event) {
-                return [
-                    'id' => $event->id,
-                    'title' => $event->name,
-                    'start' => $event->schedule_start->format('Y-m-d'),
-                    'end' => $event->schedule_end->format('Y-m-d'),
-                    'event' => $event
-                ];
-            })->groupBy(function ($item, $key) {
-                return $item['event']->schedule_start->format('Y-m-d');
-            });
+        $events = Auth::user()->events()->with('category')->get()->map(function($event) {
+            return [
+                'id' => $event->id,
+                'title' => $event->name,
+                'start' => $event->schedule_start->format('Y-m-d'),
+                'end' => $event->schedule_end->format('Y-m-d'),
+                'event' => $event,
+                'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),
+            ];
+        })
+        ->groupBy(function ($item, $key) {
+            return $item['event']->schedule_start->format('Y-m-d');
+        });
 
-            return view('organizer.events.index', compact('events'));
+        return view('organizer.events.index', compact('events'));
     }
 
     /**
@@ -43,30 +48,23 @@ class EventController extends Controller
     public function create(Request $request)
     {
         $date_range = explode(' to ', $request->date);
-        $default_event_min_time =  config('eems.default_event_min_time');
+        $date = $request->date ? Carbon::parse($request->date) : Carbon::now();
 
         if(count($date_range) > 1) {
             return redirect()->route('organizer.events.index')->with('message', 'Multi date event creation coming soon!');
         }
 
-        $categories = Category::all();
-        $date = $request->date ? Carbon::parse($request->date) : Carbon::now();
-
         if($date->copy()->startOfDay() < Carbon::now()->startOfDay()) {
             return redirect()->route('organizer.events.index')->with('message', 'Cannot add events on past dates');
         }
 
+        $is_same_day = $date->copy()->startOfDay() == Carbon::now()->startOfDay(); //? check if the selected day is the same as the current date
+        $default_event_min_time =  config('eems.default_event_min_time');
+        $categories = Category::all();
         $min_sched = [
-            'start' => $default_event_min_time['start'],
-            'end' => $default_event_min_time['end'],
+            'start' => $is_same_day ? Carbon::now()->addHour()->toTimeString() : $default_event_min_time['start'],
+            'end' => $is_same_day ? Carbon::now()->addHours(2)->toTimeString() : $default_event_min_time['end']
         ];
-
-        if($date->copy()->startOfDay() == Carbon::now()->startOfDay()) {
-            $min_sched = [
-                'start' => Carbon::now()->addHour()->toTimeString(),
-                'end' => Carbon::now()->addHours(2)->toTimeString()
-            ];
-        }
 
         return view('organizer.events.create', compact('categories', 'date', 'min_sched'));
     }
@@ -106,6 +104,9 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
+
+        //Mail::to('admin@laravel.com')->send(new EventInvitation($event));
+
         return view('organizer.events.show', compact('event'));
     }
 

@@ -13,6 +13,7 @@ $(function() {
         selectable: true,
         initialView: 'dayGridMonth',
         events: events,
+        eventBorderColor: 'white',
         eventClick: info => {
             //console.log(info
             console.log(info.event.extendedProps)
