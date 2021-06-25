@@ -46,6 +46,13 @@ class Event extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function attendees()
+    {
+        return $this->belongsToMany(User::class, 'event_attendees', 'event_id', 'attendee_id')
+                ->withPivot('is_confirmed', 'id')
+                ->withTimestamps();
+    }
+
     public function getGroupDateAttribute()
     {
         return $this->schedule_start->format('d-m-y');

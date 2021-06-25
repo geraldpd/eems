@@ -28,5 +28,8 @@ class UserSeeder extends Seeder
 	        ]);
 	        $user->assignRole($role);
 		}
+
+        //run factory seeder
+
     }
 }

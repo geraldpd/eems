@@ -9,18 +9,13 @@ $(function() {
     const events = Object.values(config.events).map(event => Object.values(event)).flat();
 
     var calendar = new FullCalendar.Calendar($('#calendar').get(0), {
-        schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+        height: "auto",
         selectable: true,
         initialView: 'dayGridMonth',
         events: events,
         eventBorderColor: 'white',
         eventClick: info => {
-            //console.log(info
-            console.log(info.event.extendedProps)
-            //console.log('Event: ' + info.event.title);
-            //console.log('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-            //console.log('View: ' + info.view.type);
-            //console.log(info.el)
+            window.location.href = config.routes.show.replace('resource_id', info.event.id)
         },
         dateClick: info => { //single date
             if(!config.events[info.dateStr] && moment(info.dateStr).isBefore()) {
@@ -59,8 +54,7 @@ $(function() {
         }
     });
 
-    function dateModal(info, events, add_buton_bool = true)
-    {
+    function dateModal(info, events, add_buton_bool = true) {
         modals.date.modal('show');
         modals.date.find('.date-title').text(`Events for ${info.dateStr}`);
         modals.date.find('.add-event-button').attr('href', `${config.routes.create}?date=${info.dateStr}`).toggle(add_buton_bool);
@@ -76,12 +70,13 @@ $(function() {
                 *TRUE - do not render the edit button
                 !FALSE - render the edit button redirecting to the edit page
             */
-            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a class="float-right btn btn-link" href="${config.routes.edit.replace('resource_id', event.id)}">edit</a>`;
+            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', event.id)}">Edit</a>`;
 
             return `
                 <div class="event row">
-                    <div class="col-md-8">
-                        <h2>${event.name}</h2>
+                    <div class="col-md-7 col-sm-12">
+                        <br>
+                        <h2 class="lead">${event.name}</h2>
                         <p>
                             Location: <b>${event.location}</b>
                             <br>
@@ -90,11 +85,12 @@ $(function() {
                             Type: <b>${event.type}</b>
                         </p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-5 col-sm-12">
                         <br>
                         <p>
-                            <h4 class="float-right"><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
-                            <a class="float-right btn btn-link" href="${config.routes.show.replace('resource_id', event.id)}">view</a>
+                            <h4 class=""><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
+                            <a class=" btn btn-link" href="${config.routes.show.replace('resource_id', event.id)}">Preview</a>
+                            <a class=" btn btn-link" href="${config.routes.attendees.replace('resource_id', event.id)}">Attendees</a>
                             ${edit_button}
                         </p>
                     </div>
@@ -121,5 +117,4 @@ $(function() {
     }
 
     calendar.render();
-
-})
+});

@@ -74,8 +74,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return Str::title("$this->firtname $this->lastname");
     }
 
-    public function events()
+    public function organizedEvents() //for organizer
     {
         return $this->hasMany(Event::class, 'organizer_id');
+    }
+
+    public function attendedEvents() //for attendees
+    {
+        return $this->belongsToMany(Event::class, 'event_attendees', 'attendee_id');
     }
 }

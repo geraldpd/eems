@@ -59,6 +59,18 @@
             margin-left: 5px;
             border-radius: 12px;
         }
+
+        .fc-daygrid-event:hover{
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+
+        .fc .fc-daygrid-day.fc-day-today {
+            background: white !important;
+            border: 3px solid #2c3e50;
+        }
+
+
     </style>
 @endpush
 
@@ -68,6 +80,8 @@
             routes: @json(routes('events', null, 'organizer')),
             events: @json($events)
         }
+
+        config.routes.attendees = '{{ route('organizer.events.attendees', ['resource_id']) }}'
     </script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js'></script>
     <script src="{{ asset('plugins/moment.js') }}"></script>

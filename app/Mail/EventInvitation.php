@@ -19,14 +19,26 @@ class EventInvitation extends Mailable
      */
     public $event;
 
+    public $url;
+
+    public $is_preview;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Event $event)
+    public function __construct(Event $event, $is_preview = false)
     {
-        $this->event = $event;
+        $this->event = $event->load([
+            'organizer',
+            'category'
+        ]);
+
+        $this->url = '#';
+
+        $this->is_preview = $is_preview;
+
     }
 
     /**
@@ -39,6 +51,6 @@ class EventInvitation extends Mailable
         //return $this->view('view.name');
         return $this
             ->from('organizer@laravel.com')
-            ->view('emails.events.invitation');
+            ->markdown('emails.events.invitation');
     }
 }

@@ -4,7 +4,9 @@
   <div class="container">
 
     <div class="float-right">
-        <a href="{{ route('organizer.events.show', [$event->id]) }}" class="btn btn-link">See preview</a>
+        <a href="{{ route('organizer.events.index') }}" class="btn btn-link">Events</a>
+        <a href="{{ route('organizer.events.attendees', [$event->id]) }}" class="btn btn-link">Attendees</a>
+        <a href="{{ route('organizer.events.show', [$event->id]) }}" class="btn btn-link">Preview</a>
     </div>
 
     <form method="POST" action="{{ route('organizer.events.update', [$event->id]) }}">
@@ -107,7 +109,3 @@
 
   </div>
 @endsection
-
-@push('scripts')
-  <script src="{{ asset('scripts/organizer/events/create.js') }}"></script>
-@endpush
