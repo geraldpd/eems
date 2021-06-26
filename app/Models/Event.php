@@ -15,6 +15,7 @@ class Event extends Model
     const Cancelled = 'Cancelled';
 
     protected $fillable = [
+        'code',
         'organizer_id',
         'category_id',
         'name',
@@ -35,6 +36,11 @@ class Event extends Model
     protected $appends = [
         'group_date',
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'code';
+    }
 
     public function organizer()
     {

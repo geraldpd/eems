@@ -4,10 +4,10 @@
     <div class="container">
         <div class="row float-right">
             @if(!$event->schedule_start->isPast())
-            <a href="{{ route('organizer.events.edit', [$event->id]) }}" class="btn btn-link">Edit</a>
+            <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
             @endif
             <a href="{{ route('organizer.events.index') }}"" class="btn btn-link">Events</a>
-            <a href="{{ route('organizer.events.show', [$event->id]) }}" class="btn btn-link">Preview</a>
+            <a href="{{ route('organizer.events.show', [$event->code]) }}" class="btn btn-link">Preview</a>
         </div>
     </div>
 
@@ -18,44 +18,47 @@
 
         <h1>{{ $event->name }}</h1>
 
-        <form method="POST" action="{{ route('organizer.events.update', [$event->id]) }}">
+        <form method="POST" action="{{ route('organizer.events.update', [$event->code]) }}">
             @method('PUT')
             @csrf
 
-            <div class="input-group mb-3">
-                <input type="text" name="email" id="email" class="form-control" placeholder="Invite people to your event!" aria-label="Search by email or name">
-                <div class="input-group-append">
-                  <button class="btn btn-primary add-attendee" type="button">Invite</button>
-                </div>
-              </div>
+            <input type="text" name="email" id="email" class="form-control form-control-lg tagify--outside" placeholder="Invite people to your event!" aria-label="Search by email or name">
         </form>
-
-        <ol id="attendees-list"></ol>
-
-        <table class="table table-bordered table-condensed">
-            <thead>
-                <td class="text-center">Email</td>
-                <td class="text-center">Invitaion Sent</td>
-                <td class="text-center">Confirmed Attendance</td>
-            </thead>
-            <tbody>
-                @forelse ($event->attendees as $attendee)
-                    <tr>
-                        <td class="text-center"> {{ $attendee->email }} </td>
-                        <td class="text-center"> {{ $attendee->pivot->id }} </td>
-                        <td class="text-center"> {{ $attendee->pivot->is_confirmed }} </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td class="text-center" colspan="3"> No Attendees </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
 
     </div>
 @endsection
 
+@push('styles')
+    <style>
+        .tagify--outside{
+            border: 0;
+        }
+
+        .tagify--outside .tagify__input{
+            order: -1;
+            flex: 100%;
+            transition: .1s;
+        }
+
+        .tagify--outside .tagify__input:hover{ border-color:var(--tags-hover-border-color); }
+        .tagify--outside.tagify--focus .tagify__input{
+            transition:0s;
+            border-color: var(--tags-focus-border-color);
+        }
+    </style>
+@endpush
+
 @push('scripts')
-  <script src="{{ asset('scripts/organizer/events/attendees.js') }}"></script>
+    <script src="https://unpkg.com/@yaireo/tagify"></script>
+    <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+    <script src="{{ asset('scripts/organizer/events/attendees.js') }}"></script>
+
+    <script>
+        const config = {
+            routes: {
+                suggest_attendees : '{{ route('helpers.suggest_attendees') }}'
+            }
+        }
+    </script>
 @endpush

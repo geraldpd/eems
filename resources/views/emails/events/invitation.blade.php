@@ -1,5 +1,9 @@
+@component('mail::subcopy', ['url' => $url])
+@endcomponent
+
 @component('mail::message')
-# You have been invited to attend the {{ $event->name }}
+
+# You have been invited to attend {{ $event->name }}
 
 ### {{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}
 

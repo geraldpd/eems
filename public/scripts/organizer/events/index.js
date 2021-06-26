@@ -15,7 +15,8 @@ $(function() {
         events: events,
         eventBorderColor: 'white',
         eventClick: info => {
-            window.location.href = config.routes.show.replace('resource_id', info.event.id)
+            let event = info.event.extendedProps.event;
+            window.location.href = config.routes.show.replace('resource_id', event.code)
         },
         dateClick: info => { //single date
             if(!config.events[info.dateStr] && moment(info.dateStr).isBefore()) {
@@ -70,7 +71,7 @@ $(function() {
                 *TRUE - do not render the edit button
                 !FALSE - render the edit button redirecting to the edit page
             */
-            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', event.id)}">Edit</a>`;
+            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', event.code)}">Edit</a>`;
 
             return `
                 <div class="event row">
@@ -89,8 +90,8 @@ $(function() {
                         <br>
                         <p>
                             <h4 class=""><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
-                            <a class=" btn btn-link" href="${config.routes.show.replace('resource_id', event.id)}">Preview</a>
-                            <a class=" btn btn-link" href="${config.routes.attendees.replace('resource_id', event.id)}">Attendees</a>
+                            <a class=" btn btn-link" href="${config.routes.show.replace('resource_id', event.code)}">Preview</a>
+                            <a class=" btn btn-link" href="${config.routes.attendees.replace('resource_id', event.code)}">Attendees</a>
                             ${edit_button}
                         </p>
                     </div>

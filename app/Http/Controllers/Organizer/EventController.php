@@ -91,7 +91,10 @@ class EventController extends Controller
             'status' => Event::Pending,
         ]);
 
-        Event::create($event_data->all());
+        $event = Event::create($event_data->all());
+
+        $event->code = $this->constructEventCode($event->id);
+        $event->save();
 
         return redirect()->route('organizer.events.index')->with('message', 'Event Successfully Created');
     }
@@ -204,5 +207,17 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         //
+    }
+
+    private function constructEventCode($id)
+    {
+        $code = '';
+
+        do {
+            $code = encrypt($id);
+            $event = Event::where('code', $code)->first();
+        } while ($event);
+
+        return $code;
     }
 }

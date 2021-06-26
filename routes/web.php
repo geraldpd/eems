@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\HelperController;
 //use /HomeController;
 
 /*
@@ -29,6 +30,18 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     return redirect('/home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
-
 Route::get('/', [FrontController::class, 'index']);
 Route::get('/home', [FrontController::class, 'index']);
+
+
+//! THE FOLLOWING ROUTES ARE FOR HELPERS
+
+Route::group([
+    'prefix' =>'helpers',
+    'as' =>'helpers.',
+], function(){
+
+    Route::get('/', [HelperController::class, 'index'])->name('index');
+    Route::post('/suggest_attendees', [HelperController::class, 'suggestAttendees'])->name('suggest_attendees');
+
+});
