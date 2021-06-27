@@ -45,6 +45,7 @@
             transition:0s;
             border-color: var(--tags-focus-border-color);
         }
+
     </style>
 @endpush
 

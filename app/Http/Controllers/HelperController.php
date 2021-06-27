@@ -34,28 +34,31 @@ class HelperController extends Controller
      */
     public function suggestAttendees(Request $request)
     {
-        return User::where(function($query) use ($request){
-            return $query
-            ->where('email', 'LIKE', "%{$request->keyword}%")
-            ->orWhere(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), 'LIKE', '%' . $request->keyword . '%');
-        })
-        ->whereHas('roles', function($query) {
-            return $query->where('name', 'attendee');
-        })
-        ->select(
-            DB::raw("CONCAT(`firstname`, ' ', `lastname`) as name"),
-            'email',
-            'id'
-        )
-        ->get()
-        ->collect()
-        ->mapWithKeys(function ($item) {
-            return [
-                'email' => $item['email'],
-                'name' => $item['name'],
-                'id' => $item['id']
-            ];
-        });
+        $query = User::query()
+            ->where(function($query) use ($request){
+                return $query
+                ->where('email', 'LIKE', "%{$request->keyword}%")
+                ->orWhere(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), 'LIKE', '%' . $request->keyword . '%');
+            })
+            ->whereHas('roles', function($query) {
+                return $query->where('name', 'attendee');
+            })
+            ->select(
+                DB::raw("CONCAT(`firstname`, ' ', `lastname`) as name"),
+                'email'
+            )
+            ->get()
+            ->collect()
+            ->transform(function($item) {
+                return [
+                    'value' => $item['email'],
+                    'email' => $item['email'],
+                    'name' => $item['name'],
+                ];
+            })
+            ->toArray();
+
+        return $query;
     }
 
 }
