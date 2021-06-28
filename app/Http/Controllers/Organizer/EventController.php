@@ -107,25 +107,9 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $preview = new EventInvitation($event, true);
+        $preview = new EventInvitation($event, Auth::user()->email, Auth::user()->email);
 
         return view('organizer.events.show', compact('event', 'preview'));
-    }
-
-    /**
-     * Manage attendees of the resource
-     *
-     * @param  \App\Models\Event  $event
-     * @return \Illuminate\Http\Response
-     */
-    public function attendees(Event $event)
-    {
-        //Mail::to('admin@laravel.com')->send(new EventInvitation($event));
-
-        $event->load(['attendees']);
-
-        //dd($event);
-        return view('organizer.events.attendees', compact('event'));
     }
 
     /**

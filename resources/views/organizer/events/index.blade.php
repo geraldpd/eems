@@ -81,7 +81,7 @@
             events: @json($events)
         }
 
-        config.routes.attendees = '{{ route('organizer.events.attendees', ['resource_id']) }}'
+        config.routes.invitations = '{{ route('organizer.invitations.index', ['resource_id']) }}'
     </script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js'></script>
     <script src="{{ asset('plugins/moment.js') }}"></script>

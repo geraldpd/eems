@@ -1,7 +1,38 @@
 $(function() {
 
-    var input = document.querySelector('#email');
-    var tagify = new Tagify(input, {
+    var send_invitation_button = $('.send-invitation');
+
+    var invitees = $('#invitees');
+
+    var tagTemplate = function(tagData){
+        return `
+            <tag title="${(tagData.title || tagData.name)}"
+                    contenteditable='false'
+                    spellcheck='false'
+                    tabIndex="-1"
+                    class="${this.settings.classNames.tag} ${tagData.class ? tagData.class : ""}"
+                    ${this.getAttributes(tagData)}>
+                <x title='' class='tagify__tag__removeBtn' role='button' aria-label='remove tag'></x>
+                <div>
+
+                    <span class='tagify__tag-text'>${tagData.email}</span>
+                </div>
+            </tag>
+        `
+    }
+
+    var suggestionItemTemplate = function(tagData){
+        return `
+            <div ${this.getAttributes(tagData)}
+                class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'
+                tabindex="0"
+                role="option">
+                <strong>${tagData.name}</strong> - <span>${tagData.email}</span>
+            </div>
+        `
+    }
+
+    var tagify = new Tagify(invitees.get(0), {
         pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         enforceWhitelist : false,
         //delimiters : null,
@@ -26,10 +57,7 @@ $(function() {
         }
     });
 
-    tagify.on('input', tagifyOnInput);
-    //tagify.on('dropdown:show dropdown:updated', onDropdownShow)
-
-    function tagifyOnInput(e) {
+    function onInputTag(e) {
         tagify.whitelist = null; // reset current whitelist
         tagify.loading(true) // show the loader animation
 
@@ -41,37 +69,28 @@ $(function() {
         .catch(function (error) {
           console.warn(error);
         });
-
     }
 
-    function tagTemplate(tagData){
-        return `
-            <tag title="${(tagData.title || tagData.name)}"
-                    contenteditable='false'
-                    spellcheck='false'
-                    tabIndex="-1"
-                    class="${this.settings.classNames.tag} ${tagData.class ? tagData.class : ""}"
-                    ${this.getAttributes(tagData)}>
-                <x title='' class='tagify__tag__removeBtn' role='button' aria-label='remove tag'></x>
-                <div>
-
-                    <span class='tagify__tag-text'>${tagData.email}</span>
-                </div>
-            </tag>
-        `
+    function onAddTag(e) {
+        //do something
     }
 
-    function suggestionItemTemplate(tagData){
-        return `
-            <div ${this.getAttributes(tagData)}
-                class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'
-                tabindex="0"
-                role="option">
-                <strong>${tagData.name}</strong> - <span>${tagData.email}</span>
-            </div>
-        `
+    function onRemoveTag(e) {
+        tagify.value.length ? send_invitation_button.removeAttr('disabled') : send_invitation_button.attr('disabled', true)
     }
 
-    console.log(tagify)
+    function onEditTag(e) {
+        tagify.value.length ? send_invitation_button.removeAttr('disabled') : send_invitation_button.attr('disabled', true)
+    }
+
+    function onTagifyFocusBlur(e) {
+        tagify.value.length ? send_invitation_button.removeAttr('disabled') : send_invitation_button.attr('disabled', true)
+    }
+
+    tagify.on('input', onInputTag)
+          .on('add', onAddTag)
+          .on('add', onEditTag)
+          .on('remove', onRemoveTag)
+          .on('blur', onTagifyFocusBlur)
 
 })

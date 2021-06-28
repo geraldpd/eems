@@ -16,14 +16,33 @@
 
     <div class="container">
 
+        @if(session()->has('message'))
+            <div class="alert alert-info">
+                {{ session()->get('message') }}
+            </div>
+        @endif
+
         <h1>{{ $event->name }}</h1>
 
-        <form method="POST" action="{{ route('organizer.events.update', [$event->code]) }}">
-            @method('PUT')
+        <form method="POST" action="{{ route('organizer.invitations.store', [$event->code]) }}">
             @csrf
 
-            <input type="text" name="email" id="email" class="form-control form-control-lg tagify--outside" placeholder="Invite people to your event!" aria-label="Search by email or name">
+            <div class="input-group mb-3">
+                <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-primary send-invitation" disabled type="submit">SEND INVITATION</button>
+                </div>
+              </div>
+
+              @if ($errors->has('invitees'))
+                @php
+                    dd($errors);
+                @endphp
+              @endif
         </form>
+
+        <br>
+        <br>
 
     </div>
 @endsection
@@ -40,7 +59,9 @@
             transition: .1s;
         }
 
-        .tagify--outside .tagify__input:hover{ border-color:var(--tags-hover-border-color); }
+        .tagify--outside .tagify__input:hover{
+            border-color:var(--tags-hover-border-color);
+        }
         .tagify--outside.tagify--focus .tagify__input{
             transition:0s;
             border-color: var(--tags-focus-border-color);

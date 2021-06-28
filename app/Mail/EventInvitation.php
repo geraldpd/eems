@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Jobs\SendEventInvitation;
 use App\Models\Event;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,26 +20,28 @@ class EventInvitation extends Mailable
      */
     public $event;
 
-    public $url;
+    public $sender;
 
-    public $is_preview;
+    public $recipient;
+
+    public $url;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Event $event, $is_preview = false)
+    public function __construct(Event $event, $sender, $recipient)
     {
         $this->event = $event->load([
             'organizer',
             'category'
         ]);
 
-        $this->url = '#';
+        $this->sender = $sender;
+        $this->recipient = $recipient;
 
-        $this->is_preview = $is_preview;
-
+        $this->url = route('organizer.events.show', [$event->code]);
     }
 
     /**
@@ -48,9 +51,8 @@ class EventInvitation extends Mailable
      */
     public function build()
     {
-        //return $this->view('view.name');
         return $this
-            ->from('organizer@laravel.com')
+            ->from($this->sender)
             ->markdown('emails.events.invitation');
     }
 }

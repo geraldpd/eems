@@ -16,6 +16,6 @@ Route::group([
 ], function(){
     Route::get('/', HomeController::class);
 
-    Route::get('events/{event}/attendees', [ControllerEvent::class, 'attendees'])->name('events.attendees'); //? Manage Attendees
+    Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
     Route::resource('events', EventController::class);
 });

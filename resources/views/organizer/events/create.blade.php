@@ -17,9 +17,9 @@
         <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="Give this event a name!" autofocus>
 
         @if ($errors->has('name'))
-        <small class="help-block text-danger">
-          <strong>{{ $errors->first('name') }}</strong>
-        </small>
+          <small class="help-block text-danger">
+            <strong>{{ $errors->first('name') }}</strong>
+          </small>
         @endif
       </div>
 
@@ -29,9 +29,9 @@
           <input type="time" max="23:29" id="schedule_start" name="schedule_start" value="{{ old('schedule_start') ?? $min_sched['start'] }}" class="form-control" required>
 
           @if ($errors->has('schedule_start'))
-          <small class="help-block text-danger">
-            <strong>{{ $errors->first('schedule_start') }}</strong>
-          </small>
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('schedule_start') }}</strong>
+            </small>
           @endif
         </div>
 
@@ -40,9 +40,9 @@
           <input type="time" id="schedule_end" name="schedule_end" value="{{ old('schedule_end') ?? $min_sched['end'] }}" class="form-control" required>
 
           @if ($errors->has('schedule_end'))
-          <small class="help-block text-danger">
-            <strong>{{ $errors->first('schedule_end') }}</strong>
-          </small>
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('schedule_end') }}</strong>
+            </small>
           @endif
         </div>
       </div>
@@ -53,14 +53,14 @@
           <select name="category_id" id="category_id" class="form-control">
             <option value=""> Select Category </option>
               @foreach ($categories as $category)
-              <option {{ old('category_id') == $category->id ? 'selected' : '' }} value="{{ $category->id }}"> {{ $category->name }} </option>
+                <option {{ old('category_id') == $category->id ? 'selected' : '' }} value="{{ $category->id }}"> {{ $category->name }} </option>
               @endforeach
           </select>
 
           @if ($errors->has('category_id'))
-          <small class="help-block text-danger">
-            <strong>{{ $errors->first('category_id') }}</strong>
-          </small>
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('category_id') }}</strong>
+            </small>
           @endif
         </div>
 
@@ -69,14 +69,14 @@
           <select name="type" id="type" class="form-control">
             <option value=""> Select Event Type </option>
               @foreach (config('eems.event_types') as $type)
-              <option {{ old('type') == $type ? 'selected' : '' }} value="{{ $type }}"> {{ $type }} </option>
+                <option {{ old('type') == $type ? 'selected' : '' }} value="{{ $type }}"> {{ $type }} </option>
               @endforeach
           </select>
 
           @if ($errors->has('type'))
-          <small class="help-block text-danger">
-            <strong>{{ $errors->first('type') }}</strong>
-          </small>
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('type') }}</strong>
+            </small>
           @endif
         </div>
       </div>
@@ -86,9 +86,9 @@
         <textarea class="form-control" name="description" id="description" cols="30" rows="10">{{ old('description') }}</textarea>
 
         @if ($errors->has('description'))
-        <small class="help-block text-danger">
-          <strong>{{ $errors->first('description') }}</strong>
-        </small>
+          <small class="help-block text-danger">
+            <strong>{{ $errors->first('description') }}</strong>
+          </small>
         @endif
       </div>
 
@@ -101,9 +101,9 @@
         </select>
 
         @if ($errors->has('location'))
-        <small class="help-block text-danger">
-          <strong>{{ $errors->first('location') }}</strong>
-        </small>
+          <small class="help-block text-danger">
+            <strong>{{ $errors->first('location') }}</strong>
+          </small>
         @endif
       </div>
 
@@ -112,9 +112,9 @@
         <input type="text" {{ old('documents') }}class="form-control" placeholder="documents">
 
         @if ($errors->has('documents'))
-        <small class="help-block text-danger">
-          <strong>{{ $errors->first('documents') }}</strong>
-        </small>
+          <small class="help-block text-danger">
+            <strong>{{ $errors->first('documents') }}</strong>
+          </small>
         @endif
       </div>
 
