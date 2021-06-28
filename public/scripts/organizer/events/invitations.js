@@ -1,5 +1,7 @@
 $(function() {
 
+    var table = $('.table');
+
     var send_invitation_button = $('.send-invitation');
 
     var invitees = $('#invitees');
@@ -35,7 +37,6 @@ $(function() {
     var tagify = new Tagify(invitees.get(0), {
         pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         enforceWhitelist : false,
-        //delimiters : null,
         tagTextProp: 'email', // very important since a custom template is used with this property as text
         templates: {
             tag: tagTemplate,
@@ -61,7 +62,10 @@ $(function() {
         tagify.whitelist = null; // reset current whitelist
         tagify.loading(true) // show the loader animation
 
-        axios.post(config.routes.suggest_attendees, {keyyword: e.detail.value})
+        axios.post(config.routes.suggest_attendees, {
+            keyyword: e.detail.value,
+            event_id: config.event.id
+        })
         .then(function (response) {
             tagify.whitelist = response.data;
             tagify.loading(false);
@@ -93,4 +97,15 @@ $(function() {
           .on('remove', onRemoveTag)
           .on('blur', onTagifyFocusBlur)
 
+    $.noConflict();
+    $(table).DataTable({
+        language: {
+            search: "",
+            searchPlaceholder: "Seach Invited Guests",
+        },
+        bLengthChange: false,
+        bFilter: true,
+        bInfo: false,
+        bAutoWidth: false
+    });
 })

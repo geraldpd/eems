@@ -91,7 +91,7 @@ $(function() {
                         <p>
                             <h4 class=""><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
                             <a class=" btn btn-link" href="${config.routes.show.replace('resource_id', event.code)}">Preview</a>
-                            <a class=" btn btn-link" href="${config.routes.attendees.replace('resource_id', event.code)}">Attendees</a>
+                            <a class=" btn btn-link" href="${config.routes.invitations.replace('resource_id', event.code)}">Attendees</a>
                             ${edit_button}
                         </p>
                     </div>

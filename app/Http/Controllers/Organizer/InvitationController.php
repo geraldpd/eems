@@ -20,9 +20,9 @@ class InvitationController extends Controller
      */
     public function index(Event $event)
     {
-        $event->load(['attendees']);
+        $event->load(['attendees', 'invitations']);
 
-        return view('organizer.events.attendees', compact('event'));
+        return view('organizer.events.invitation', compact('event'));
     }
 
     public function store(Request $request, Event $event)

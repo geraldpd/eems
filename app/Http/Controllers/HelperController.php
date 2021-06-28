@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 
 class HelperController extends Controller
 {
@@ -28,7 +28,7 @@ class HelperController extends Controller
     }
 
     /**
-     * search users table for for emails with similar keyword
+     * search attendees from users table for for emails with similar keyword
      * @param string
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -42,6 +42,12 @@ class HelperController extends Controller
             })
             ->whereHas('roles', function($query) {
                 return $query->where('name', 'attendee');
+            })
+            ->when($request->has('event_id'), function($query) {
+                $event = Event::find(request()->event_id)->load('invitations');
+                $invited_emails = $event->invitations->pluck('email');
+
+                return $query->whereNotIn('email', $invited_emails);
             })
             ->select(
                 DB::raw("CONCAT(`firstname`, ' ', `lastname`) as name"),
