@@ -58,7 +58,7 @@
                         <th>Confirmed</th>
                     </thead>
                     <tbody>
-                        @forelse ($event->invitations->sortByDesc('created_at') as $invitee)
+                        @forelse ($event->invitations->sortBy('created_at') as $invitee)
                             <tr>
                                 <td style="display:none">{{ $invitee->created_at }}</td> <!-- just for ordering -->
                                 <td>{{ $invitee->email }}</td>

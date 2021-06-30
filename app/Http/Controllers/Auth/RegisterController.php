@@ -77,7 +77,7 @@ class RegisterController extends Controller
         $event = false;
 
         //if a code(event) is specified, check its validity
-        if($data['code']) {
+        if(isset($data['code'])) {
             try {
               $event = Event::whereCode($data['code'])->firstOrFail();
             } catch (ModelNotFoundException $e) {
@@ -96,11 +96,25 @@ class RegisterController extends Controller
         $user->assignRole('attendee');
 
         if($event) {
-            $event->attendees()->attach($event->id, [
+            $event->attendees()->attach($user->id, [
                 'is_confirmed'=> 1
             ]);
         }
 
         return $user;
+    }
+
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function registered(Request $request, $user)
+    {
+        return route();
+        //$event = $request->has('code') ? Event::whereCode($data['code'])->first() : false;
+        //return redirect()->route('verification.notice', compact('event'))
     }
 }

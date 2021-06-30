@@ -26,7 +26,9 @@ class Attendee
 
         if (in_array($role_id, [1, 2]))
         {
-            return redirect()->route('/');
+            $index = Auth::user()->roles->first()->id - 1;
+            return redirect()->route(config('eems.roles')[$index].".");
+            //return redirect()->route('/');
         }
 
         return $next($request);

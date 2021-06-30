@@ -3,12 +3,6 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
-use App\Http\Controllers\Organizer\ {
-    EventController as ControllerEvent
-};
-
-
 Auth::routes(['register' => false]);
 
 Route::group([

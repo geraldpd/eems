@@ -22,11 +22,10 @@ class Organizer
             return redirect()->route('organizer.login');
         }
 
-        $role_id = Auth::user()->roles->first()->id;
-
-        if (in_array($role_id, [1, 3]))
+        if (in_array(Auth::user()->roles->first()->id, [1, 3]))
         {
-            return redirect()->route('/organizer');
+            $index = Auth::user()->roles->first()->id - 1;
+            return redirect()->route(config('eems.roles')[$index].".");
         }
 
         return $next($request);

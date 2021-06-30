@@ -101,6 +101,7 @@ $(function() {
     $.noConflict();
 
     $(table).DataTable({
+        order: [[0, 'desc']],
         columnDefs: [
             {
                 "targets": [ 0 ],

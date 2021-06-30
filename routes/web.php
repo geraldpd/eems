@@ -34,7 +34,8 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 Route::get('/', [FrontController::class, 'index']);
 Route::get('/home', [FrontController::class, 'index']);
 
-Route::get('/event/{event}/{email}/invitation', [EventController::class, 'invitation'])->name('event.invitation');
+Route::get('/events/{event}/{email}/invitation', [EventController::class, 'invitation'])->name('event.invitation');
+Route::resource('events', EventController::class)->only(['show', 'index']);
 
 //! THE FOLLOWING ROUTES ARE FOR HELPERS
 Route::group([

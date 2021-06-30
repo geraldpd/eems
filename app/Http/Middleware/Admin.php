@@ -26,7 +26,9 @@ class Admin
 
         if (in_array($role_id, [2, 3]))
         {
-            return redirect()->route('/admin');
+            $index = Auth::user()->roles->first()->id - 1;
+            return redirect()->route(config('eems.roles')[$index].".");
+            //return redirect()->route('/admin');
         }
 
         return $next($request);
