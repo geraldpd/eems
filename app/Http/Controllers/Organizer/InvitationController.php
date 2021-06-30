@@ -21,7 +21,7 @@ class InvitationController extends Controller
      */
     public function index(Event $event)
     {
-        $event->load(['attendees.invitation', 'invitations']);
+        $event->load(['invitations.attendee']);
 
         return view('organizer.events.invitation', compact('event'));
     }

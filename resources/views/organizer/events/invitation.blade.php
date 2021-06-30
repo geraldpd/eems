@@ -62,7 +62,7 @@
                             <tr>
                                 <td style="display:none">{{ $invitee->created_at }}</td> <!-- just for ordering -->
                                 <td>{{ $invitee->email }}</td>
-                                <td>{{ $invitee->id }}</td>
+                                <td>{{ $invitee->attendee ? '' : $invitee->attendee }}</td>
                             </tr>
                         @empty
                             No one is invited yet

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -59,6 +62,7 @@ class RegisterController extends Controller
             'mobile_number' => ['required', 'string', 'max:11', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'code' => ['nullable', 'exists:events'],
         ]);
     }
 
@@ -70,6 +74,17 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $event = false;
+
+        //if a code(event) is specified, check its validity
+        if($data['code']) {
+            try {
+              $event = Event::whereCode($data['code'])->firstOrFail();
+            } catch (ModelNotFoundException $e) {
+              return abort(404); //TODO: specif why the an error occured to the user
+            }
+        }
+
         $user = User::create([
             'firstname' => $data['firstname'],
             'lastname' => $data['lastname'],
@@ -79,6 +94,12 @@ class RegisterController extends Controller
         ]);
 
         $user->assignRole('attendee');
+
+        if($event) {
+            $event->attendees()->attach($event->id, [
+                'is_confirmed'=> 1
+            ]);
+        }
 
         return $user;
     }

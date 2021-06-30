@@ -21,6 +21,6 @@ class Invitation extends Model
 
     public function attendee()
     {
-        return $this->hasOne(User::class, 'email');
+        return $this->belongsTo(User::class, 'email');
     }
 }
