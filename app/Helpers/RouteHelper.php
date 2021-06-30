@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-if (!function_exists('routes')) {
+if (! function_exists('routes')) {
     function routes($section, $parent = null, $end = 'admin')
     {
         return collect([

@@ -1,6 +1,3 @@
-@component('mail::subcopy', ['url' => $url])
-@endcomponent
-
 @component('mail::message')
 
 # You have been invited to attend {{ $event->name }}
@@ -14,7 +11,7 @@ Category: <strong>{{ $event->category->name }}</strong> | Type: <strong>{{ $even
 
 {!! $event->description !!}
 
-@component('mail::button', ['url' => $url])
+@component('mail::button', ['url' => $invitation_link])
     confirm invitation
 @endcomponent
 

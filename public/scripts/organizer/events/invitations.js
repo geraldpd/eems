@@ -36,6 +36,7 @@ $(function() {
 
     var tagify = new Tagify(invitees.get(0), {
         pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        blacklist : config.event.blacklist,
         enforceWhitelist : false,
         tagTextProp: 'email', // very important since a custom template is used with this property as text
         templates: {
@@ -98,7 +99,14 @@ $(function() {
           .on('blur', onTagifyFocusBlur)
 
     $.noConflict();
+
     $(table).DataTable({
+        columnDefs: [
+            {
+                "targets": [ 0 ],
+                "visible": false
+            }
+        ],
         language: {
             search: "",
             searchPlaceholder: "Seach Invited Guests",

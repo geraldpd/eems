@@ -24,7 +24,7 @@ class EventInvitation extends Mailable
 
     public $recipient;
 
-    public $url;
+    public $invitation_link;
 
     /**
      * Create a new message instance.
@@ -39,9 +39,9 @@ class EventInvitation extends Mailable
         ]);
 
         $this->sender = $sender;
-        $this->recipient = $recipient;
+        $this->recipient = $recipient; // email of the recipient
 
-        $this->url = route('organizer.events.show', [$event->code]);
+        $this->invitation_link = eventHelperGetInvitationLink($event, $recipient);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 class FrontController extends Controller
@@ -24,7 +25,7 @@ class FrontController extends Controller
      */
     public function index()
     {
-        return view('welcome');
+        return view('front.welcome');
     }
 
     public function home()

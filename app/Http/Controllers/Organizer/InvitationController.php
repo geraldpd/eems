@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\Invitation;
 
 use App\Jobs\SendEventInvitation;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class InvitationController extends Controller
@@ -20,7 +21,7 @@ class InvitationController extends Controller
      */
     public function index(Event $event)
     {
-        $event->load(['attendees', 'invitations']);
+        $event->load(['attendees.invitation', 'invitations']);
 
         return view('organizer.events.invitation', compact('event'));
     }
@@ -29,13 +30,18 @@ class InvitationController extends Controller
     {
         $newly_invited = collect(json_decode($request->invitees))->pluck('email')->unique();
 
-        $invitations = array_diff($newly_invited->toArray(), $event->invitations->pluck('email')->toArray()); //get only emai that has not been invited yet
+        /*
+            *get only the emails that has not been invited yet in case a duplicate email has been inserted
+        */
+        $invitations = array_diff($newly_invited->toArray(), $event->invitations->pluck('email')->toArray());
 
         $recipients = collect($invitations)
             ->map(function($email) use ($event){
                 return [
                     'event_id' => $event->id,
-                    'email' => $email
+                    'email' => $email,
+                    'updated_at' => Carbon::now(),
+                    'created_at' => Carbon::now(),
                 ];
             })
             ->toArray();

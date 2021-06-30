@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row float-right">
             @if(!$event->schedule_start->isPast())
-            <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
+                <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
             @endif
             <a href="{{ route('organizer.events.index') }}"" class="btn btn-link">Events</a>
             <a href="{{ route('organizer.events.show', [$event->code]) }}" class="btn btn-link">Preview</a>
@@ -25,38 +25,44 @@
         <h1>{{ $event->name }}</h1>
 
         <div class="row">
-            <div class="col-md-8">
-                <form method="POST" action="{{ route('organizer.invitations.store', [$event->code]) }}">
-                    @csrf
+            @if(!$event->schedule_start->isPast())
+                <div class="col-md-8">
+                    <form method="POST" action="{{ route('organizer.invitations.store', [$event->code]) }}">
+                        @csrf
 
-                    <div class="input-group mb-3">
-                        <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                        <div class="input-group-append">
-                        <button class="btn btn-primary send-invitation" disabled type="submit">SEND INVITATION</button>
+                        <div class="input-group mb-3">
+                            <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                            <button class="btn btn-primary send-invitation" disabled type="submit">SEND INVITATION</button>
+                            </div>
                         </div>
-                    </div>
 
-                    @if ($errors->has('invitees'))
-                        @php
-                            dd($errors);
-                        @endphp
-                    @endif
-                </form>
+                        @if ($errors->has('invitees'))
+                            @php
+                                dd($errors);
+                            @endphp
+                        @endif
+                    </form>
 
-                <br>
-                <br>
+                    <br>
+                    <br>
 
-            </div>
+                </div>
+            @endif
 
-            <div class="col-md-4">
+            <div class="col-md-{{ !$event->schedule_start->isPast() ? '4' : '12'}}">
                 <table class="table table-bordered table-condensed table-hover">
                     <thead class="none">
+                        <th style="display:none">created_at</th> <!-- just for ordering -->
                         <th>Invited Guests</th>
+                        <th>Confirmed</th>
                     </thead>
                     <tbody>
-                        @forelse ($event->invitations as $invitee)
+                        @forelse ($event->invitations->sortByDesc('created_at') as $invitee)
                             <tr>
+                                <td style="display:none">{{ $invitee->created_at }}</td> <!-- just for ordering -->
                                 <td>{{ $invitee->email }}</td>
+                                <td>{{ $invitee->id }}</td>
                             </tr>
                         @empty
                             No one is invited yet
@@ -128,7 +134,8 @@
                 suggest_attendees : '{{ route('helpers.suggest_attendees') }}'
             },
             event: {
-                id: {{ $event->id }}
+                id: {{ $event->id }},
+                blacklist: @json($event->invitations->pluck('email'))
             }
         }
     </script>
