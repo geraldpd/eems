@@ -5,8 +5,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\HelperController;
 
 use App\Http\Controllers\FrontController;
-use App\Http\Controllers\EventController;
-//use /HomeController;
+use App\Http\Controllers\EventController as Event;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +33,7 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 Route::get('/', [FrontController::class, 'index']);
 Route::get('/home', [FrontController::class, 'index']);
 
-Route::get('/events/{event}/{email}/invitation', [EventController::class, 'invitation'])->name('event.invitation');
+Route::get('/events/{event}/{email}/invitation', [Event::class, 'invitation'])->name('event.invitation');
 Route::resource('events', EventController::class)->only(['show', 'index']);
 
 //! THE FOLLOWING ROUTES ARE FOR HELPERS

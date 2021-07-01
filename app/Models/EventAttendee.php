@@ -8,5 +8,4 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class EventAttendee extends Pivot
 {
     use HasFactory;
-
 }

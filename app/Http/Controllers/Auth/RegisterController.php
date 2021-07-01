@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Providers\RouteServiceProvider;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
 class RegisterController extends Controller
 {
     /*
@@ -81,7 +83,7 @@ class RegisterController extends Controller
             try {
               $event = Event::whereCode($data['code'])->firstOrFail();
             } catch (ModelNotFoundException $e) {
-              return abort(404); //TODO: specif why the an error occured to the user
+              return abort(404); //TODO: specif why an error occured to the user
             }
         }
 
@@ -104,6 +106,33 @@ class RegisterController extends Controller
         return $user;
     }
 
+      /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        $user = $this->create($request->all());
+
+        if(! $request->has('code')) {
+            event(new Registered($user));
+        }
+
+        $this->guard()->login($user);
+
+        if ($response = $this->registered($request, $user)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+                    ? new JsonResponse([], 201)
+                    : redirect($this->redirectPath());
+    }
+
     /**
      * The user has been registered.
      *
@@ -113,8 +142,11 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
-        return route();
-        //$event = $request->has('code') ? Event::whereCode($data['code'])->first() : false;
-        //return redirect()->route('verification.notice', compact('event'))
+        if($request->has('code')) {
+            $user->email_verified_at = Carbon::now();
+            $user->save();
+
+            return redirect()->route('events.show', [$request->code])->with('message', 'Successfuly confirmed invitation');
+        }
     }
 }

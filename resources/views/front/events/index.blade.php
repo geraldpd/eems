@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-    all events here
+
+    @forelse ($events as $event)
+        {! $event !}
+    @empty
+        No Event
+    @endforelse
 @endsection

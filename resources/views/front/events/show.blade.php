@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+
+    @if(session()->has('message'))
+        <div class="alert alert-info">
+            {{ session()->get('message') }}
+        </div>
+    @endif
+
     <div class="container">
         <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
             <div class="my-3 py-3">

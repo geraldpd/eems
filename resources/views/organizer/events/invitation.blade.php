@@ -54,15 +54,15 @@
                 <table class="table table-bordered table-condensed table-hover">
                     <thead class="none">
                         <th style="display:none">created_at</th> <!-- just for ordering -->
-                        <th>Invited Guests</th>
-                        <th>Confirmed</th>
+                        <th>Invited</th>
+                        <th class="text-center">Confirmed</th>
                     </thead>
                     <tbody>
-                        @forelse ($event->invitations->sortBy('created_at') as $invitee)
+                        @forelse ($event->invitations->sortBy('created_at') as $invitation)
                             <tr>
-                                <td style="display:none">{{ $invitee->created_at }}</td> <!-- just for ordering -->
-                                <td>{{ $invitee->email }}</td>
-                                <td>{{ $invitee->attendee ? '' : $invitee->attendee }}</td>
+                                <td style="display:none">{{ $invitation->created_at }}</td> <!-- just for ordering -->
+                                <td>{{ $invitation->guest?->email ?? $invitation->email }}</td>
+                                <td class="text-center">{{ $invitation->guest?->has_confirmed }}</td>
                             </tr>
                         @empty
                             No one is invited yet

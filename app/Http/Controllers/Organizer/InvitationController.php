@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Organizer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\User;
 use App\Models\Invitation;
 
 use App\Jobs\SendEventInvitation;
@@ -21,7 +22,22 @@ class InvitationController extends Controller
      */
     public function index(Event $event)
     {
-        $event->load(['invitations.attendee']);
+        $event->load(['invitations.guest', 'attendees']);
+
+        $attendees = $event->attendees;
+
+        $event->invitations->map(function($invitation) use ($attendees) {
+            if(! $invitation->guest) return $invitation;
+
+            $invitation->guest->has_confirmed = '';
+
+            if(in_array($invitation->guest->email, $attendees->pluck('email')->all())) {
+                $invitation->guest->has_confirmed = 'YES';
+            }
+
+            return $invitation;
+        });
+
 
         return view('organizer.events.invitation', compact('event'));
     }
@@ -48,13 +64,8 @@ class InvitationController extends Controller
 
         Invitation::insert($recipients);
 
-        $this->send($event, $recipients);
+        SendEventInvitation::dispatch($event, Auth::user()->email, collect($recipients)->pluck('email'));
 
         return  redirect()->back()->with('message', 'Invitations are on their way!');
-    }
-
-    private function send(Event $event, $recipients)
-    {
-        SendEventInvitation::dispatch($event, Auth::user()->email, collect($recipients)->pluck('email'));
     }
 }

@@ -29,7 +29,7 @@ $(function() {
                 class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'
                 tabindex="0"
                 role="option">
-                <strong>${tagData.name}</strong> - <span>${tagData.email}</span>
+                <h4 style="margin:0px;">${tagData.name}</h4> <span>${tagData.email}</span>
             </div>
         `
     }

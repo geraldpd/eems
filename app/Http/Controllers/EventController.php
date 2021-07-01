@@ -14,7 +14,9 @@ class EventController extends Controller
 
     public function index()
     {
-        return view('front.events.index', compact('event'));
+        $events = Event::query();
+
+        return view('front.events.index', compact('events'));
     }
 
     public function show(Event $event)
@@ -22,33 +24,36 @@ class EventController extends Controller
         return view('front.events.show', compact('event'));
     }
 
-    public function invitation(Event $event, $email)
+    public function invitation(Event $event, $encrypted_email)
     {
-        // check if the email can be decrypted
         try {
-            $email = decrypt($email);
+            $email = decrypt($encrypted_email);
         } catch (DecryptException $e) {
-           return abort(404);
+           return abort(404); //in the future updates, put more information why we returned 404
         }
 
-        // check whether the email exists in the users table
+        $has_invitation = $event->invitations()->whereEmail($email)->exists();
+        if(! $has_invitation) {
+            return redirect()->route('events.show', [$event->code])->with('message', 'OoOps!You are not invited to this event');
+        }
+
         $invitee = User::whereEmail($email)->first();
 
-        //when no user is found with that email
         if(! $invitee) {
 
             Auth::logout();
             request()->session()->invalidate();
             request()->session()->regenerateToken();
 
-            return redirect()->route('register', ['event' => $event->code, 'email' => $email]);
+            return redirect()->route('register', ['event' => $event->code, 'email' => $encrypted_email]);
         }
 
-        //
         Auth::login($invitee);
 
-        //check if this email has already accepted the invitation for this event
-        //$event->
+        $event->attendees()->attach($invitee->id, [
+              'is_confirmed'=> 1
+        ]);
 
+        return redirect()->route('events.show', [$event->code])->with('message', 'Successfuly confirmed invitation');
     }
 }
