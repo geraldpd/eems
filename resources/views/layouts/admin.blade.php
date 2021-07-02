@@ -18,7 +18,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
+    <link href="{{ asset('plugins/datatable/datatable.bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ asset('plugins/datatable/datatable.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
 <body>
@@ -38,8 +39,8 @@
                 Users
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Attendees</a>
-                <a class="dropdown-item" href="#">Organizer</a>
+                <a class="dropdown-item" href="{{ route('admin.users.index') }}#attendees">Attendees</a>
+                <a class="dropdown-item" href="{{ route('admin.users.index') }}#organizer">Organizer</a>
               </div>
             </li>
 
@@ -48,7 +49,7 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
+              <a class="nav-link" href="{{ route('admin.categories.index') }}">Categories</a>
             </li>
 
             <li class="nav-item">
@@ -99,7 +100,12 @@
         </main>
     </div>
 
-    <script src="{{ asset('js/jquery.js') }} "></script>
+    <script src="{{ asset('js/jquery.js') }}"></script>
+    <script src="{{ asset('plugins/axios.js') }}"></script>
+    <script src="{{ asset('plugins/datatable/datatable.js') }}"></script>
+    <script>
+      $(function($) {$.noConflict();})
+    </script>
     @stack('scripts')
 </body>
 </html>

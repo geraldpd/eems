@@ -26,34 +26,45 @@ class EventController extends Controller
 
     public function invitation(Event $event, $encrypted_email)
     {
+
         try {
             $email = decrypt($encrypted_email);
         } catch (DecryptException $e) {
-           return abort(404); //in the future updates, put more information why we returned 404
+           return abort(404); //TODO: in the future updates, put more information why we returned 404
         }
 
-        $has_invitation = $event->invitations()->whereEmail($email)->exists();
-        if(! $has_invitation) {
-            return redirect()->route('events.show', [$event->code])->with('message', 'OoOps!You are not invited to this event');
+        switch (true) {
+            case $event->schedule_start->isPast():
+                $message = 'Event has already concluded';
+                break;
+
+            case !$event->invitations()->whereEmail($email)->exists():
+                //TODO: allow public invitation
+                $message = 'You are not invited to this event';
+                break;
+
+            default:
+                    $invitee = User::whereEmail($email)->first();
+
+                    if(! $invitee) {
+
+                        Auth::logout();
+                        request()->session()->invalidate();
+                        request()->session()->regenerateToken();
+
+                        return redirect()->route('register', ['event' => $event->code, 'email' => $encrypted_email]);
+                    }
+
+                    Auth::login($invitee);
+
+                    $event->attendees()->attach($invitee->id, [
+                        'is_confirmed'=> 1
+                    ]);
+
+                    $message = 'Successfuly confirmed invitation';
+                break;
         }
 
-        $invitee = User::whereEmail($email)->first();
-
-        if(! $invitee) {
-
-            Auth::logout();
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
-
-            return redirect()->route('register', ['event' => $event->code, 'email' => $encrypted_email]);
-        }
-
-        Auth::login($invitee);
-
-        $event->attendees()->attach($invitee->id, [
-              'is_confirmed'=> 1
-        ]);
-
-        return redirect()->route('events.show', [$event->code])->with('message', 'Successfuly confirmed invitation');
+        return redirect()->route('events.show', [$event->code])->with('message', $message);
     }
 }

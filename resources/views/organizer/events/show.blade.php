@@ -16,7 +16,19 @@
     {!! $preview !!}
 @endsection
 
+@push('styles')
+    <style>
+        .button {
+            pointer-events: none;
+        }
+    </style>
+@endpush
 
 @push('scripts')
   <script src="{{ asset('scripts/organizer/events/show.js') }}"></script>
+  <script>
+      $(function() {
+        $('.button').attr('href', '#');
+      });
+  </script>
 @endpush

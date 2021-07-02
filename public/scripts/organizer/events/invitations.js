@@ -99,7 +99,6 @@ $(function() {
           .on('blur', onTagifyFocusBlur)
 
     $.noConflict();
-
     $(table).DataTable({
         order: [[0, 'desc']],
         columnDefs: [

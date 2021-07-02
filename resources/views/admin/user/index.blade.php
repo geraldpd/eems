@@ -3,8 +3,8 @@
 @section('content')
     <div class="container">
 
-        <button type="button" class="btn btn-user" data-tbody="organizer">organizer</button>
-        <button type="button" class="btn btn-user" data-tbody="attendee">attendee</button>
+        <button type="button" class="btn btn-secondary btn-user" data-tbody="organizer">organizer</button>
+        <button type="button" class="btn btn-secondary btn-user" data-tbody="attendee">attendee</button>
 
         <br>
         <br>
@@ -52,6 +52,7 @@
     <script type="text/javascript">
         $(function() {
             $('.btn-user').on('click', function() {
+                $(this).button('toggle');
                 $('table tbody').hide();
 
                 $(`#${$(this).data('tbody')}`).show();

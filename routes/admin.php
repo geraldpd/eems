@@ -10,4 +10,5 @@ Route::group([
     Route::get('/', HomeController::class);
 
     Route::resource('users', UserController::class);
+    Route::resource('categories', CategoryController::class);
 });
