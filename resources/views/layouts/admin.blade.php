@@ -17,10 +17,12 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('plugins/datatable/datatable.bootstrap.css') }}" rel="stylesheet">
     <link href="{{ asset('plugins/datatable/datatable.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
     @stack('styles')
+
 </head>
 <body>
     <div id="app">
@@ -101,8 +103,9 @@
     </div>
 
     <script src="{{ asset('js/jquery.js') }}"></script>
-    <script src="{{ asset('plugins/axios.js') }}"></script>
     <script src="{{ asset('plugins/datatable/datatable.js') }}"></script>
+    <script src="{{ asset('plugins/axios.js') }}"></script>
+    <script src="{{ asset('plugins/axios.js') }}"></script>
     <script>
       $(function($) {$.noConflict();})
     </script>

@@ -8,7 +8,7 @@
         <br>
         <br>
 
-        <table class="table table-bordered table-condensed">
+        <table class="table table-bordered table-compact">
             <thead class="thead-dark">
                 <tr>
                     <th>Name</th>
