@@ -8,7 +8,7 @@
         <br>
         <br>
 
-        <table class="table table-bordered table-compact">
+        <table id="table" class="table">
             <thead class="thead-dark">
                 <tr>
                     <th>Name</th>
@@ -22,7 +22,7 @@
                         <td>{{ $category->name }}</td>
                         <td class="text-center">{{ $category->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>
                         <td>
-                            <div>
+                            <div class="float-right">
                                 <a href="{{ route('admin.categories.index') }}" class="btn btn-primary">Events</a>
                                 {!! tableActions($category, 'admin.categories') !!}
                             </div>
@@ -37,29 +37,5 @@
 @endsection
 
 @push('scripts')
-    <script type="text/javascript">
-        $(function($) {
-
-            $('.destroy-button').on('click', function() {
-                let that = this;
-
-                axios.delete($(this).data('destroy_route'))
-                    .then(function (response) {
-                        // handle success
-                        if(!response.data.result === 'success') {
-                            alert('category cannot be deleted, an event is using this category');
-                        }
-
-                        alert('category deleted');
-                        table.row( $(that).parents('tr') ).remove().draw(false);
-                    })
-                    .catch(function (error) {
-                        // handle error
-                        console.warn(error);
-                    })
-            });
-
-            let table = $('.table').DataTable();
-        })
-    </script>
+   {!! tableScript('categories') !!}
 @endpush

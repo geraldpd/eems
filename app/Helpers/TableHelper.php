@@ -9,3 +9,12 @@ if (! function_exists('tableActions')) {
         return "$edit_button $delete_button";
     }
 }
+
+
+if (! function_exists('tableScript')) {
+    function tableScript($section, $parent = null, $end = 'admin')
+    {
+        $routes = json_encode(routes($section, $parent, $end)); //TODO: encrypt this data
+        return '<script routes=`'.$routes.'` src="'.asset('helpers/datatable.js').'"></script>';
+    }
+}

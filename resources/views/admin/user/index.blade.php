@@ -3,13 +3,13 @@
 @section('content')
     <div class="container">
 
-        <button type="button" class="btn btn-secondary btn-user" data-tbody="organizer">organizer</button>
-        <button type="button" class="btn btn-secondary btn-user" data-tbody="attendee">attendee</button>
+        <button type="button" class="btn btn-secondary btn-user" data-user="organizer">organizer</button>
+        <button type="button" class="btn btn-secondary btn-user" data-user="attendee">attendee</button>
 
         <br>
         <br>
 
-        <table class="table">
+        <table id="table" class="table">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
@@ -20,43 +20,45 @@
                 </tr>
             </thead>
 
-            <tbody id="organizer">
-                @foreach($users['organizer'] as $user)
-                    <tr>
-                        <th scope="row">{{ $loop->iteration }}</th>
-                        <td>{{ $user->firstname }}</td>
-                        <td>{{ $user->lastname }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>No Actions Yet</td>
-                    </tr>
-                @endforeach
-            </tbody>
-
-            <tbody id="attendee" style="display:none">
-                @foreach($users['attendee'] as $user)
-                    <tr>
-                        <th scope="row">{{ $loop->iteration }}</th>
-                        <td>{{ $user->firstname }}</td>
-                        <td>{{ $user->lastname }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>No Actions Yet</td>
-                    </tr>
-                @endforeach
-            </tbody>
+            <tbody></tbody>
 
         </table>
     </div>
 @endsection
 
 @push('scripts')
+    {!! tableScript('categories') !!}
     <script type="text/javascript">
+
         $(function() {
+
+            const user_data = {
+                attendee: constructTableData(@json($users['attendee'])),
+                organizer: constructTableData(@json($users['organizer']))
+            };
+
             $('.btn-user').on('click', function() {
                 $(this).button('toggle');
-                $('table tbody').hide();
 
-                $(`#${$(this).data('tbody')}`).show();
-            });
+                DataTable.clear();
+                DataTable.rows.add(user_data[$(this).data('user')]);
+                DataTable.draw();
+            })
+            .trigger('click')
+
+            function constructTableData(users){
+                return users.map((user, iteration) => [
+                    `<strong>${iteration + 1}</strong>`, //#
+                    user.firstname, //First name
+                    user.lastname, //Last Name
+                    user.email, //Email
+                    `
+                        <a href="#" class="btn btn-primary">Edit</a>
+                        <a href="#" class="btn btn-secondary">Delete</a>
+                    `
+                ])
+            }
         })
     </script>
 @endpush
+
