@@ -3,8 +3,8 @@
 @section('content')
     <div class="container">
 
-        <button type="button" class="btn btn-secondary btn-user" data-user="organizer">organizer</button>
-        <button type="button" class="btn btn-secondary btn-user" data-user="attendee">attendee</button>
+        <button type="button" class="btn btn-secondary btn-user" data-user="attendee">attendees</button>
+        <button type="button" class="btn btn-secondary btn-user" data-user="organizer">organizers</button>
 
         <br>
         <br>
@@ -32,22 +32,7 @@
 
         $(function() {
 
-            const user_data = {
-                attendee: constructTableData(@json($users['attendee'])),
-                organizer: constructTableData(@json($users['organizer']))
-            };
-
-            $('.btn-user').on('click', function() {
-                $(this).button('toggle');
-
-                DataTable.clear();
-                DataTable.rows.add(user_data[$(this).data('user')]);
-                DataTable.draw();
-            })
-            .trigger('click')
-
-            function constructTableData(users){
-                return users.map((user, iteration) => [
+            const constructTableData = users => users.map((user, iteration) => [
                     `<strong>${iteration + 1}</strong>`, //#
                     user.firstname, //First name
                     user.lastname, //Last Name
@@ -56,8 +41,23 @@
                         <a href="#" class="btn btn-primary">Edit</a>
                         <a href="#" class="btn btn-secondary">Delete</a>
                     `
-                ])
-            }
+            ]);
+
+            const user_data = {
+                attendee: constructTableData(@json($users['attendee'])),
+                organizer: constructTableData(@json($users['organizer']))
+            };
+
+            $('.btn-user')
+            .on('click', function() {
+                $(this).button('toggle');
+
+                DataTable.clear();
+                DataTable.rows.add(user_data[$(this).data('user')]);
+                DataTable.draw();
+            })
+            .trigger('click')
+
         })
     </script>
 @endpush
