@@ -9,6 +9,12 @@ class category extends Model
 {
     use HasFactory, SoftDeletes;
 
+
+    protected $fillable = [
+        'name',
+        'is_active',
+    ];
+
     public function events()
     {
         return $this->hasMany(Event::class);

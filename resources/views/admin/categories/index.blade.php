@@ -3,6 +3,12 @@
 @section('content')
     <div class="container">
 
+        @if(session()->has('message'))
+            <div class="alert alert-info">
+                {{ session()->get('message') }}
+            </div>
+        @endif
+
         <a href="{{ route('admin.categories.create') }}" class="btn btn-primary float-right">Add Category</a>
 
         <br>
@@ -17,7 +23,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($categories as $category)
+                @forelse ($categories->sortBy('created_at') as $category)
                     <tr id="{{ $category->id }}">
                         <td>{{ $category->name }}</td>
                         <td class="text-center">{{ $category->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>

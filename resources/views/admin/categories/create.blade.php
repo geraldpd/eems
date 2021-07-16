@@ -9,14 +9,12 @@
       @csrf
 
         <div class="form-group">
+            {!! hasError($errors, 'name') !!}
             <input type="text" name="name" id="name" class="form-control">
-            @error('name')
-                <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
         </div>
 
         <div class="custom-control custom-checkbox mr-sm-2">
-            <input type="checkbox" class="custom-control-input" name="is_active" id="is_active" checked>
+            <input type="checkbox" class="custom-control-input" name="is_active" id="is_active" value="1" checked>
             <label class="custom-control-label" for="is_active">Active</label>
         </div>
 

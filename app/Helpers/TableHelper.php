@@ -10,7 +10,6 @@ if (! function_exists('tableActions')) {
     }
 }
 
-
 if (! function_exists('tableScript')) {
     function tableScript($section, $parent = null, $end = 'admin')
     {

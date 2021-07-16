@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Event\StoreRequest;
-use App\Http\Requests\Event\UpdateRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\EventInvitation;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Event;
 use Carbon\Carbon;
 
-use App\Mail\EventInvitation;
-use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\Event\{
+    StoreRequest,
+    UpdateRequest
+};
 
 class EventController extends Controller
 {

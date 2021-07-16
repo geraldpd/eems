@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
+use App\Http\Requests\Category\{
+    StoreRequest,
+    UpdateRequest
+};
+
 class CategoryController extends Controller
 {
     /**
@@ -35,9 +40,11 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        dd($request->all());
+        Category::create($request->validated());
+
+        return redirect()->route('admin.categories.index')->with('message', 'Category Successfully Created');
     }
 
     /**
@@ -59,7 +66,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        return view('admin.categories.create', compact('category'));
     }
 
     /**
@@ -69,9 +76,11 @@ class CategoryController extends Controller
      * @param  \App\Models\category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(UpdateRequest $request, Category $category)
     {
-        //
+        $category->update($request->validated());
+
+        return redirect()->route('admin.categories.index')->with('message', 'Category Successfully Created');
     }
 
     /**
