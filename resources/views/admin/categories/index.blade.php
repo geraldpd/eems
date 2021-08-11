@@ -17,14 +17,16 @@
         <table id="table" class="table">
             <thead class="thead-dark">
                 <tr>
+                    <th style="display:none">created_at</th>
                     <th>Name</th>
                     <th class="text-center">Status</th>
                     <th class="text-center">Action</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($categories->sortBy('created_at') as $category)
+                @forelse ($categories as $category)
                     <tr id="{{ $category->id }}">
+                        <td style="display:none">{{ $category->created_at }}</td>
                         <td>{{ $category->name }}</td>
                         <td class="text-center">{{ $category->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>
                         <td>
@@ -43,5 +45,6 @@
 @endsection
 
 @push('scripts')
-   {!! tableScript('categories') !!}
+    <script src="{{ asset('scripts/admin/categories/index.js') }}"></script>
+   {{-- {!! tableScript('categories') !!} --}}
 @endpush

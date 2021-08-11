@@ -14,7 +14,10 @@ class EventController extends Controller
 
     public function index()
     {
-        $events = Event::query();
+        $events = Event::orderBy('schedule_start')
+            ->with(['attendees'])
+            ->withCount('attendees')
+            ->get();
 
         return view('front.events.index', compact('events'));
     }

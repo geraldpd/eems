@@ -16,7 +16,7 @@ class CreateInvitationsTable extends Migration
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained();
-            $table->string('email')->unique();
+            $table->string('email');//->unique();
             $table->timestamps();
         });
     }

@@ -66,7 +66,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('admin.categories.create', compact('category'));
+        return view('admin.categories.edit', compact('category'));
     }
 
     /**
@@ -78,9 +78,15 @@ class CategoryController extends Controller
      */
     public function update(UpdateRequest $request, Category $category)
     {
-        $category->update($request->validated());
+        $data = $request->validated();
 
-        return redirect()->route('admin.categories.index')->with('message', 'Category Successfully Created');
+        if(! $request->has('is_active')) {
+            $data['is_active'] = 0;
+        }
+
+        $category->update($data);
+
+        return redirect()->route('admin.categories.index')->with('message', $category->name.' Successfully Updated');
     }
 
     /**

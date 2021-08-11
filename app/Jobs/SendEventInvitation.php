@@ -35,7 +35,6 @@ class SendEventInvitation implements ShouldQueue
         $this->sender = $sender;
 
         $this->recipients = $recipients;
-
     }
 
     /**
@@ -45,6 +44,7 @@ class SendEventInvitation implements ShouldQueue
      */
     public function handle()
     {
+        //? to run a job: php artisan queue:work
         foreach($this->recipients as $recipient) {
             Mail::to($recipient)->send(new EventInvitation($this->event, $this->sender, $recipient));
         }

@@ -69,10 +69,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return Str::title("$this->firtname $this->lastname");
     }
 
-    public function getRoleAttribute()
-    {
-        return Str::title("$this->firtname $this->lastname");
-    }
+    // public function getRoleAttribute()
+    // {
+    //     return Str::title("$this->firtname $this->lastname");
+    // }
 
     public function organizedEvents() //for organizer
     {
@@ -84,7 +84,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Event::class, 'event_attendees', 'attendee_id');
     }
 
-    public function invitations()
+    public function invitations() //for attendees
     {
         return $this->hasMany(Invitation::class, 'email', 'email');
     }

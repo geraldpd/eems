@@ -15,18 +15,29 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with('roles')
+        return redirect()->route('admin.users.attendees');
+    }
+
+    public function attendees()
+    {
+        $attendees = User::with('roles')
             ->whereHas('roles', function($roles){
-                $roles->whereIn('name', ['organizer', 'attendee']);
+                $roles->where('name', 'attendee');
             })
             ->get();
 
-        $users = $users->mapToGroups(function ($user) {
-            return [$user['roles'][0]['name'] => $user];
-        })
-        ->all();
+        return view('admin.user.attendees', compact('attendees'));
+    }
 
-        return view('admin.user.index', compact('users'));
+    public function organizers()
+    {
+        $organizers = User::with('roles')
+            ->whereHas('roles', function($roles){
+                $roles->where('name', 'organizer');
+            })
+            ->get();
+
+        return view('admin.user.organizers', compact('organizers'));
     }
 
     /**

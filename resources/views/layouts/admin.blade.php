@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('plugins/DataTables/datatables.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ asset('plugins/DataTables/datatables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
     @stack('styles')
@@ -39,9 +39,9 @@
               <a class="nav-link" href="{{ route('admin.users.index') }}">Users <span class="sr-only">(current)</span></a>
             </li>
 
-            <li class="nav-item active">
+            {{-- <li class="nav-item active">
               <a class="nav-link" href="#">Organizations <span class="sr-only">(current)</span></a>
-            </li>
+            </li> --}}
 
             <li class="nav-item">
               <a class="nav-link" href="{{ route('admin.categories.index') }}">Categories</a>
@@ -96,9 +96,10 @@
     </div>
 
     <script src="{{ asset('js/jquery.js') }}"></script>
-    <script src="{{ asset('plugins/DataTables/datatables.min.js') }}"></script>
     <script src="{{ asset('plugins/axios.js') }}"></script>
-    <script src="{{ asset('plugins/axios.js') }}"></script>
+    <script type="text/javascript" charset="utf8" src="{{ asset('plugins/DataTables/datatables.min.js') }}"></script>
+
+    <script src="{{ asset('helpers/datatable.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

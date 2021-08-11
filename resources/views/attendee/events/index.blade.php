@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-
 <div class="container">
-    <h1>BROWSE EVENTS</h1>
+    <h1>MY EVENTS</h1>
     <div class="row justify-content-center">
-        @forelse ($events as $event)
+
+        @forelse ($attended_events as $event)
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
@@ -23,9 +23,11 @@
                 <br>
             </div>
         @empty
-            No Event
+            <div class="card">
+                <div class="card-header">NO EVENT FOUND</div>
+            </div>
         @endforelse
+
     </div>
 </div>
-
 @endsection

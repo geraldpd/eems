@@ -28,7 +28,7 @@ class InvitationRequest extends FormRequest
             'invitees' => [
                 'required',
                 'email',
-                Rule::unique('invitations', 'email')->ignore($this->event)
+                Rule::unique('invitations', 'email')->ignore($this->event->id)
             ],
         ];
     }
