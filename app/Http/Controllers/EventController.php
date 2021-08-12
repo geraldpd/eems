@@ -26,17 +26,22 @@ class EventController extends Controller
     {
         if($request->has('invite')) { //scanned from qrcode
 
-            if(Auth::check() && Auth::user()->roles()->first()->name == 'attendee') {
+            if(Auth::check()) {//check if someone is logged in
 
-                $this->attend($event, Auth::user()->email, true);
+                if(Auth::user()->roles()->first()->name == 'attendee') { //if logged in user is attendee, run attend()
+                    return $this->attend($event, Auth::user()->email, true);
+                }
 
-            } else {
+            } else { //redirect to login
 
                 return redirect()->route('login');
 
             }
         }
 
+        $event->load(['invitations', 'attendees']);
+
+        //show the event
         return view('front.events.show', compact('event'));
     }
 
@@ -46,11 +51,16 @@ class EventController extends Controller
         try {
             $email = decrypt($encrypted_email);
         } catch (DecryptException $e) {
-           return abort(404); //TODO: in the future updates, put more information why we returned 404
+            return abort(404); //TODO: in the future updates, put more information why we returned 404a
         }
 
-        $this->attend($event, $email);
+        if(Auth::check()) {
+            if(Auth::user()->email != $email) { //user tried clicked an invitaion that is not for him/her
+                return redirect()->route('events.show', [$event->code]);
+            }
+        }
 
+        return $this->attend($event, $email);
     }
 
     private function attend(Event $event, $email, $is_qrcode_scanned = false)
@@ -66,13 +76,9 @@ class EventController extends Controller
 
                 if($is_qrcode_scanned) {
 
-                    $event->invitations()->create([
-                        'email' => $email
-                    ]);
-
-                    $event->attendees()->attach($invitee->id, [
-                        'is_confirmed'=> 1
-                    ]);
+                    $event->invitations()->create(['email' => $email]);
+                    $event->attendees()->attach($invitee->id, ['is_confirmed'=> 1]);
+                    $event->save();
 
                     $message = 'You have been invited to this event.';
 
@@ -84,20 +90,20 @@ class EventController extends Controller
                 break;
 
             default:
-                    if($event->attendees()->find($invitee->id)) {
+                if(! $invitee) { //invited user is not yet registerd
 
-                        $message = 'You will be attending this event';
-                        break;
-                    }
+                    Auth::logout();
+                    request()->session()->invalidate();
+                    request()->session()->regenerateToken();
 
-                    if(! $invitee) {
+                    return redirect()->route('register', ['event' => $event->code, 'email' => encrypt($email)]);
+                }
 
-                        Auth::logout();
-                        request()->session()->invalidate();
-                        request()->session()->regenerateToken();
+                if($event->attendees()->whereAttendeeId($invitee->id)->exists()) { //user has already accepted the invitation
 
-                        return redirect()->route('register', ['event' => $event->code, 'email' => encrypt($email)]);
-                    }
+                    $message = 'You will be attending this event';
+
+                } else { //login the user and confirm the attendance
 
                     Auth::login($invitee);
 
@@ -106,6 +112,8 @@ class EventController extends Controller
                     ]);
 
                     $message = 'Successfuly confirmed invitation';
+                }
+
                 break;
         }
 

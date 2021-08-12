@@ -5,12 +5,16 @@
     <h1>MY EVENTS</h1>
     <div class="row justify-content-center">
 
-        @forelse ($attended_events as $event)
-            <div class="col-md-12">
-                <div class="card">
+        <div class="col-md-12">
+            @forelse ($attended_events as $event)
+                <div class="card" style="margin-bottom: 10px">
                     <div class="card-header">
                         <h2>
                             <a href="{{ route('events.show', [$event->code]) }}">{{ $event->name }}</a>
+
+                            @if ($event->is_confirmed)
+                                <i class="float-right text-success fas fa-check-circle"></i>
+                            @endif
                         </h2>
                     </div>
 
@@ -20,13 +24,12 @@
                         <p>{{ $event->description }}</p>
                     </div>
                 </div>
-                <br>
-            </div>
-        @empty
-            <div class="card">
-                <div class="card-header">NO EVENT FOUND</div>
-            </div>
-        @endforelse
+            @empty
+                <div class="card">
+                    <div class="card-header">You have not yet attended nor invited to any events</div>
+                </div>
+            @endforelse
+        </div>
 
     </div>
 </div>

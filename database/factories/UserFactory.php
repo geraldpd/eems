@@ -23,9 +23,9 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'firstname' => $this->faker->name,
-            'lastname' => $this->faker->name,
-            'email' => $this->faker->unique()->safeEmail,
+            'firstname' => $this->faker->firstName,
+            'lastname' => $this->faker->lastName,
+            'email' => strtolower($this->faker->firstName.rand(0, 99).'@eems.local'),
             'mobile_number' => '09'.rand(111111111, 99999999),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
