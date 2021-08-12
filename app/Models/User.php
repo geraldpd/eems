@@ -51,7 +51,8 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $appends = [
-        'fullname'
+        'fullname',
+        'profile_picture_path'
     ];
 
     public function setFirstnameAttribute($value)
@@ -67,6 +68,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFullnameAttribute()
     {
         return Str::title("$this->firtname $this->lastname");
+    }
+
+    public function getProfilePicturePathAttribute()
+    {
+        return $this->profile_picture ? asset('storage/'.$this->profile_picture) : asset('assets/default-profile_picture.png');
     }
 
     // public function getRoleAttribute()

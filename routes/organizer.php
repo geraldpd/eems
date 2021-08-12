@@ -3,15 +3,20 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Auth::routes(['register' => false]);
+Auth::routes();
 
 Route::group([
-    'middleware' => ['organizer', 'verified'],
+    'middleware' => ['organizer'],
 ], function(){
-    Route::get('/', HomeController::class);
 
     Route::resource('profile', ProfileController::class)->only(['index', 'update']);
 
-    Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
-    Route::resource('events', EventController::class);
+    Route::group([
+        'middleware' => ['verified'],
+    ], function(){
+
+        Route::get('/', HomeController::class);
+        Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
+        Route::resource('events', EventController::class);
+    });
 });

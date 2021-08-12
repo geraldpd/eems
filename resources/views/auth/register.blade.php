@@ -98,10 +98,13 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Register') }}
                                 </button>
+
+                                <a class="float-right" href="{{ route('organizer.register') }}">register as organizer</a>
                             </div>
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

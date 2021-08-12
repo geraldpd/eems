@@ -9,11 +9,13 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Event;
 use Carbon\Carbon;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use App\Http\Requests\Event\{
     StoreRequest,
     UpdateRequest
 };
+use Illuminate\Support\Facades\File;
 
 class EventController extends Controller
 {
@@ -95,6 +97,13 @@ class EventController extends Controller
         $event = Event::create($event_data->all());
 
         $event->code = eventHelperGetCode($event->id);
+        $qrcode_path = "storage/events/$event->id/";
+        $qrcode_invitation_link = route('events.show', $event->code).'?invite=true';
+
+        File::makeDirectory($qrcode_path);
+        QrCode::generate($qrcode_invitation_link, $qrcode_path.'qrcode.svg');
+        $event->qrcode = $qrcode_path.'qrcode.svg';
+
         $event->save();
 
         return redirect()->route('organizer.events.index')->with('message', 'Event Successfully Created');

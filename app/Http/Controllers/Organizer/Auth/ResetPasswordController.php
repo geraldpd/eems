@@ -22,6 +22,23 @@ class ResetPasswordController extends Controller
     use ResetsPasswords;
 
     /**
+     * Display the password reset view for the given token.
+     *
+     * If no token is present, display the link request form.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function showResetForm(Request $request)
+    {
+        $token = $request->route()->parameter('token');
+
+        return view('organizer.auth.passwords.reset')->with(
+            ['token' => $token, 'email' => $request->email]
+        );
+    }
+
+    /**
      * Where to redirect users after resetting their password.
      *
      * @var string

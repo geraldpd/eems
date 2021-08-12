@@ -1,14 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-
-    @if(session()->has('message'))
-        <div class="alert alert-info">
-            {{ session()->get('message') }}
-        </div>
-    @endif
-
     <div class="container">
+
+        @if(session()->has('message'))
+            <div class="alert alert-info">
+                {{ session()->get('message') }}
+            </div>
+        @endif
 
         <h1 class="display-5">{{ $event->name }}</h1>
 

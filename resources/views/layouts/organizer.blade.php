@@ -7,24 +7,24 @@
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Laravel') }} - Organizer</title>
 
         <!-- Fonts -->
         <link rel="dns-prefetch" href="//fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
         <!-- Styles -->
-        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="{{ asset('plugins/DataTables/datatables.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
         @stack('styles')
     </head>
 
     <body>
         <div id="app">
-            <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+            <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
                 <div class="container">
-                    <a class="navbar-brand" href="{{ url('/') }}">
+                    <a class="navbar-brand" href="{{ url('/organizer') }}">
                         {{ config('app.name', 'Laravel') }}
                     </a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -35,7 +35,7 @@
                         <!-- Left Side Of Navbar -->
                         <ul class="navbar-nav mr-auto">
                             <li class="nav-item active">
-                                <a class="nav-link" href="{{ route('organizer.events.index') }}">Events <span class="sr-only">(current)</span></a>
+                                <a class="nav-link" href="{{ route('organizer.events.index') }}">Event Management<span class="sr-only">(current)</span></a>
                             </li>
                         </ul>
 

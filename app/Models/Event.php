@@ -16,6 +16,7 @@ class Event extends Model
 
     protected $fillable = [
         'code',
+        'qrcode',
         'organizer_id',
         'category_id',
         'name',

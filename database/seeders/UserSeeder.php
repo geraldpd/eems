@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
 	        $user = User::create([
 				'firstname' => $role,
                 'lastname' => $role,
-                'mobile_number' => '900000000'.$index,
+                'mobile_number' => '09'.rand(111111111, 99999999),
 				'email' => Str::lower($role.'@'.config('app.name').'.com'),
 				'email_verified_at' => Carbon::now(),
 				'password' => bcrypt('password'),

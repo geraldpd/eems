@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Organizer\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
@@ -21,12 +22,21 @@ class VerificationController extends Controller
 
     use VerifiesEmails;
 
+    public function show(Request $request)
+    {
+        return $request->user()->hasVerifiedEmail()
+
+                        ? redirect($this->redirectPath())
+
+                        : view('organizer.auth.verify');
+
+    }
     /**
      * Where to redirect users after verification.
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = '/organizer';//RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.

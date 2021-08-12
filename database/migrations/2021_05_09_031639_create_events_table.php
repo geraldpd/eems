@@ -16,6 +16,7 @@ class CreateEventsTable extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique()->nullable()->comment('unique identifier to be used in invitation links');
+            $table->text('qrcode')->nullable()->comment('qrcode path');
             $table->foreignId('organizer_id')->constrained('users');
             $table->foreignId('category_id')->constrained();
             $table->string('name');

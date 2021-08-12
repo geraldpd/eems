@@ -2,6 +2,13 @@
 
 @section('content')
 <div class="container">
+
+    @if(session()->has('message'))
+        <div class="alert alert-info">
+            {{ session()->get('message') }}
+        </div>
+    @endif
+
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
@@ -14,7 +21,7 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }} as Orgnizer
+                    {{ __('You are logged in!') }} as {{ Auth::user()->roles()->first()->name }}
                 </div>
             </div>
         </div>
