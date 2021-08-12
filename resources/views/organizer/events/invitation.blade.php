@@ -126,9 +126,25 @@
         #DataTables_Table_0_wrapper > div:nth-child(1) > div.col-sm-12.col-md-6 {
             flex: 0 0 100%;
             max-width: 100%;
-
         }
 
+        #DataTables_Table_0_wrapper > div:nth-child(3) > div:nth-child(1) {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        #DataTables_Table_0_wrapper > div:nth-child(3) > div.col-sm-12.col-md-7 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        #DataTables_Table_0_paginate > ul {
+            justify-content: center;
+        }
+
+        #DataTables_Table_0_info {
+            text-align: center;
+        }
 
     </style>
 @endpush

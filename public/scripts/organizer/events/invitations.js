@@ -113,7 +113,7 @@ $(function() {
         },
         bLengthChange: false,
         bFilter: true,
-        bInfo: false,
+        //bInfo: false,
         bAutoWidth: false,
         pagingType: 'full'
     });
