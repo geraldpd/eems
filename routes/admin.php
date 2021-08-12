@@ -10,6 +10,8 @@ Route::group([
 ], function(){
     Route::get('/', HomeController::class);
 
+    Route::resource('profile', ProfileController::class)->only(['index', 'update']);
+
     Route::get('users/attendees', [User::class, 'attendees'])->name('users.attendees');
     Route::get('users/organizers', [User::class, 'organizers'])->name('users.organizers');
     Route::resource('users', UserController::class);

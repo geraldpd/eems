@@ -15,7 +15,8 @@
 
         <!-- Styles -->
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-        <link href="{{ asset('plugins/datatable/datatable.css') }}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{{ asset('plugins/DataTables/datatables.min.css') }}" rel="stylesheet">
+
         @stack('styles')
     </head>
 
@@ -56,10 +57,12 @@
                             @else
                                 <li class="nav-item dropdown">
                                     <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                        {{ Auth::user()->name }}
+                                        {{ Auth::user()->fullname }}
                                     </a>
 
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" aria-labelledby="navbarDropdown" href="{{ route('organizer.profile.index') }}"> Profile</a>
+
                                         <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
                                                         document.getElementById('logout-form').submit();">
@@ -86,8 +89,8 @@
 
         <script src="{{ asset('js/app.js') }}" defer></script>
         <script src="{{ asset('js/jquery.js') }}"></script>
-        <script src="{{ asset('plugins/datatable/datatable.js') }}"></script>
         <script src="{{ asset('plugins/axios.js') }}"></script>
+        <script type="text/javascript" charset="utf8" src="{{ asset('plugins/DataTables/datatables.min.js') }}"></script>
         @stack('scripts')
     </body>
 </html>

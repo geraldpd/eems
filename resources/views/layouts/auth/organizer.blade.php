@@ -47,12 +47,6 @@
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                                 </li>
                             @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -61,20 +55,9 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
 
-                                    @switch(Auth::user()->roles()->first()->name)
-                                        @case('admin')
-                                            <a class="dropdown-item" href="{{ route('admin.profile.index') }}"> Profile</a>
-
-                                            @break
-                                        @case('organizer')
-                                            <a class="dropdown-item" href="{{ route('organizer.profile.index') }}"> Profile</a>
-
-                                            @break
-                                        @default {{-- attendee,admin,organier --}}
-                                            <a class="dropdown-item" href="{{ route('attendee.events.index') }}"> My Events</a>
-                                            <a class="dropdown-item" href="{{ route('attendee.profile.index') }}"> Profile</a>
-                                    @endswitch
-
+                                    @if (Auth::user()->roles()->first()->name == 'attendee')
+                                        <a class="dropdown-item" href="{{ route('attendee.events.index') }}"> My Events</a>
+                                    @endif
 
                                     <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

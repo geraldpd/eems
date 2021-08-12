@@ -7,5 +7,7 @@ Route::group([
 ], function(){
     Route::get('/', HomeController::class);
 
+    Route::resource('profile', ProfileController::class)->only(['index', 'update']);
+
     Route::resource('events', EventController::class);
 });
