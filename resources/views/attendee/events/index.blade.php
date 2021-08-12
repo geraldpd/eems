@@ -13,7 +13,7 @@
                             <a href="{{ route('events.show', [$event->code]) }}">{{ $event->name }}</a>
 
                             @if ($event->is_confirmed)
-                                <i class="float-right text-success fas fa-check-circle"></i>
+                                <i title="You have accepted the invitation to this event." class="float-right text-success fas fa-check-circle"></i>
                             @endif
                         </h2>
                     </div>

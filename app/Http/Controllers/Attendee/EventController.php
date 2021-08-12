@@ -19,9 +19,12 @@ class EventController extends Controller
     {
         $attended_events = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->leftJoin('invitations', 'users.email', '=','invitations.email')
-            ->leftJoin('event_attendees', 'users.id', '=', 'event_attendees.attendee_id')
-            ->leftJoin('events', 'invitations.event_id', '=','events.id')
+            ->join('invitations', 'users.email', '=', 'invitations.email')
+            ->join('events', 'invitations.event_id', '=', 'events.id')
+            ->leftJoin('event_attendees', function($join) {
+                $join->on('users.id', '=', 'event_attendees.attendee_id');
+                $join->on('events.id', '=', 'event_attendees.event_id');
+            })
             ->select(
                 'users.id as user_id',
                 'invitations.id as invitation_id',
@@ -35,6 +38,7 @@ class EventController extends Controller
                return $event;
             });
 
+        //dd($attended_events);
         return view('attendee.events.index', compact('attended_events'));
     }
 }

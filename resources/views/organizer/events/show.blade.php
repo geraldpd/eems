@@ -13,11 +13,15 @@
                 </div>
             </div>
 
+            <div class="col-md-12"><br></div>
+
             <div class="col-md-3">
-                <img src="{{ asset($event->qrcode) }}" alt="Event Qrcode" style="height: 200px;">
+                    <img class="mx-auto d-block" src="{{ asset($event->qrcode) }}" alt="Event Qrcode" style="height: 200px;">
             </div>
             <div class="col-md-9">
-                share this QR code to directly invite them to this event
+                <br>
+                <h3>Share this QR code to directly invite them to this event</h3>
+                <p>Users will need to signup(for unregistered) and login to their EEMS account <br> to be automatically booked to this event.</p>
             </div>
         </div>
     </div>

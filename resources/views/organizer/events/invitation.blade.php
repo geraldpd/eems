@@ -31,7 +31,7 @@
                         @csrf
 
                         <div class="input-group mb-3">
-                            <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="email" aria-label="email" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                             <button class="btn btn-primary send-invitation" disabled type="submit">SEND INVITATION</button>
                             </div>
@@ -118,6 +118,17 @@
         #DataTables_Table_0_filter > label {
             width: 100%;
         }
+
+        #DataTables_Table_0_wrapper > div:nth-child(1) > div:nth-child(1) {
+            display: none;
+        }
+
+        #DataTables_Table_0_wrapper > div:nth-child(1) > div.col-sm-12.col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+
+        }
+
 
     </style>
 @endpush
