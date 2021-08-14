@@ -23,6 +23,8 @@ class Event extends Model
         'type',
         'description',
         'location',
+        'venue', //depending on the location field
+        'online', //depending on the location field
         'documents',
         'schedule_start',
         'schedule_end',

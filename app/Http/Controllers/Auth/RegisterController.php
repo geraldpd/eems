@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\Organization;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\Rule;
+
 class RegisterController extends Controller
 {
     /*
@@ -65,6 +68,10 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'code' => ['nullable', 'exists:events'],
+            'as' => ['required', Rule::in(['attendee', 'organizer'])],
+
+            'organization_name' => ['required_if:as,organizer'],
+            'department' => ['required_if:as,organizer']
         ]);
     }
 
@@ -76,17 +83,6 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $event = false;
-
-        //if a code(event) is specified, check its validity
-        if(isset($data['code'])) {
-            try {
-              $event = Event::whereCode($data['code'])->firstOrFail();
-            } catch (ModelNotFoundException $e) {
-              return abort(404); //TODO: specif why an error occured to the user
-            }
-        }
-
         $user = User::create([
             'firstname' => $data['firstname'],
             'lastname' => $data['lastname'],
@@ -95,13 +91,30 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        $user->assignRole('attendee');
+        $event = false;
 
-        if($event) {
+        if(isset($data['code'])) { //if a code(event) is specified, check its validity
+            try {
+              $event = Event::whereCode($data['code'])->firstOrFail();
+            } catch (ModelNotFoundException $e) {
+              return abort(404); //TODO: specif why an error occured to the user
+            }
+        }
+
+        if($event && $data['as'] === 'attendee') {
             $event->attendees()->attach($user->id, [
                 'is_confirmed'=> 1
             ]);
         }
+
+        if($data['as'] === 'organizer') {
+            $user->organization()->create([
+                'name' => $data['organization_name'],
+                'department' => $data['department']
+            ]);
+        }
+
+        $user->assignRole($data['as']);
 
         return $user;
     }

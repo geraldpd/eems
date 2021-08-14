@@ -21,10 +21,7 @@ class EventController extends Controller
             ->where('users.id', Auth::user()->id)
             ->join('invitations', 'users.email', '=', 'invitations.email')
             ->join('events', 'invitations.event_id', '=', 'events.id')
-            ->leftJoin('event_attendees', function($join) {
-                $join->on('users.id', '=', 'event_attendees.attendee_id');
-                $join->on('events.id', '=', 'event_attendees.event_id');
-            })
+            ->leftJoin('event_attendees', fn($join) => $join->on('users.id', '=', 'event_attendees.attendee_id')->on('events.id', '=', 'event_attendees.event_id'))
             ->select(
                 'users.id as user_id',
                 'invitations.id as invitation_id',

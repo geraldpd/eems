@@ -14,7 +14,7 @@
         <br>
         <br>
 
-        <table id="table" class="table">
+        <table id="table" class="table table-responsive display">
             <thead class="thead-dark">
                 <tr>
                     <th style="display:none">created_at</th>
@@ -46,5 +46,4 @@
 
 @push('scripts')
     <script src="{{ asset('scripts/admin/categories/index.js') }}"></script>
-   {{-- {!! tableScript('categories') !!} --}}
 @endpush

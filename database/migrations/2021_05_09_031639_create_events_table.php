@@ -23,6 +23,8 @@ class CreateEventsTable extends Migration
             $table->string('type');
             $table->text('description');
             $table->text('location');
+            $table->text('venue')->nullable()->comment('required if location field is venue');
+            $table->text('online')->nullable()->comment('required if location field is online');
             $table->text('documents')->nullable();
             $table->dateTime('schedule_start');
             $table->dateTime('schedule_end');

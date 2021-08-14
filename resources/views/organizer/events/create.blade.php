@@ -107,6 +107,32 @@
         @endif
       </div>
 
+      <div class="location-additionl-field">
+
+        <div class="form-group location-venue d-none">
+          <label for="location-venue">Venue</label>
+          <textarea class="form-control" name="venue" id="location-venue" cols="30" rows="2" placeholder="Complete address to the venue">{{ old('venue') }}</textarea>
+
+          @if ($errors->has('location-venue'))
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('location-venue') }}</strong>
+            </small>
+          @endif
+        </div>
+
+        <div class="form-group location-online d-none">
+          <label for="location-online">Link</label>
+          <input type="url" name="online" id="location-online" value="{{ old('online') }}" class="form-control" placeholder="link to the online event" autofocus>
+
+            @if ($errors->has('location-online'))
+              <small class="help-block text-danger">
+                <strong>{{ $errors->first('location-online') }}</strong>
+              </small>
+            @endif
+        </div>
+
+      </div>
+
       <div class="form-group">
         <label for="documents">Documents</label>
         <input type="text" {{ old('documents') }}class="form-control" placeholder="documents">
@@ -129,6 +155,5 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('plugins/moment.js') }}"></script>
   <script src="{{ asset('scripts/organizer/events/create.js') }}"></script>
 @endpush

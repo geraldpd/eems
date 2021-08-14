@@ -27,13 +27,15 @@ class UserSeeder extends Seeder
                 'remember_token' => Str::random(10),
 	        ]);
 	        $user->assignRole($role);
+
+            if($role == 'organizer') {
+                $user->organization()->create([
+                    'name' => $role.' organization',
+                    'department' => $role.' department'
+                ]);
+            }
 		}
 
-        User::factory()
-        ->count(50)
-        ->create();
-
-        //run factory seeder
-
+        User::factory()->count(50)->create();
     }
 }

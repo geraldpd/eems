@@ -75,10 +75,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->profile_picture ? asset('storage/'.$this->profile_picture) : asset('assets/default-profile_picture.png');
     }
 
-    // public function getRoleAttribute()
-    // {
-    //     return Str::title("$this->firtname $this->lastname");
-    // }
+    public function organization() //for organizer
+    {
+        return $this->hasOne(Organization::class, 'organizer_id');
+    }
 
     public function organizedEvents() //for organizer
     {

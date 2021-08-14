@@ -29,6 +29,8 @@ class StoreRequest extends FormRequest
             'type' => ['required'],
             'description' => ['required'],
             'location' => ['required'],
+            'venue' => ['required_if:location,venue'],
+            'online' => ['required_if:location,online'],
             'documents' => ['nulllable'],
             'schedule_start' => ['required'], //?range and single day
             'schedule_end' => ['required'], //?range and single day

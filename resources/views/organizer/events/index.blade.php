@@ -1,17 +1,13 @@
 @extends('layouts.organizer')
 
 @section('content')
-    <div class="container">
+    @if(session()->has('message'))
+        <div class="alert alert-info">
+            {{ session()->get('message') }}
+        </div>
+    @endif
 
-        @if(session()->has('message'))
-            <div class="alert alert-info">
-                {{ session()->get('message') }}
-            </div>
-        @endif
-
-        <div id='calendar'></div>
-
-    </div>
+    <div id='calendar'></div>
 @endsection
 
 @push('modals')
@@ -69,8 +65,6 @@
             background: white !important;
             border: 3px solid #2c3e50;
         }
-
-
     </style>
 @endpush
 
@@ -84,6 +78,5 @@
         config.routes.invitations = '{{ route('organizer.invitations.index', ['resource_id']) }}'
     </script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js'></script>
-    <script src="{{ asset('plugins/moment.js') }}"></script>
     <script src="{{ asset('scripts/organizer/events/index.js') }}"></script>
 @endpush

@@ -29,6 +29,8 @@ class UpdateRequest extends FormRequest
             'type' => ['required'],
             'description' => ['required'],
             'location' => ['required'],
+            'venue' => ['required_if:location,venue'],
+            'online' => ['required_if:location,online'],
             'documents' => ['nullable']
         ];
     }
