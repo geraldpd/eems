@@ -15,7 +15,7 @@
         <br>
         <br>
 
-        <table id="table" class="table">
+        <table id="table" class="table table-striped table-bordered"  width="100%">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
@@ -33,7 +33,7 @@
                         <td>{{ $organizer->firstname }}</td>
                         <td>{{ $organizer->lastname }}</td>
                         <td>{{ $organizer->email }}</td>
-                        <td>{!! tableActions($organizer, 'admin.users') !!}</td>
+                        <td>actions</td>
                     </tr>
                 @empty
 
@@ -45,6 +45,10 @@
 @endsection
 
 @push('scripts')
-    {{-- {!! tableScript('categories') !!} --}}
+    <script>
+        $(function() {
+            $('#table').DataTable();
+        })
+    </script>
 @endpush
 

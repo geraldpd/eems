@@ -2,17 +2,12 @@
 
 @section('content')
     <div class="container">
-        <div class="row float-right">
-            @if(!$event->schedule_start->isPast())
-                <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
-            @endif
-            <a href="{{ route('organizer.events.index') }}"" class="btn btn-link">Events</a>
-            <a href="{{ route('organizer.events.show', [$event->code]) }}" class="btn btn-link">Preview</a>
-        </div>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page"> <a href="{{ route('organizer.events.edit', [$event->code]) }}">{{ ucwords(strtolower($event->name)) }}</a></li>
+            <li class="breadcrumb-item">Invitations</li>
+        </ol>
     </div>
-
-    <br>
-    <br>
 
     <div class="container">
 
@@ -33,14 +28,12 @@
                         <div class="input-group mb-3">
                             <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="email" aria-label="email" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                            <button class="btn btn-primary send-invitation" disabled type="submit">SEND INVITATION</button>
+                                <button class="btn btn-secondary send-invitation" disabled type="submit"> <i class="fas fa-paper-plane"></i> send </button>
                             </div>
                         </div>
 
                         @if ($errors->has('invitees'))
-                            @php
-                                dd($errors);
-                            @endphp
+                            {{ $message }}
                         @endif
                     </form>
 
@@ -50,8 +43,8 @@
                 </div>
             @endif
 
-            <div class="col-md-{{ !$event->schedule_start->isPast() ? '4' : '12'}}">
-                <table class="table table-bordered table-condensed table-hover">
+            <div class="col-md-{{ $event->schedule_start->isPast() ? '12' : '4'}}">
+                <table id="table" class="table table-bordered">
                     <thead class="none">
                         <th style="display:none">created_at</th> <!-- just for ordering -->
                         <th>Invited</th>
@@ -65,11 +58,14 @@
                                 <td class="text-center">{{ $invitation->guest?->has_confirmed }}</td>
                             </tr>
                         @empty
-                            No one is invited yet
+                            <tr>
+                                <td colspan="2" class="text-center">No one is invited yet</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
 @endsection
@@ -78,6 +74,7 @@
     <style>
         .tagify--outside{
             border: 0;
+            border: 1px solid #ced4da;
         }
 
         .tagify--outside .tagify__input{
@@ -98,62 +95,71 @@
             margin-right: 10px;
         }
 
-        #DataTables_Table_0_filter > label > input[type=search] {
-            display: block;
+        #table_wrapper > div:nth-child(2) > div {
+            padding-right:0px;
+            padding-left:0px;
+        }
+
+        #table_wrapper > div:nth-child(1) > div:nth-child(1) {
+            display:none;
+        }
+
+        #table_wrapper > div:nth-child(1) > div:nth-child(2) {
+            padding:0px;
+        }
+
+        #table_filter > label > input {
+            margin-left:0px;
+            width: 100%
+        }
+
+        #table_filter {
+            text-align: left;
+            width: 100%
+        }
+        #table_filter > label {
             width: 100%;
-            height: calc(1.6em + 0.75rem + 2px);
-            padding: 0.375rem 0.75rem;
-            font-size: 0.9rem;
-            font-weight: 400;
-            line-height: 1.6;
-            color: #495057;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-            margin-left: 0px;
         }
 
-        #DataTables_Table_0_filter > label {
-            width: 100%;
-        }
-
-        #DataTables_Table_0_wrapper > div:nth-child(1) > div:nth-child(1) {
-            display: none;
-        }
-
-        #DataTables_Table_0_wrapper > div:nth-child(1) > div.col-sm-12.col-md-6 {
+        #table_wrapper > div:nth-child(1) > div.col-sm-12.col-md-6 {
             flex: 0 0 100%;
             max-width: 100%;
         }
 
-        #DataTables_Table_0_wrapper > div:nth-child(3) > div:nth-child(1) {
+        #table_wrapper > div:nth-child(3) > div.col-sm-12.col-md-5 {
             flex: 0 0 100%;
             max-width: 100%;
+            padding-left:0px;
         }
 
-        #DataTables_Table_0_wrapper > div:nth-child(3) > div.col-sm-12.col-md-7 {
+        #table_wrapper > div:nth-child(3) > div.col-sm-12.col-md-7 {
             flex: 0 0 100%;
             max-width: 100%;
+            padding-left:0px;
         }
 
-        #DataTables_Table_0_paginate > ul {
-            justify-content: center;
+        #table_paginate > ul {
+            float:center;
         }
 
-        #DataTables_Table_0_info {
-            text-align: center;
+        #table_info {
+            padding-top: 5px;
+            padding-bottom: 5px;
         }
 
+        #table_filter > label > input {
+            height: calc(1.5em + 1rem + 2px);
+            padding: 0.5rem 1rem;
+            font-size: 1.25rem;
+            line-height: 1.5;
+            border-radius: 0.3rem;
+        }
     </style>
+
 @endpush
 
 @push('scripts')
-    <script src="https://unpkg.com/@yaireo/tagify"></script>
-    <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-    <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
-    <script src="{{ asset('scripts/organizer/events/invitations.js') }}"></script>
+    <script src="{{ asset('scripts/organizer/events/invitations.js') }}" defer></script>
 
     <script>
         const config = {

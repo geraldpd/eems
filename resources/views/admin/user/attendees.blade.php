@@ -9,13 +9,17 @@
             </div>
         @endif
 
-        <button type="button" class="btn btn-secondary btn-user active" data-user="attendee">attendees</button>
-        <a href="{{ route('admin.users.organizers') }}" class="btn btn-secondary btn-user" data-user="organizer">organizers</a>
+        <button type="button" class="btn btn-secondary btn-user active" data-user="attendee">
+            <i class="fas fa-user"></i> attendees
+        </button>
+        <a href="{{ route('admin.users.organizers') }}" class="btn btn-secondary btn-user" data-user="organizer">
+            <i class="fas fa-user"></i> organizers
+        </a>
 
         <br>
         <br>
 
-        <table id="table" class="table">
+        <table id="table" class="table table-striped table-bordered"  width="100%">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
@@ -33,7 +37,7 @@
                         <td>{{ $attendee->firstname }}</td>
                         <td>{{ $attendee->lastname }}</td>
                         <td>{{ $attendee->email }}</td>
-                        <td>{!! tableActions($attendee, 'admin.users') !!}</td>
+                        <td>actions</td>
                     </tr>
                 @empty
 
@@ -45,6 +49,10 @@
 @endsection
 
 @push('scripts')
-    {{-- {!! tableScript('categories') !!} --}}
+    <script>
+        $(function() {
+            $('#table').DataTable();
+        })
+    </script>
 @endpush
 

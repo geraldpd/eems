@@ -14,7 +14,7 @@
         <br>
         <br>
 
-        <table id="table" class="table table-responsive display">
+        <table id="table" class="table table-striped table-bordered"  width="100%">
             <thead class="thead-dark">
                 <tr>
                     <th style="display:none">created_at</th>
@@ -31,8 +31,9 @@
                         <td class="text-center">{{ $category->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>
                         <td>
                             <div class="float-right">
-                                <a href="{{ route('admin.categories.index') }}" class="btn btn-primary">Events</a>
-                                {!! tableActions($category, 'admin.categories') !!}
+                                <a class="btn btn-link" href="{{ route('admin.categories.index') }}">Events</a>
+                                <a class="btn btn-primary" href="{{ route('admin.categories.edit', [$category->id]) }}">edit</a>
+                                <a class="btn btn-secondary" href="{{ route('admin.categories.destroy', [$category->id]) }}">delete</a>
                             </div>
                         </td>
                     </tr>

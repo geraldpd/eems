@@ -1,5 +1,5 @@
 require('./bootstrap');
 
-require('datatables.net-bs4');
+window.tagify = require('@yaireo/tagify/dist/jQuery.tagify.min.js');
 
 window.moment = require('moment');

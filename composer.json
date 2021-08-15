@@ -33,7 +33,6 @@
         "files": [
             "app/Helpers/RouteHelper.php",
             "app/Helpers/EventHelper.php",
-            "app/Helpers/TableHelper.php",
             "app/Helpers/FormErrorHelper.php"
         ]
     },

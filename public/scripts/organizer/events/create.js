@@ -38,4 +38,6 @@ $(function() {
                 break;
         }
     });
+
+    $('#location').trigger('change');
 })

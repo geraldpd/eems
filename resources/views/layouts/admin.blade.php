@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- CSRF Token -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -15,6 +15,7 @@
 
   <!-- Styles -->
   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ asset('scripts/plugins/DataTables/datatables.min.css') }}"/>
 
   @stack('styles')
 
@@ -91,9 +92,11 @@
   </nav>
 
   <div class="container-fluid">
-    <br>
-    @yield('content')
-    <br>
+      <br>
+      @yield('content')
+      <br>
+      <br>
+      <br>
   </div>
 
   @stack('modals')
@@ -101,6 +104,7 @@
 
 <!-- Scripts -->
 <script src="{{ asset('js/app.js') }}"></script>
+<script type="text/javascript" src="{{ asset('scripts/plugins/DataTables/datatables.min.js') }}"></script>
 
 @stack('scripts')
 </body>

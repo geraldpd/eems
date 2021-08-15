@@ -3,6 +3,11 @@
 @section('content')
   <div class="container">
 
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Add</li>
+    </ol>
+
     @if ($date)
       <h1>{{ $date->format('M d, Y') }}</h1>
     @endif
@@ -113,9 +118,9 @@
           <label for="location-venue">Venue</label>
           <textarea class="form-control" name="venue" id="location-venue" cols="30" rows="2" placeholder="Complete address to the venue">{{ old('venue') }}</textarea>
 
-          @if ($errors->has('location-venue'))
+          @if ($errors->has('venue'))
             <small class="help-block text-danger">
-              <strong>{{ $errors->first('location-venue') }}</strong>
+              <strong>{{ $errors->first('venue') }}</strong>
             </small>
           @endif
         </div>
@@ -124,9 +129,9 @@
           <label for="location-online">Link</label>
           <input type="url" name="online" id="location-online" value="{{ old('online') }}" class="form-control" placeholder="link to the online event" autofocus>
 
-            @if ($errors->has('location-online'))
+            @if ($errors->has('online'))
               <small class="help-block text-danger">
-                <strong>{{ $errors->first('location-online') }}</strong>
+                <strong>{{ $errors->first('online') }}</strong>
               </small>
             @endif
         </div>

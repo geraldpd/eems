@@ -1,17 +1,22 @@
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
-// Variables
-@import 'variables';
-
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
-// DataTable
-@import '~datatables.net-bs4/css/dataTables.bootstrap4.css';
+// DataTable Bootstrap
+//@import '~datatables.net-dt';
+//@import "~datatables.net-bs/css/dataTables.bootstrap.css";
+//@import "~datatables.net-bs4/css/dataTables.bootstrap4.css";
+//@import '~datatables.net-bs/css/dataTables.bootstrap.css';
+
+// Variables
+@import 'variables';
 
 // Font-Awesome
 @import "~@fortawesome/fontawesome-free/scss/fontawesome";
 @import "~@fortawesome/fontawesome-free/scss/regular";
 @import "~@fortawesome/fontawesome-free/scss/solid";
 @import "~@fortawesome/fontawesome-free/scss/brands";
+
+@import '../../node_modules/@yaireo/tagify/src/tagify';

@@ -1,7 +1,5 @@
 $(function() {
 
-    var table = $('.table');
-
     var send_invitation_button = $('.send-invitation');
 
     var invitees = $('#invitees');
@@ -34,7 +32,7 @@ $(function() {
         `
     }
 
-    var tagify = new Tagify(invitees.get(0), {
+    var tagify = new window.tagify(invitees.get(0), {
         pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         blacklist : config.event.blacklist,
         enforceWhitelist : false,
@@ -81,15 +79,21 @@ $(function() {
     }
 
     function onRemoveTag(e) {
-        tagify.value.length ? send_invitation_button.removeAttr('disabled') : send_invitation_button.attr('disabled', true)
+        tagify.value.length
+        ? send_invitation_button.removeAttr('disabled').addClass('btn-primary').removeClass('btn-secondary')
+        : send_invitation_button.attr('disabled', true).addClass('btn-secondary').removeClass('btn-primary');
     }
 
     function onEditTag(e) {
-        tagify.value.length ? send_invitation_button.removeAttr('disabled') : send_invitation_button.attr('disabled', true)
+        tagify.value.length
+        ? send_invitation_button.removeAttr('disabled').addClass('btn-primary').removeClass('btn-secondary')
+        : send_invitation_button.attr('disabled', true).addClass('btn-secondary').removeClass('btn-primary');
     }
 
     function onTagifyFocusBlur(e) {
-        tagify.value.length ? send_invitation_button.removeAttr('disabled') : send_invitation_button.attr('disabled', true)
+        tagify.value.length
+        ? send_invitation_button.removeAttr('disabled').addClass('btn-primary').removeClass('btn-secondary')
+        : send_invitation_button.attr('disabled', true).addClass('btn-secondary').removeClass('btn-primary');
     }
 
     tagify.on('input', onInputTag)
@@ -98,8 +102,7 @@ $(function() {
           .on('remove', onRemoveTag)
           .on('blur', onTagifyFocusBlur)
 
-    $.noConflict();
-    $(table).DataTable({
+    $('#table').DataTable({
         order: [[0, 'desc']],
         columnDefs: [
             {
@@ -113,8 +116,8 @@ $(function() {
         },
         bLengthChange: false,
         bFilter: true,
-        //bInfo: false,
         bAutoWidth: false,
-        pagingType: 'full'
+        pagingType: 'full',
+        responsive: true,
     });
 })

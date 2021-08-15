@@ -2,6 +2,18 @@
 
 @section('content')
     <div class="container">
+
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ ucwords(strtolower($event->name)) }}</li>
+        </ol>
+
+        @if(session()->has('message'))
+            <div class="alert alert-info">
+                {{ session()->get('message') }}
+            </div>
+        @endif
+
         <div class="row">
             <div class="col-md-12">
                 <div class="float-right">
@@ -9,7 +21,6 @@
                         <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
                     @endif
                     <a href="{{ route('organizer.invitations.index', [$event->code]) }}" class="btn btn-link">Invitations</a>
-                    <a href="{{ route('organizer.events.index') }}"" class="btn btn-link">Events</a>
                 </div>
             </div>
 

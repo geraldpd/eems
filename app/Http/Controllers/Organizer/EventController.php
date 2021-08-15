@@ -106,7 +106,7 @@ class EventController extends Controller
 
         $event->save();
 
-        return redirect()->route('organizer.events.index')->with('message', 'Event Successfully Created');
+        return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Created');
     }
 
     /**
@@ -181,7 +181,7 @@ class EventController extends Controller
 
         $event->update($request->validated());
 
-        return redirect()->route('organizer.events.index')->with('message', 'Event Successfully Updated');
+        return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
     }
 
     //? RESCHEDULE METHOD

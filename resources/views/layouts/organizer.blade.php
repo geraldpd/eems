@@ -15,6 +15,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ asset('scripts/plugins/DataTables/datatables.min.css') }}"/>
 
     @stack('styles')
 </head>
@@ -83,6 +84,8 @@
         <br>
         @yield('content')
         <br>
+        <br>
+        <br>
     </div>
 
     @stack('modals')
@@ -90,6 +93,7 @@
 
 <!-- Scripts -->
 <script src="{{ asset('js/app.js') }}"></script>
+<script type="text/javascript" src="{{ asset('scripts/plugins/DataTables/datatables.min.js') }}"></script>
 
 @stack('scripts')
 </body>
