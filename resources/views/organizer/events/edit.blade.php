@@ -141,6 +141,14 @@
   </div>
 @endsection
 
+@push('styles')
+  <style>
+    .ck-editor__editable_inline {
+        min-height: 400px;
+    }
+  </style>
+@endpush
+
 @push('scripts')
   <script src="{{ asset('scripts/organizer/events/edit.js') }}"></script>
 @endpush

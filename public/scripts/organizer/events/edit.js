@@ -6,5 +6,17 @@ $(function() {
         additional_field.find(`.location-${location}`).removeClass('d-none');
     });
 
+    window.ckeditor
+    .create($('#description').get(0), {
+        removePlugins: ['CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'Image', 'ImageCaption', 'ImageStyle', 'ImageToolbar', 'ImageUpload', 'MediaEmbed'],
+    })
+    .then( editor => {
+        console.log( editor );
+    } )
+    .catch( error => {
+        console.error( error );
+    } );
+
+
     $('#location').trigger('change');
 });

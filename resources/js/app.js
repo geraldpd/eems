@@ -1,5 +1,7 @@
 require('./bootstrap');
 
-window.tagify = require('@yaireo/tagify/dist/jQuery.tagify.min.js');
+window.ckeditor = require('@ckeditor/ckeditor5-build-classic');
+
+window.tagify = require('@yaireo/tagify');
 
 window.moment = require('moment');

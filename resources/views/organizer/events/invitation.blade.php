@@ -17,9 +17,39 @@
             </div>
         @endif
 
+        <br>
+
         <h1>{{ $event->name }}</h1>
 
         <div class="row">
+            <div class="col-md-{{ $event->schedule_start->isPast() ? '12' : '4'}} col-sm-12">
+                <table id="table" class="table table-bordered">
+                    <thead class="none">
+                        <th style="display:none">created_at</th> <!-- just for ordering -->
+                        <th>Invited</th>
+                        <th class="text-center">Response</th>
+                    </thead>
+                    <tbody>
+                        @forelse ($event->invitations->sortBy('created_at') as $invitation)
+                            <tr>
+                                <td style="display:none">{{ $invitation->created_at }}</td> <!-- just for ordering -->
+                                <td>{{ $invitation->guest?->email ?? $invitation->email }}</td>
+                                <td class="text-center">{{ $invitation->guest?->has_confirmed }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td></td>
+                                <td >No guest invited yet</td>
+                                <td></td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+
+                <br>
+                <br>
+            </div>
+
             @if(!$event->schedule_start->isPast())
                 <div class="col-md-8">
                     <form method="POST" action="{{ route('organizer.invitations.store', [$event->code]) }}">
@@ -42,31 +72,6 @@
 
                 </div>
             @endif
-
-            <div class="col-md-{{ $event->schedule_start->isPast() ? '12' : '4'}}">
-                <table id="table" class="table table-bordered">
-                    <thead class="none">
-                        <th style="display:none">created_at</th> <!-- just for ordering -->
-                        <th>Invited</th>
-                        <th class="text-center">Confirmed</th>
-                    </thead>
-                    <tbody>
-                        @forelse ($event->invitations->sortBy('created_at') as $invitation)
-                            <tr>
-                                <td style="display:none">{{ $invitation->created_at }}</td> <!-- just for ordering -->
-                                <td>{{ $invitation->guest?->email ?? $invitation->email }}</td>
-                                <td class="text-center">{{ $invitation->guest?->has_confirmed }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td></td>
-                                <td >No guest invited yet</td>
-                                <td></td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
 
         </div>
     </div>
@@ -95,6 +100,13 @@
 
         .dataTables_paginate a{
             margin-right: 10px;
+        }
+
+        @media(max-width:400px){
+            .col-md-8 {
+                padding-left: 0px;;
+                padding-right: 0px;;
+            }
         }
 
         #table_wrapper > div:nth-child(2) > div {

@@ -23,6 +23,17 @@ $(function() {
         schedule_start.prop('max', $(this).val());
     });
 
+    window.ckeditor
+    .create($('#description').get(0), {
+        removePlugins: ['CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'Image', 'ImageCaption', 'ImageStyle', 'ImageToolbar', 'ImageUpload', 'MediaEmbed'],
+    })
+    .then( editor => {
+        console.log( editor );
+    } )
+    .catch( error => {
+        console.error( error );
+    } );
+
     $('#location').on('change', function() {
         let location = $(this).val();
         let additional_field = $('.location-additionl-field');
@@ -39,5 +50,6 @@ $(function() {
         }
     });
 
+    //run in the end of the script
     $('#location').trigger('change');
 })
