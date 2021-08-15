@@ -59,7 +59,9 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2" class="text-center">No one is invited yet</td>
+                                <td></td>
+                                <td >No guest invited yet</td>
+                                <td></td>
                             </tr>
                         @endforelse
                     </tbody>
