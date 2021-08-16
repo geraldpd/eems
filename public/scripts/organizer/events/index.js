@@ -8,9 +8,10 @@ $(function() {
 
     const events = Object.values(config.events).map(event => Object.values(event)).flat();
 
-    var calendar = new FullCalendar.Calendar($('#calendar').get(0), {
-        height: 790,
+    var calendar = new window.Fullcalendar.Calendar($('#calendar').get(0), {
+        plugins: window.Fullcalendar.Plugins,
         selectable: true,
+        height: 790,
         initialView: 'dayGridMonth',
         events: events,
         eventBorderColor: 'white',
@@ -44,7 +45,7 @@ $(function() {
                     return;
                 }
 
-                return `<h3>${date}</h3> <div class="col-md-12"> ${constructEventList(config.events[date])}</div>`;
+                return `<h3>${window.moment(date).format('MMMM D YYYY')}</h3> <div class="col-md-12"> ${constructEventList(config.events[date])}</div>`;
             }).join('<hr>');
 
             if(!events) {
@@ -56,10 +57,29 @@ $(function() {
     });
 
     function dateModal(info, events, add_buton_bool = true) {
+        let readableFormat = date => window.moment(date).format('MMMM Do YYYY');
+        let event_for = info.dateStr ? readableFormat(info.dateStr) : `${readableFormat(info.startStr)} - ${readableFormat(info.endStr)}`;
+
         modals.date.modal('show');
-        modals.date.find('.date-title').text(`Events for ${info.dateStr}`);
+        modals.date.find('.date-title').text(`Events for ${ event_for }`);
         modals.date.find('.add-event-button').attr('href', `${config.routes.create}?date=${info.dateStr}`).toggle(add_buton_bool);
         modals.date.find('.date-events').html(events);
+
+        modals.date.find('.event-countdown').each((i, countdown_div) => {
+            let countdown = $(countdown_div).data();
+
+            i = setInterval(_ => {
+                if(window.moment(countdown.start).isBefore()) {
+                    clearInterval(i);
+                    return $(countdown_div).html('<p>Event has concluded</p>').prev().addClass('text-secondary');
+                }
+
+                let diff = moment(countdown.end).diff(moment())
+                let duration = window.moment.duration(diff).format("hh:mm:ss");
+
+                $(countdown_div).html(`<h3 title="Event Countdown" ><b class="event-countdown-timer">${duration}</b></h3>`);
+            }, 1000);
+        });
     }
 
     function constructEventList(events) {
@@ -88,12 +108,11 @@ $(function() {
                     </div>
                     <div class="col-md-5 col-sm-12">
                         <br>
-                        <p>
-                            <h4 class=""><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
-                            <a class=" btn btn-link" href="${config.routes.show.replace('resource_id', event.code)}">Preview</a>
-                            <a class=" btn btn-link" href="${config.routes.invitations.replace('resource_id', event.code)}">Attendees</a>
-                            ${edit_button}
-                        </p>
+                        <h4 class="scheduled_time"><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
+                        <div class="event-countdown" data-start="${event.schedule_start}" data-end="${event.schedule_end}"></div>
+                        <a class=" btn btn-link" href="${config.routes.show.replace('resource_id', event.code)}">Preview</a>
+                        <a class=" btn btn-link" href="${config.routes.invitations.replace('resource_id', event.code)}">Attendees</a>
+                        ${edit_button}
                     </div>
                 </div>`;
 

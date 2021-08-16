@@ -3,7 +3,7 @@
 @section('content')
   <div class="container">
 
-    <h1>EDIT Category</h1>
+    <h1>Edit Category</h1>
 
     <form method="POST" action="{{ route('admin.categories.update', [$category->id]) }}">
         @method('PUT')

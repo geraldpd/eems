@@ -19,4 +19,11 @@
 @import "~@fortawesome/fontawesome-free/scss/solid";
 @import "~@fortawesome/fontawesome-free/scss/brands";
 
-@import '../../node_modules/@yaireo/tagify/src/tagify';
+// Tagify
+@import '~@yaireo/tagify/src/tagify';
+
+// Fullcalendar
+@fullcalendar/core/main.css;
+@fullcalendar/daygrid/main.css;
+@fullcalendar/timegrid/main.css;
+@fullcalendar/list/main.css;

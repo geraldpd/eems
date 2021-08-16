@@ -2,27 +2,42 @@
 
 @section('content')
     <div class="container">
-
         @if(session()->has('message'))
             <div class="alert alert-info">
                 {{ session()->get('message') }}
             </div>
         @endif
 
-        <a href="{{ route('admin.users.attendees') }}"  class="btn btn-secondary btn-user" data-user="attendee">attendees</a>
-        <button type="button" class="btn btn-secondary btn-user active" data-user="organizer">organizers</button>
+        <div class="row">
+            <div class="col-md-6">
+                <h1>User Management</h1>
+            </div>
+            <div class="col-md-6">
+                <div class="float-right mt-2">
+                    <a href="{{ route('admin.users.attendees') }}" class="btn btn-link" data-user="attendee">
+                        <i class="fas fa-user"></i> Attendees
+                    </a>
+                    <button class="btn btn-primary active" data-user="organizer">
+                        <i class="fas fa-user"></i> Organizers
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        <br>
         <br>
 
         <table id="table" class="table table-striped table-bordered"  width="100%">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Action</th>
+                    <th rowspan="2" class="text-center ">#</th>
+                    <th rowspan="2" class="text-center align-middle">Organization</th>
+                    <th rowspan="2" class="text-center align-middle">Department</th>
+                    <th colspan="2" class="text-center">Organizer</th>
+                    <th rowspan="2" class="text-center">Action</th>
+                </tr>
+                <tr>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Email</th>
                 </tr>
             </thead>
 
@@ -30,10 +45,11 @@
                 @forelse ($organizers as $organizer)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $organizer->firstname }}</td>
-                        <td>{{ $organizer->lastname }}</td>
+                        <td>{{ $organizer->organization->name }}</td>
+                        <td>{{ $organizer->organization->department }}</td>
+                        <td>{{ $organizer->fullname }}</td>
                         <td>{{ $organizer->email }}</td>
-                        <td>actions</td>
+                        <td>show</td>
                     </tr>
                 @empty
 

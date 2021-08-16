@@ -47,7 +47,6 @@
 @endpush
 
 @push('styles')
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.css' rel='stylesheet' />
     <style>
         .event {
             background-color: #e6e6e642;
@@ -65,6 +64,17 @@
             background: white !important;
             border: 3px solid #2c3e50;
         }
+
+        @font-face {
+            font-family: 'digital7';
+            font-weight: normal;
+            font-style: normal;
+            src: url('{{asset('/fonts/custom/digital-7.ttf')}}') format('truetype');
+        }
+
+        .event-countdown-timer {
+            font-family: 'digital7', sans-serif;
+        }
     </style>
 @endpush
 
@@ -77,6 +87,5 @@
 
         config.routes.invitations = '{{ route('organizer.invitations.index', ['resource_id']) }}'
     </script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js'></script>
     <script src="{{ asset('scripts/organizer/events/index.js') }}"></script>
 @endpush

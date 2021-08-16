@@ -9,10 +9,14 @@
             </div>
         @endif
 
-        <a href="{{ route('admin.categories.create') }}" class="btn btn-primary float-right">Add Category</a>
-
-        <br>
-        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Category Management</h1>
+            </div>
+            <div class="col-md-6">
+                <a href="{{ route('admin.categories.create') }}" class="btn btn-primary float-right mt-2">Add Category</a>
+            </div>
+        </div>
 
         <table id="table" class="table table-striped table-bordered"  width="100%">
             <thead class="thead-dark">

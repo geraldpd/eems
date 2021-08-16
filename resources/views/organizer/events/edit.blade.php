@@ -95,7 +95,7 @@
         @endif
       </div>
 
-      <div class="location-additionl-field">
+      <div class="form-group location-additional-field">
 
         <div class="form-group location-venue d-none">
           <label for="location-venue">Venue</label>

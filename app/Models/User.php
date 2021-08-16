@@ -67,7 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getFullnameAttribute()
     {
-        return Str::title("$this->firtname $this->lastname");
+        return Str::title($this->firstname.' '.$this->lastname);
     }
 
     public function getProfilePicturePathAttribute()
