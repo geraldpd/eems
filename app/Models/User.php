@@ -80,6 +80,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Organization::class, 'organizer_id');
     }
 
+    public function evaluations() //for organizer
+    {
+        return $this->hasMany(Evaluation::class, 'organizer_id');
+    }
+
     public function organizedEvents() //for organizer
     {
         return $this->hasMany(Event::class, 'organizer_id');

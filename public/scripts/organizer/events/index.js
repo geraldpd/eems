@@ -1,14 +1,14 @@
 $(function() {
 
-    const modals = {
-        date: $('#date-modal')
-    }
+    let intervals = [];
+
+    const modals = { date: $('#date-modal') }
 
     const moment_format = 'YYYY-MM-DD';
 
     const events = Object.values(config.events).map(event => Object.values(event)).flat();
 
-    var calendar = new window.Fullcalendar.Calendar($('#calendar').get(0), {
+    const calendar = new window.Fullcalendar.Calendar($('#calendar').get(0), {
         plugins: window.Fullcalendar.Plugins,
         selectable: true,
         height: 790,
@@ -20,7 +20,7 @@ $(function() {
             window.location.href = config.routes.show.replace('resource_id', event.code)
         },
         dateClick: info => { //single date
-            if(!config.events[info.dateStr] && window.moment(info.dateStr).isBefore()) {
+            if(!config.events[info.dateStr] && moment(info.dateStr).isBefore()) {
                 return;
             }
 
@@ -28,11 +28,11 @@ $(function() {
                 ? constructEventList(config.events[info.dateStr])
                 : '<h3>No event scheduled for this date!</h3>';
 
-            dateModal(info, events, window.moment(info.dateStr).isAfter()); //window.moment(info.dateStr).isAfter() compares the moment object if its after NOW date
+            dateModal(info, events, moment(info.dateStr).isAfter()); //moment(info.dateStr).isAfter() compares the moment object if its after NOW date
         },
         select: info => { //multi date
-            let start = window.moment(info.startStr).add(1, 'days').format(moment_format); //full calendar adds 1 day to info.endStr so we need to add 1 day to start to compensate
-            let end = window.moment(info.endStr).format(moment_format);
+            let start = moment(info.startStr).add(1, 'days').format(moment_format); //full calendar adds 1 day to info.endStr so we need to add 1 day to start to compensate
+            let end = moment(info.endStr).format(moment_format);
 
             if(start == end) {
                 return;
@@ -45,7 +45,7 @@ $(function() {
                     return;
                 }
 
-                return `<h3>${window.moment(date).format('MMMM D YYYY')}</h3> <div class="col-md-12"> ${constructEventList(config.events[date])}</div>`;
+                return `<h3>${moment(date).format('MMMM D YYYY')}</h3> <div class="col-md-12"> ${constructEventList(config.events[date])}</div>`;
             }).join('<hr>');
 
             if(!events) {
@@ -57,7 +57,7 @@ $(function() {
     });
 
     function dateModal(info, events, add_buton_bool = true) {
-        let readableFormat = date => window.moment(date).format('MMMM Do YYYY');
+        let readableFormat = date => moment(date).format('MMMM Do YYYY');
         let event_for = info.dateStr ? readableFormat(info.dateStr) : `${readableFormat(info.startStr)} - ${readableFormat(info.endStr)}`;
 
         modals.date.modal('show');
@@ -68,30 +68,52 @@ $(function() {
         modals.date.find('.event-countdown').each((i, countdown_div) => {
             let countdown = $(countdown_div).data();
 
-            i = setInterval(_ => {
-                if(window.moment(countdown.start).isBefore()) {
-                    clearInterval(i);
-                    return $(countdown_div).html('<p>Event has concluded</p>').prev().addClass('text-secondary');
+            if(moment(countdown.start).isBefore()) {
+                clearInterval(i);
+                let html = moment(countdown.end).isBefore() ? '<b class="text-secondary">Event has concluded</b>' : '<b class="text-success">Ongoing Event</b >'
+                return $(countdown_div).html(html).prev().addClass('text-secondary');
+            }
+
+            intervals[i] = setInterval(_ => {
+                let duration = moment.duration(moment(countdown.start).diff(moment()));
+                let display_duration = '';
+
+                switch (true) {
+                    case duration.years() >= 1:
+                        let year = duration.format("Y") == 1 ? 'year' : 'years';
+                        display_duration = `<p title="Event Countdown"><b>${duration.format("Y")} ${year} left</b></p>`;
+                    break;
+
+                    case duration.months() >= 1:
+                        let month = duration.format("M") == 1 ? 'month' : 'months';
+                        display_duration = `<p title="Event Countdown"><b>${duration.format("M")} ${month} left</b></p>`;
+                    break;
+
+                    case duration.days() >= 1:
+                        let day = duration.format("D") == 1 ? 'day' : 'days';
+                        display_duration = `<p title="Event Countdown"><b>${duration.format("D")} ${day} left</b></p>`;
+                    break;
+
+                    case duration.hours() <= 24:
+                        display_duration = `<h4 title="Event Countdown" ><b class="event-countdown-timer text-warning">${duration.format("hh : mm : ss")}</b></h4>`;
+                    break;
                 }
 
-                let diff = moment(countdown.end).diff(moment())
-                let duration = window.moment.duration(diff).format("hh:mm:ss");
-
-                $(countdown_div).html(`<h3 title="Event Countdown" ><b class="event-countdown-timer">${duration}</b></h3>`);
+                $(countdown_div).html(display_duration);
             }, 1000);
         });
     }
 
     function constructEventList(events) {
         let event_row = event => {
-            let date_formater = (date) => ({time: window.moment(date).format('hh:mm A'), day: window.moment(date).format('MMMM D YYYY')});
+            let date_formater = (date) => ({time: moment(date).format('hh:mm A'), day: moment(date).format('MMMM D YYYY')});
 
             /*
                 check if the the event is scheduled today or was in the past
                 *TRUE - do not render the edit button
                 !FALSE - render the edit button redirecting to the edit page
             */
-            let edit_button = window.moment(event.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', event.code)}">Edit</a>`;
+            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', event.code)}">Edit</a>`;
 
             return `
                 <div class="event row">
@@ -124,8 +146,8 @@ $(function() {
     function constructListOfIntervals(start, end, interval) {
         const intervals = {};
 
-        while (window.moment(end).diff(start, interval) > 0) {
-          const current_end = window.moment(window.moment(start).add(1, interval)).format(moment_format);
+        while (moment(end).diff(start, interval) > 0) {
+          const current_end = moment(moment(start).add(1, interval)).format(moment_format);
 
           Object.assign(intervals, { [start]: current_end });
 
@@ -135,6 +157,10 @@ $(function() {
         //return intervals;
         return Object.keys(intervals);
     }
+
+    modals.date.on('hidden.bs.modal', function (e) {
+        intervals.forEach(i => clearInterval(i));
+    });
 
     calendar.render();
 });

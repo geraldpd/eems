@@ -8,6 +8,8 @@ $(function() {
 
     const events = Object.values(config.events).map(event => Object.values(event)).flat();
 
+    let intervals = [];
+
     var calendar = new window.Fullcalendar.Calendar($('#calendar').get(0), {
         plugins: window.Fullcalendar.Plugins,
         selectable: true,
@@ -68,16 +70,38 @@ $(function() {
         modals.date.find('.event-countdown').each((i, countdown_div) => {
             let countdown = $(countdown_div).data();
 
-            i = setInterval(_ => {
-                if(window.moment(countdown.start).isBefore()) {
-                    clearInterval(i);
-                    return $(countdown_div).html('<p>Event has concluded</p>').prev().addClass('text-secondary');
+            if(moment(countdown.start).isBefore()) {
+                clearInterval(i);
+                let html = moment(countdown.end).isBefore() ? '<b class="text-secondary">Event has concluded</b>' : '<b class="text-success">Ongoing Event</b >'
+                return $(countdown_div).html(html).prev().addClass('text-secondary');
+            }
+
+            intervals[i] = setInterval(_ => {
+                let duration = moment.duration(moment(countdown.start).diff(moment()));
+                let display_duration = '';
+
+                switch (true) {
+                    case duration.years() >= 1:
+                        let year = duration.format("Y") == 1 ? 'year' : 'years';
+                        display_duration = `<p title="Event Countdown"><b>${duration.format("Y")} ${year} left</b></p>`;
+                    break;
+
+                    case duration.months() >= 1:
+                        let month = duration.format("M") == 1 ? 'month' : 'months';
+                        display_duration = `<p title="Event Countdown"><b>${duration.format("M")} ${month} left</b></p>`;
+                    break;
+
+                    case duration.days() >= 1:
+                        let day = duration.format("D") == 1 ? 'day' : 'days';
+                        display_duration = `<p title="Event Countdown"><b>${duration.format("D")} ${day} left</b></p>`;
+                    break;
+
+                    case duration.hours() <= 24:
+                        display_duration = `<h4 title="Event Countdown" ><b class="event-countdown-timer text-warning">${duration.format("hh : mm : ss")}</b></h4>`;
+                    break;
                 }
 
-                let diff = moment(countdown.end).diff(moment())
-                let duration = window.moment.duration(diff).format("hh:mm:ss");
-
-                $(countdown_div).html(`<h3 title="Event Countdown" ><b class="event-countdown-timer">${duration}</b></h3>`);
+                $(countdown_div).html(display_duration);
             }, 1000);
         });
     }
@@ -134,6 +158,10 @@ $(function() {
         //return intervals;
         return Object.keys(intervals);
     }
+
+    modals.date.on('hidden.bs.modal', function (e) {
+        intervals.forEach(i => clearInterval(i));
+    });
 
     calendar.render();
 });

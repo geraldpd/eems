@@ -21,4 +21,41 @@ return [
         'end' => '17:00:00', // 05:00 PM
     ],
 
+    'evaluation_types' => [
+        'text' => [
+            'minlength',
+            'maxlength',
+            'required',
+        ],
+
+        'number' => [
+            'min',
+            'max',
+            'required'
+        ],
+
+        // 'range' => [
+        //     'min',
+        //     'max',
+        //     'required'
+        // ],
+
+        'date' => [
+            'min',
+            'max',
+            'required'
+        ],
+
+        'select' => [
+            'options',
+            'required'
+        ],
+
+        'checkbox' => [
+            'options',
+            'required'
+        ]
+
+    ]
+
 ];

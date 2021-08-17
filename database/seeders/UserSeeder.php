@@ -33,6 +33,12 @@ class UserSeeder extends Seeder
                     'name' => $role.' organization',
                     'department' => $role.' department'
                 ]);
+
+                $user->evaluations()->create([
+                    'name' => $role.' evaluation',
+                    'description' => 'The default evaluation sheet for organizations',
+                    'questions' => null
+                ]);
             }
 		}
 

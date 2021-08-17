@@ -112,6 +112,12 @@ class RegisterController extends Controller
                 'name' => $data['organization_name'],
                 'department' => $data['department']
             ]);
+
+            $user->evaluations()->create([
+                'name' => 'Default Evaluation Sheet',
+                'description' => 'The default evaluation sheet for organizations',
+                'questions' => null
+            ]);
         }
 
         $user->assignRole($data['as']);
