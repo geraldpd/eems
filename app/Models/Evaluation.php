@@ -17,6 +17,7 @@ class Evaluation extends Model
     protected $fillable = [
         'name',
         'questions',
+        'html_form',
     ];
 
     protected $casts = [

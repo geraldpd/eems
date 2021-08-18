@@ -8,7 +8,7 @@
     @endif
 
     <div class="container">
-        <div class="row questions-div"></div>
+        <ol class="row questions-div"></ol>
 
         <hr>
 
@@ -20,14 +20,21 @@
                         <option value="{{ $evaluation_type }}" data-attributes='@json($attributes)'> {{ ucwords($evaluation_type) }} </option>
                     @endforeach
                 </select>
+
+                <div class="row form_builder-div mt-2"></div>
             </div>
 
             <div class="col-md-4">
-                <button type="submit" id="add-evaluation_type" class="btn btn-primary mb-2 btn-block">Add Item</button>
-            </div>
+                <button type="button" id="add-evaluation_type" class="btn btn-light mb-2 btn-block">Add Item</button>
+                <br>
 
-            <div class="col-md-8 ">
-                <div class="row form_builder-div"></div>
+                <form action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="html_form" id="html_form" required>
+                    <input type="hidden" name="questions" required>
+                    <button type="submit" id="save-evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Form</button>
+                </form>
             </div>
         </div>
     </div>

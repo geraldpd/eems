@@ -72,7 +72,7 @@ class EvaluationController extends Controller
      */
     public function update(Request $request, Evaluation $evaluation)
     {
-        //
+        dd($request->all());
     }
 
     /**

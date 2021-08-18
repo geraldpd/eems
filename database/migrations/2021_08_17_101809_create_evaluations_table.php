@@ -19,6 +19,7 @@ class CreateEvaluationsTable extends Migration
             $table->string('name')->default('Default Evaluation Sheet');
             $table->text('description')->nullable();
             $table->text('questions')->json()->nullable();
+            $table->text('html_form')->nullable()->comment('renderable html form');
             $table->timestamps();
             $table->softDeletes();
         });

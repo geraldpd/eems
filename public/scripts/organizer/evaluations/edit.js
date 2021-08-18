@@ -1,6 +1,43 @@
 $(function() {
+    let evaluation_questions = {};
     let questions_div = $('.questions-div');
     let form_builder_div = $('.form_builder-div');
+
+    $('#save-evaluation_form').on('click', function() {
+        let evaluation_item = questions_div.find('li');
+
+        evaluation_item.map((i, li) => {
+            let item = $(li);
+
+            type = item.data('type');
+
+            switch (evaluation_type) {
+                case 'checkbox':
+                    break;
+
+                case 'date':
+
+
+                case 'number':
+
+                    break;
+
+                case 'select':
+
+                    break;
+
+                case 'text':
+                    break;
+            }
+
+            return {
+                label: '',
+                type: type,
+                attributes: ''
+            };
+
+        })
+    });
 
     $('#add-evaluation_type').on('click', function() {
         formBuilder();
@@ -56,10 +93,10 @@ $(function() {
             return `<div class="form-group col-md-6"><label style="text-transform:capitalize">${attribute}</label>${input}</div>`;
         }).join('');
 
-        let input_query = `<div class="form-group col-md-12"> <label>Query</label> <textarea name="form_evaluation_query" id="form_evaluation_query" class="form-control"></textarea> </div>`;
+        let input_query = `<div class="form-group col-md-12"> <label>Query</label> <textarea name="form_evaluation_query" id="form_evaluation_query" class="form-control" placeholder="Ask a question"></textarea> </div>`;
         form_builder_div.empty().append(input_query+attributes);
 
-        hookFormBuilderEventListeners(form_builder_div);
+        hookFormBuilderEventListeners();
     });
 
     function formBuilder() {
@@ -70,7 +107,6 @@ $(function() {
 
         let data = formAttributeConstructor();
 
-        console.log(data)
         let form_input = formInputConstructor({
             label: form_builder_div.find('#form_evaluation_query').val(),
             type: evaluation_type,
@@ -79,6 +115,8 @@ $(function() {
         });
 
         questions_div.append(form_input);
+
+        $('#html_form').val(questions_div.html());
     }
 
     function formAttributeConstructor() {
@@ -87,37 +125,71 @@ $(function() {
         let attributes = '';
         let options = '';
 
+        let questionToName = text => text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'_');
+
         switch (evaluation_type) {
             case 'checkbox':
                 form_builder_div.find('input, select').map((i, input) => {
+                    let attribute = $(input);
+                    if(attribute.attr('name') == 'required' && attribute.val()) {
+                        attributes += ` ${$(input).attr('name')}="${$(input).val()}"`;
+                    }
+
                     if($(input).hasClass('option')) {
-                        options += `<div class="form-check"> <label> <input class="form-check-input" type="checkbox" name="option[]" value="${$(input).val()}"> ${$(input).val()} </label> </div>`;
-                    } else {
-                        attributes += ` ${$(input).attr('name')}="${$(input).val()}`
+                        options += `<div class="form-check">
+                                        <label>
+                                            <input class="form-check-input" type="checkbox" name="${questionToName(form_builder_div.find('#form_evaluation_query').val())}[]" value="${$(input).val()}">
+                                            ${$(input).val()}
+                                        </label>
+                                    </div>`;
                     }
                 });
                 break;
 
             case 'date':
-                form_builder_div.find('input, select').map((i, input) => attributes += ` ${$(input).attr('name')}="${$(input).val()}"`);
+                form_builder_div.find('input, select').map((i, input) => {input
+                    let attribute = $(input);
+                    if(attribute.attr('name') == 'required') {
+                        if(!attribute.val()) return;
+                    }
+                    return attributes += ` ${attribute.attr('name')}="${attribute.val()}"`
+                });
                 break;
 
             case 'number':
-                form_builder_div.find('input, select').map((i, input) => attributes += ` ${$(input).attr('name')}="${$(input).val()}"`);
+                form_builder_div.find('input, select').map((i, input) => {input
+                    let attribute = $(input);
+                    if(attribute.attr('name') == 'required') {
+                        if(!attribute.val()) return;
+                    }
+                    return attributes += ` ${attribute.attr('name')}="${attribute.val()}"`
+                });
                 break;
 
             case 'select':
                 form_builder_div.find('input, select').map((i, input) => {
+                    let attribute = $(input);
+
+                    if(attribute.attr('id') == 'add_option_value') return;
+
+                    if(attribute.attr('name') == 'required' && attribute.val()) {
+                        attributes += ` ${$(input).attr('name')}="${$(input).val()}"`;
+                    }
+
                     if($(input).hasClass('option')) {
                         options += `<option value="${$(input).val()}">${$(input).val()}</option>`;
-                    } else {
-                        attributes += ` ${$(input).attr('name')}="${$(input).val()}`
                     }
                 });
                 break;
 
             case 'text':
-                form_builder_div.find('input, select').map((i, input) => attributes += ` ${$(input).attr('name')}="${$(input).val()}"`);
+                form_builder_div.find('input, select').map((i, input) => {input
+                    let attribute = $(input);
+                    if(attribute.attr('name') == 'required') {
+                        if(!attribute.val()) return;
+                    }
+                    return attributes += ` ${attribute.attr('name')}="${attribute.val()}"`
+                });
                 break;
         }
 
@@ -142,7 +214,7 @@ $(function() {
 
                 break;
             case 'select':
-                var form = `<select class="form-control"  ${data.attributes}> ${data.options}</select>`;
+                var form = `<select class="form-control" ${data.attributes}> ${data.options} </select>`;
 
                 break;
             case 'text':
@@ -151,10 +223,28 @@ $(function() {
                 break;
         }
 
-        return `<div class="form-group col-md-12"><label>${data.label}</label>${form}</div>`;
+        return `<li data-type="${data.type}" class="form-group col-md-12 evaluation_item">
+                    <label>${data.label}</label>${form}
+                </li>`;
     }
 
-    function hookFormBuilderEventListeners(form_builder_div) {
+    function formOptionsConstructor(type, options) {
+
+        let questionToName = text => text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
+
+        switch (true) {
+            case type == 'select':
+
+                break;
+
+
+            case type == 'checkbox':
+                questionToName();
+                 break;
+        }
+    }
+
+    function hookFormBuilderEventListeners() {
         form_builder_div.find('#add_option_button').on('click', _ => {
             let option_value = form_builder_div.find('.add_option_div').find('#add_option_value');
 
