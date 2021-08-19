@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Evaluation\StoreRequest;
+use App\Http\Requests\Evaluation\UpdateRequest;
 use App\Models\Evaluation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +38,7 @@ class EvaluationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
         //
     }
@@ -70,9 +72,11 @@ class EvaluationController extends Controller
      * @param  \App\Models\Evaluation  $evaluation
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Evaluation $evaluation)
+    public function update(UpdateRequest $request, Evaluation $evaluation)
     {
-        dd($request->all());
+        $evaluation->update($request->validated());
+        $request->session()->flash('clear_storage');
+        return redirect()->route('organizer.evaluations.edit', [$evaluation->id])->with('message', 'Evaluation  Successfully Updated');
     }
 
     /**

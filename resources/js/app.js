@@ -7,6 +7,8 @@ window.ckeditor = require('@ckeditor/ckeditor5-build-classic');
 
 window.tagify = require('@yaireo/tagify');
 
+window.draggable = require('@shopify/draggable');
+
 import { Calendar } from '@fullcalendar/core';
 import interaction from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -15,3 +17,6 @@ import listPlugin from '@fullcalendar/list';
 window.Fullcalendar = {};
 window.Fullcalendar.Calendar = Calendar;
 window.Fullcalendar.Plugins = [interaction, dayGridPlugin, timeGridPlugin, listPlugin];
+
+import Swal from 'sweetalert2';
+window.Swal = Swal;

@@ -29,11 +29,13 @@
         "@fullcalendar/interaction": "^5.9.0",
         "@fullcalendar/list": "^5.9.0",
         "@fullcalendar/timegrid": "^5.9.0",
+        "@shopify/draggable": "^1.0.0-beta.8",
         "@yaireo/tagify": "^4.6.0",
         "font-awesome": "^4.7.0",
         "fullcalendar": "^5.9.0",
         "moment": "^2.29.1",
         "moment-duration-format": "^2.3.2",
-        "prop-types": "^15.7.2"
+        "prop-types": "^15.7.2",
+        "sweetalert2": "^11.1.3"
     }
 }

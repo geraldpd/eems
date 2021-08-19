@@ -4,43 +4,73 @@ $(function() {
     let form_builder_div = $('.form_builder-div');
 
     $('#save-evaluation_form').on('click', function() {
-        let evaluation_item = questions_div.find('li');
+        const html_form = questions_div.html();
 
-        evaluation_item.map((i, li) => {
-            let item = $(li);
+        if(!questions_div.find('.evaluation_item').length) {
+            window.Swal.fire({
+                title: 'Evalaution Sheet can\'t be empty!',
+                text: 'Please provide at least 1 evalaution item',
+                icon: 'info',
+                confirmButtonText: 'Okay',
+                confirmButtonColor: '#007bff',
+            });
+            return;
+        }
 
-            type = item.data('type');
+        $('#name').val($('#preview-name').val());
+        $('#description').val($('#preview-description').val());
+        $('#questions').val(JSON.stringify($.map(questions_div.find('.question_item'), label => $(label).text())));
+        $('#html_form').val(html_form);
+        localStorage.setItem('html_form', html_form);
 
-            switch (evaluation_type) {
-                case 'checkbox':
-                    break;
-
-                case 'date':
-
-
-                case 'number':
-
-                    break;
-
-                case 'select':
-
-                    break;
-
-                case 'text':
-                    break;
-            }
-
-            return {
-                label: '',
-                type: type,
-                attributes: ''
-            };
-
-        })
+        $('#evaluation-form').trigger('submit');
     });
 
     $('#add-evaluation_type').on('click', function() {
-        formBuilder();
+        let evaluation_type = $('#evaluation_type').val();
+        let label = form_builder_div.find('#form_evaluation_query').val();
+
+        if(!label) return;
+
+        let data = formAttributeConstructor();
+
+        let form_input = formInputConstructor({
+            label: form_builder_div.find('#form_evaluation_query').val(),
+            type: evaluation_type,
+            attributes: data.attributes,
+            options: data.options
+        });
+
+        questions_div.find('.empty-form_text').remove().append(form_input);
+        questions_div.append(form_input);
+    });
+
+    $('#clear-evaluation_type').on('click', function() {
+
+        if(!questions_div.find('.evaluation_item').length) {
+            window.Swal.fire({
+                title: 'Nothing to clear!',
+                text: 'This evaluation sheet is empty',
+                icon: 'info',
+                confirmButtonText: 'Okay',
+                confirmButtonColor: '#007bff',
+            });
+            return;
+        }
+
+        window.Swal.fire({
+            title: 'Please Confirm',
+            text: 'Are you sure you want to clear the evaluation entries?',
+            icon: 'question',
+            confirmButtonText: 'Yes',
+            confirmButtonColor: '#007bff',
+            showCancelButton: true
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                questions_div.html('<h2 class="empty-form_text">No Evaluation Entries </h2>');
+            }
+        })
     });
 
     $('#evaluation_type').on('change', function() {
@@ -98,26 +128,6 @@ $(function() {
 
         hookFormBuilderEventListeners();
     });
-
-    function formBuilder() {
-        let evaluation_type = $('#evaluation_type').val();
-        let label = form_builder_div.find('#form_evaluation_query').val();
-
-        if(!label) return;
-
-        let data = formAttributeConstructor();
-
-        let form_input = formInputConstructor({
-            label: form_builder_div.find('#form_evaluation_query').val(),
-            type: evaluation_type,
-            attributes: data.attributes,
-            options: data.options
-        });
-
-        questions_div.append(form_input);
-
-        $('#html_form').val(questions_div.html());
-    }
 
     function formAttributeConstructor() {
         let evaluation_type = $('#evaluation_type').val();
@@ -223,25 +233,9 @@ $(function() {
                 break;
         }
 
-        return `<li data-type="${data.type}" class="form-group col-md-12 evaluation_item">
-                    <label>${data.label}</label>${form}
+        return `<li draggable data-type="${data.type}" class="form-group evaluation_item alert alert-light">
+                    <label class="question_item">${data.label}</label>${form}
                 </li>`;
-    }
-
-    function formOptionsConstructor(type, options) {
-
-        let questionToName = text => text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
-
-        switch (true) {
-            case type == 'select':
-
-                break;
-
-
-            case type == 'checkbox':
-                questionToName();
-                 break;
-        }
     }
 
     function hookFormBuilderEventListeners() {

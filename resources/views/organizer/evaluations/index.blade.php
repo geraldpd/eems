@@ -16,7 +16,7 @@
 
                 <hr class="my-4">
 
-                {{ $evaluation->question ? $evaluation->question->count() : 'No questions set' }}
+                {{ count($evaluation->questions_array) ? count($evaluation->questions_array).' Items' : 'No questions set' }}
 
                 <a class="btn btn-link float-right" href="{{ route('organizer.evaluations.edit', [$evaluation->id]) }}">update</a>
             </div>

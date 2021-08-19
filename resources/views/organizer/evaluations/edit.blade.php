@@ -1,40 +1,74 @@
 @extends('layouts.organizer')
 
 @section('content')
-    @if(session()->has('message'))
-        <div class="alert alert-info">
-            {{ session()->get('message') }}
-        </div>
-    @endif
-
     <div class="container">
-        <ol class="row questions-div"></ol>
 
-        <hr>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('organizer.evaluations.index') }}">Evaluation Sheets</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ ucwords(strtolower($evaluation->name)) }}</li>
+        </ol>
 
-        <div class="row jumbotron">
-            <div class="col-md-8">
-                <select class="form-control" name="evaluation_type" id="evaluation_type">
-                    <option value=""> Select Item </option>
-                    @foreach (config('eems.evaluation_types') as $evaluation_type => $attributes)
-                        <option value="{{ $evaluation_type }}" data-attributes='@json($attributes)'> {{ ucwords($evaluation_type) }} </option>
-                    @endforeach
-                </select>
+        @if(session()->has('message'))
+            <div class="alert alert-info">
+                {{ session()->get('message') }}
+            </div>
+        @endif
 
-                <div class="row form_builder-div mt-2"></div>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="">Evaluation Title</label>
+                <input type="text" id="preview-name" class="form-control" value="{{ old('name') ?? $evaluation->name }}" required>
+                @error('name')
+                <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
 
-            <div class="col-md-4">
-                <button type="button" id="add-evaluation_type" class="btn btn-light mb-2 btn-block">Add Item</button>
-                <br>
+            <div class="form-group col-md-12">
+                <label for="">Description</label>
+                <textarea name="preview-description" id="preview-description"class="form-control" cols="30" rows="5">{{ old('description') ?? $evaluation->description }}</textarea>
+                @error('description')
+                <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
 
-                <form action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="html_form" id="html_form" required>
-                    <input type="hidden" name="questions" required>
-                    <button type="submit" id="save-evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Form</button>
-                </form>
+        <div class="alert alert-secondary">
+            <ol class="questions-div">
+                @error('description')
+                <span class="text-danger">{{ $message }}</span>
+                @enderror
+                {!! $evaluation->html_form !!}
+            </ol>
+        </div>
+
+        <div class="alert alert-dark">
+            <div class="row">
+                <div class="col-md-8">
+                    <select class="form-control" name="evaluation_type" id="evaluation_type">
+                        <option value=""> Select Item </option>
+                        @foreach (config('eems.evaluation_types') as $evaluation_type => $attributes)
+                            <option value="{{ $evaluation_type }}" data-attributes='@json($attributes)'> {{ ucwords($evaluation_type) }} </option>
+                        @endforeach
+                    </select>
+
+                    <div class="row form_builder-div mt-2"></div>
+                </div>
+
+                <div class="col-md-4">
+                    <button type="button" id="add-evaluation_type" class="btn btn-light mb-2 btn-block">Add Item</button>
+                    <button type="button" id="clear-evaluation_type" class="btn btn-secondary mb-2 btn-block">Clear Form</button>
+                    <br>
+
+                    <form id="evaluation-form" action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="name" id="name" value="{{ old('name') }}">
+                        <input type="hidden" name="description" id="description" value="{{ old('description') }}" required>
+                        <input type="hidden" name="html_form" id="html_form" value="{{ old('html_form') }}" required>
+                        <input type="hidden" name="questions" id="questions" value="{{ old('questions') }}" required>
+                        <button type="button" id="save-evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Sheet</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -47,10 +81,26 @@
 @endpush
 
 @push('scripts')
-    <script type="text/javascript">
+    <script>
+        document.addEventListener('touchmove', function() { e.preventDefault(); }, { passive:false });
+
+        const sortable = new window.draggable.Sortable(document.querySelectorAll('ol'), {
+            draggable: 'li',
+            delay: 200,
+        });
+
         const config = {
             evaluation_type: @json(config('eems.evaluation_types'))
         }
+
+        if(parseInt({{ session()->has('clear_storage') ? 1: 0 }})) {
+            localStorage.removeItem('html_form');
+        }
+
+        if(localStorage.getItem('html_form')) {
+            $('.questions-div').html(localStorage.getItem('html_form'))
+        }
     </script>
     <script src="{{ asset('scripts/organizer/evaluations/edit.js') }}"></script>
+
 @endpush

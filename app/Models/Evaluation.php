@@ -24,9 +24,18 @@ class Evaluation extends Model
         'questions' => 'json',
     ];
 
+    protected $appends = [
+        'questions_array'
+    ];
+
     public function organizer()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getQuestionsArrayAttribute()
+    {
+        return json_decode($this->questions);
     }
 
 }
