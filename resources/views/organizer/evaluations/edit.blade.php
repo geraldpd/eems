@@ -86,7 +86,7 @@
 
         const sortable = new window.draggable.Sortable(document.querySelectorAll('ol'), {
             draggable: 'li',
-            delay: 200,
+            delay: 1000,
         });
 
         const config = {

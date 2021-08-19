@@ -1,5 +1,4 @@
 $(function() {
-    let evaluation_questions = {};
     let questions_div = $('.questions-div');
     let form_builder_div = $('.form_builder-div');
 
@@ -30,7 +29,11 @@ $(function() {
         let evaluation_type = $('#evaluation_type').val();
         let label = form_builder_div.find('#form_evaluation_query').val();
 
-        if(!label) return;
+        if(['select', 'checkbox', 'radio'].includes(evaluation_type)) { //when the evaluation is type and there is o option provided, do nothin
+            if(!form_builder_div.find('.option').length) return;
+        }
+
+        if(!label) return; //when no Query is provided, do not add to the evauation item
 
         let data = formAttributeConstructor();
 
@@ -41,6 +44,7 @@ $(function() {
             options: data.options
         });
 
+        form_builder_div.slideUp().empty();
         questions_div.find('.empty-form_text').remove().append(form_input);
         questions_div.append(form_input);
     });
@@ -94,13 +98,13 @@ $(function() {
                 case attribute == 'options': //? Option
                     input = `
                         <div class="add_option_div">
-                            <div class="option_list"></div>
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" minlength="1" id="add_option_value">
                                 <div class="input-group-append">
                                     <button class="btn btn-secondary" type="button" id="add_option_button"> <i class="fas fa-plus"></i> </button>
                                 </div>
                             </div>
+                            <div class="option_list"></div>
                         </div>
                     `;
                 break;
@@ -124,7 +128,7 @@ $(function() {
         }).join('');
 
         let input_query = `<div class="form-group col-md-12"> <label>Query</label> <textarea name="form_evaluation_query" id="form_evaluation_query" class="form-control" placeholder="Ask a question"></textarea> </div>`;
-        form_builder_div.empty().append(input_query+attributes);
+        form_builder_div.empty().append(input_query+attributes).slideDown();
 
         hookFormBuilderEventListeners();
     });
@@ -262,12 +266,21 @@ $(function() {
         let has_required = data.attributes.includes('required') ? '<strong class="text-danger" title="required">*</strong>' : '';
 
         return `<li draggable data-type="${data.type}" class="form-group evaluation_item alert alert-light">
-                    <label class="question_item">${data.label} ${has_required}</label>${form}
+                    <label class="question_item">${data.label} ${has_required}</label>
+                    <span class="edit-evaluation_type btn btn-link float-right">edit</span>
+                    ${form}
                 </li>`;
     }
 
     function hookFormBuilderEventListeners() {
-        form_builder_div.find('#add_option_button').on('click', _ => {
+        form_builder_div.find('#add_option_button').on('click', e => optionEvents()); //on click the add icon for options
+        form_builder_div.find('#add_option_value').on('keypress', e => {
+            if(e.keyCode == '13') {
+                optionEvents()
+            }
+        }); //on press ente
+
+        function optionEvents() {
             let option_value = form_builder_div.find('.add_option_div').find('#add_option_value');
 
             if(!option_value.val()) {
@@ -288,6 +301,36 @@ $(function() {
             });
 
             option_value.val('').focus();
-        });
+        }
+
     }
+
+    $(document).on('click', '.edit-evaluation_type', function() {
+        let form_item =  $(this).closest('li');
+        let form_element = form_item.find('input, select, textarea, checkbox, radio');
+
+        let type = form_item.data('type');
+        let label = form_item.find('label.question_item').text().replace(' *', '');
+        let attributes = form_element.get(0).attributes;
+
+        $('#evaluation_type').val(type).trigger('change');
+
+        form_builder_div.find(`select[name="required"]`).val(attributes.hasOwnProperty('required') ? 'required' : ''); //so far, for required attribute only
+
+        $.each(attributes, (i, attr) => {
+            form_builder_div.find(`input[name="${attr.name}"]`).val(attr.value);
+        });
+
+        //loop form_element
+        if(type == 'checkbox') {
+            form_builder_div.find('#add_option_value').val(attr.value)
+            form_builder_div.find('#add_option_button').trigger('click')
+        }
+
+        console.log(form_element)
+
+        form_builder_div.find('#form_evaluation_query').val(label);
+
+
+    })
 });
