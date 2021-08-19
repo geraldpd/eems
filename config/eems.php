@@ -34,12 +34,6 @@ return [
             'required'
         ],
 
-        // 'range' => [
-        //     'min',
-        //     'max',
-        //     'required'
-        // ],
-
         'date' => [
             'min',
             'max',
@@ -52,6 +46,13 @@ return [
         ],
 
         'checkbox' => [
+            'options',
+            'required'
+        ],
+
+        'radio' => [
+            //'left-text',
+            //'right-text',
             'options',
             'required'
         ]

@@ -155,6 +155,24 @@ $(function() {
                     }
                 });
                 break;
+            case 'radio':
+                form_builder_div.find('input, select').map((i, input) => {
+                    let attribute = $(input);
+                    if(attribute.attr('name') == 'required' && attribute.val()) {
+                        attributes += ` ${$(input).attr('name')}="${$(input).val()}"`;
+                    }
+
+                    if($(input).hasClass('option')) {
+                        options += `<div class="form-check form-check-inline">
+                                        <label>
+                                            ${$(input).val()}
+                                            <br>
+                                            <input class="form-check-input" type="radio" name="${questionToName(form_builder_div.find('#form_evaluation_query').val())}[]" value="${$(input).val()}">
+                                        </label>
+                                    </div>`;
+                    }
+                });
+                break;
 
             case 'date':
                 form_builder_div.find('input, select').map((i, input) => {input
@@ -213,8 +231,16 @@ $(function() {
         switch (data.type) {
             case 'checkbox':
                 var form = data.options;
-
                 break;
+
+            case 'radio':
+                var form = `<br> <div class="d-flex justify-content-between align-content-stretch flex-wrap">
+                                <div class="align-middle"><span>Not Very</span></div>
+                                ${data.options}
+                                <div class="align-middle"><span>Very Much</span></div>
+                            </div>`;
+                break;
+
             case 'date':
                 var form = `<input type="date" class="form-control" ${data.attributes}>`;
 
@@ -228,13 +254,15 @@ $(function() {
 
                 break;
             case 'text':
-                var form = `<textarea class="form-control" ${data.attributes}></textarea>`;
+                var form = `<textarea class="form-control" placeholder="Your answer" ${data.attributes}></textarea>`;
 
                 break;
         }
 
+        let has_required = data.attributes.includes('required') ? '<strong class="text-danger" title="required">*</strong>' : '';
+
         return `<li draggable data-type="${data.type}" class="form-group evaluation_item alert alert-light">
-                    <label class="question_item">${data.label}</label>${form}
+                    <label class="question_item">${data.label} ${has_required}</label>${form}
                 </li>`;
     }
 
