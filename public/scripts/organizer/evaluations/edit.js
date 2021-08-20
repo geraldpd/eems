@@ -26,27 +26,9 @@ $(function() {
     });
 
     $('#add-evaluation_type').on('click', function() {
-        let evaluation_type = $('#evaluation_type').val();
-        let label = form_builder_div.find('#form_evaluation_query').val();
-
-        if(['select', 'checkbox', 'radio'].includes(evaluation_type)) { //when the evaluation is type and there is o option provided, do nothin
-            if(!form_builder_div.find('.option').length) return;
-        }
-
-        if(!label) return; //when no Query is provided, do not add to the evauation item
-
-        let data = formAttributeConstructor();
-
-        let form_input = formInputConstructor({
-            label: form_builder_div.find('#form_evaluation_query').val(),
-            type: evaluation_type,
-            attributes: data.attributes,
-            options: data.options
-        });
-
-        form_builder_div.slideUp().empty();
-        questions_div.find('.empty-form_text').remove().append(form_input);
-        questions_div.append(form_input);
+        questions_div.find('.empty-form_text').remove();
+        questions_div.append($(formBuilder()));
+        $('#evaluation_type').val('').trigger('change');
     });
 
     $('#clear-evaluation_type').on('click', function() {
@@ -74,7 +56,7 @@ $(function() {
             if (result.isConfirmed) {
                 questions_div.html('<h2 class="empty-form_text">No Evaluation Entries </h2>');
             }
-        })
+        });
     });
 
     $('#evaluation_type').on('change', function() {
@@ -132,6 +114,117 @@ $(function() {
 
         hookFormBuilderEventListeners();
     });
+
+    questions_div.on('click', '.edit-evaluation_type', function() {
+        formModifier(this);
+    });
+
+    questions_div.on('click', '.remove-evaluation_type', function() {
+        window.Swal.fire({
+            title: 'Remove this Entry?',
+            text: 'Are you sure you want to remove this evaluation item?',
+            icon: 'question',
+            confirmButtonText: 'Yes',
+            confirmButtonColor: '#007bff',
+            showCancelButton: true
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                $(this).closest('li').remove();
+                if(!$('.questions-div').find('li').length) {
+                    questions_div.html('<h2 class="empty-form_text">No Evaluation Entries </h2>');
+                }
+            }
+        })
+    });
+
+    function formBuilder() {
+        let evaluation_type = $('#evaluation_type').val();
+        let label = form_builder_div.find('#form_evaluation_query').val();
+
+        if(['select', 'checkbox', 'radio'].includes(evaluation_type)) { //when the evaluation is type and there is o option provided, do nothin
+            if(!form_builder_div.find('.option').length) return;
+        }
+
+        if(!label) return; //when no Query is provided, do not add to the evaluation item
+
+        let data = formAttributeConstructor();
+
+        let form_input = formInputConstructor({
+            label: form_builder_div.find('#form_evaluation_query').val(),
+            type: evaluation_type,
+            attributes: data.attributes,
+            options: data.options
+        });
+
+        form_builder_div.slideUp().empty();
+
+        return form_input;
+    }
+
+    function formModifier(edit_button) {
+        questions_div.find('li').each((i, li) => $(li).removeClass('alert-info').addClass('alert-light')); //remove highlight of all list
+
+        let form_item =  $(edit_button).closest('li');
+        let form_element = form_item.find('input, select, textarea, checkbox, radio');
+
+        let type = form_item.data('type');
+        let label = form_item.find('label.question_item').text().replace(' *', '');
+        let attributes = form_element.get(0).attributes;
+
+        form_item.removeClass('alert-light').addClass('alert-info'); //add highlight to the item
+
+        $('#evaluation_type').val(type).trigger('change');
+
+        //required attr
+        form_builder_div.find(`select[name="required"]`).val(attributes.hasOwnProperty('required') ? 'required' : '');
+
+        //other inputs
+        $.each(attributes, (i, attr) => {
+            form_builder_div.find(`input[name="${attr.name}"]`).val(attr.value);
+        });
+
+        //checkboxes and radio buttons
+        if(['checkbox', 'radio'].includes(type)) {
+            form_element.each((i, input) => {
+                form_builder_div.find('#add_option_value').val($(input).val())
+                form_builder_div.find('#add_option_button').trigger('click')
+            });
+        }
+
+        //select
+        if(['select'].includes(type)) {
+            form_element.find('option').each((i, input) => {
+                form_builder_div.find('#add_option_value').val($(input).attr('value'))
+                form_builder_div.find('#add_option_button').trigger('click')
+            });
+        }
+
+        //the query
+        form_builder_div.find('#form_evaluation_query').val(label);
+
+        $('.form-creation-buttons').addClass('d-none'); //hide the add and clear buttons
+
+        $('.form-modification-buttons').removeClass('d-none'); //show the update button
+
+        //hook update event
+        $('#update-evaluation_type').off().on('click', _ => {
+            form_item.replaceWith($(formBuilder())); //replace the list item with the new form_item
+            stopModification();
+        });
+
+        //hook cancel event
+        $('#cancel-evaluation_type').off().on('click', _ => {
+            stopModification();
+        });
+
+        function stopModification() {
+            $('#evaluation_type').val('').trigger('change'); //reset eht evalution type selector
+            $('.form-creation-buttons').removeClass('d-none'); //return the add and clear buttons
+            $('.form-modification-buttons').addClass('d-none'); //hide the update button
+            form_item.removeClass('alert-info').addClass('alert-light');
+        }
+    }
 
     function formAttributeConstructor() {
         let evaluation_type = $('#evaluation_type').val();
@@ -268,6 +361,7 @@ $(function() {
         return `<li draggable data-type="${data.type}" class="form-group evaluation_item alert alert-light">
                     <label class="question_item">${data.label} ${has_required}</label>
                     <span class="edit-evaluation_type btn btn-link float-right">edit</span>
+                    <span class="remove-evaluation_type btn btn-link text-secondary float-right">remove</span>
                     ${form}
                 </li>`;
     }
@@ -302,35 +396,5 @@ $(function() {
 
             option_value.val('').focus();
         }
-
     }
-
-    $(document).on('click', '.edit-evaluation_type', function() {
-        let form_item =  $(this).closest('li');
-        let form_element = form_item.find('input, select, textarea, checkbox, radio');
-
-        let type = form_item.data('type');
-        let label = form_item.find('label.question_item').text().replace(' *', '');
-        let attributes = form_element.get(0).attributes;
-
-        $('#evaluation_type').val(type).trigger('change');
-
-        form_builder_div.find(`select[name="required"]`).val(attributes.hasOwnProperty('required') ? 'required' : ''); //so far, for required attribute only
-
-        $.each(attributes, (i, attr) => {
-            form_builder_div.find(`input[name="${attr.name}"]`).val(attr.value);
-        });
-
-        //loop form_element
-        if(type == 'checkbox') {
-            form_builder_div.find('#add_option_value').val(attr.value)
-            form_builder_div.find('#add_option_button').trigger('click')
-        }
-
-        console.log(form_element)
-
-        form_builder_div.find('#form_evaluation_query').val(label);
-
-
-    })
 });

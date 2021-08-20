@@ -55,19 +55,26 @@
                 </div>
 
                 <div class="col-md-4">
-                    <button type="button" id="add-evaluation_type" class="btn btn-light mb-2 btn-block">Add Item</button>
-                    <button type="button" id="clear-evaluation_type" class="btn btn-secondary mb-2 btn-block">Clear Form</button>
-                    <br>
+                    <div class="form-creation-buttons">
+                        <button type="button" id="add-evaluation_type" class="btn btn-light mb-2 btn-block">Add Item</button>
+                        <button type="button" id="clear-evaluation_type" class="btn btn-secondary mb-2 btn-block">Clear Form</button>
+                        <br>
 
-                    <form id="evaluation-form" action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="name" id="name" value="{{ old('name') }}">
-                        <input type="hidden" name="description" id="description" value="{{ old('description') }}" required>
-                        <input type="hidden" name="html_form" id="html_form" value="{{ old('html_form') }}" required>
-                        <input type="hidden" name="questions" id="questions" value="{{ old('questions') }}" required>
-                        <button type="button" id="save-evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Sheet</button>
-                    </form>
+                        <form id="evaluation-form" action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="name" id="name" value="{{ old('name') }}">
+                            <input type="hidden" name="description" id="description" value="{{ old('description') }}" required>
+                            <input type="hidden" name="html_form" id="html_form" value="{{ old('html_form') }}" required>
+                            <input type="hidden" name="questions" id="questions" value="{{ old('questions') }}" required>
+                            <button type="button" id="save-evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Sheet</button>
+                        </form>
+                    </div>
+
+                    <div class="form-modification-buttons d-none">
+                        <button type="button" id="update-evaluation_type" class="btn btn-light mb-2 btn-block">Update Item</button>
+                        <button type="button" id="cancel-evaluation_type" class="btn btn-secondary mb-2 btn-block">Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
