@@ -16,6 +16,7 @@ class Evaluation extends Model
      */
     protected $fillable = [
         'name',
+        'description',
         'questions',
         'html_form',
     ];

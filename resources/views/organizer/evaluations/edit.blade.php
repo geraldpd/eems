@@ -37,7 +37,8 @@
                 @error('description')
                 <span class="text-danger">{{ $message }}</span>
                 @enderror
-                {!! $evaluation->html_form !!}
+
+                {!! $evaluation->html_form ? $evaluation->html_form : '<h2 class="empty-form_text text-muted">No Evaluation Entries </h2>' !!}
             </ol>
         </div>
 
@@ -60,14 +61,14 @@
                         <button type="button" id="clear-evaluation_type" class="btn btn-secondary mb-2 btn-block">Clear Form</button>
                         <br>
 
-                        <form id="evaluation-form" action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" method="POST">
+                        <form id="evaluation-form" action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" onsubmit="save_evaluation_form.disabled=true; return true;" method="POST">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="name" id="name" value="{{ old('name') }}">
                             <input type="hidden" name="description" id="description" value="{{ old('description') }}" required>
                             <input type="hidden" name="html_form" id="html_form" value="{{ old('html_form') }}" required>
                             <input type="hidden" name="questions" id="questions" value="{{ old('questions') }}" required>
-                            <button type="button" id="save-evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Sheet</button>
+                            <button type="button" id="save-evaluation_form" name="save_evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Sheet</button>
                         </form>
                     </div>
 
@@ -89,9 +90,7 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('touchmove', function() { e.preventDefault(); }, { passive:false });
-
-        const sortable = new window.draggable.Sortable(document.querySelectorAll('ol'), {
+        const sortable = new window.draggable.Sortable($('.questions-div').get(0), {
             draggable: 'li',
             delay: 1000,
         });
@@ -105,9 +104,8 @@
         }
 
         if(localStorage.getItem('html_form')) {
-            $('.questions-div').html(localStorage.getItem('html_form'))
+            $('.questions-div').html(localStorage.getItem('html_form'));
         }
     </script>
     <script src="{{ asset('scripts/organizer/evaluations/edit.js') }}"></script>
-
 @endpush

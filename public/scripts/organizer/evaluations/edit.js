@@ -28,7 +28,6 @@ $(function() {
     $('#add-evaluation_type').on('click', function() {
         questions_div.find('.empty-form_text').remove();
         questions_div.append($(formBuilder()));
-        $('#evaluation_type').val('').trigger('change');
     });
 
     $('#clear-evaluation_type').on('click', function() {
@@ -54,7 +53,7 @@ $(function() {
         })
         .then((result) => {
             if (result.isConfirmed) {
-                questions_div.html('<h2 class="empty-form_text">No Evaluation Entries </h2>');
+                questions_div.html('<h2 class="empty-form_text text-muted">No Evaluation Entries </h2>');
             }
         });
     });
@@ -129,6 +128,9 @@ $(function() {
             showCancelButton: true
         })
         .then((result) => {
+            $('#evaluation_type').val('').trigger('change');
+            $('.form-creation-buttons').removeClass('d-none'); //return the add and clear buttons
+            $('.form-modification-buttons').addClass('d-none'); //hide the update button
             if (result.isConfirmed) {
                 $(this).closest('li').remove();
                 if(!$('.questions-div').find('li').length) {
@@ -159,7 +161,10 @@ $(function() {
 
         form_builder_div.slideUp().empty();
 
+        $('#evaluation_type').val('').trigger('change');
+
         return form_input;
+
     }
 
     function formModifier(edit_button) {
@@ -170,6 +175,7 @@ $(function() {
 
         let type = form_item.data('type');
         let label = form_item.find('label.question_item').text().replace(' *', '');
+        let required = form_item.find('label.question_item').data('is_required'); // 1 or 0
         let attributes = form_element.get(0).attributes;
 
         form_item.removeClass('alert-light').addClass('alert-info'); //add highlight to the item
@@ -177,7 +183,7 @@ $(function() {
         $('#evaluation_type').val(type).trigger('change');
 
         //required attr
-        form_builder_div.find(`select[name="required"]`).val(attributes.hasOwnProperty('required') ? 'required' : '');
+        form_builder_div.find(`select[name="required"]`).val(required ? 'required' : '');
 
         //other inputs
         $.each(attributes, (i, attr) => {
@@ -209,14 +215,21 @@ $(function() {
 
         //hook update event
         $('#update-evaluation_type').off().on('click', _ => {
+            let evaluation_type = $('#evaluation_type').val();
+            let label = form_builder_div.find('#form_evaluation_query').val();
+
+            if(['select', 'checkbox', 'radio'].includes(evaluation_type)) { //when the evaluation is type and there is o option provided, do nothin
+                if(!form_builder_div.find('.option').length) return;
+            }
+
+            if(!label) return; //when no Query is provided, do not add to the evaluation item
+
             form_item.replaceWith($(formBuilder())); //replace the list item with the new form_item
             stopModification();
         });
 
         //hook cancel event
-        $('#cancel-evaluation_type').off().on('click', _ => {
-            stopModification();
-        });
+        $('#cancel-evaluation_type').off().on('click', _ => stopModification());
 
         function stopModification() {
             $('#evaluation_type').val('').trigger('change'); //reset eht evalution type selector
@@ -332,9 +345,9 @@ $(function() {
 
             case 'radio':
                 var form = `<br> <div class="d-flex justify-content-between align-content-stretch flex-wrap">
-                                <div class="align-middle"><span>Not Very</span></div>
+                                <div class="align-middle" contenteditable><span>Not Very</span></div>
                                 ${data.options}
-                                <div class="align-middle"><span>Very Much</span></div>
+                                <div class="align-middle" contenteditable><span>Very Much</span></div>
                             </div>`;
                 break;
 
@@ -359,10 +372,16 @@ $(function() {
         let has_required = data.attributes.includes('required') ? '<strong class="text-danger" title="required">*</strong>' : '';
 
         return `<li draggable data-type="${data.type}" class="form-group evaluation_item alert alert-light">
-                    <label class="question_item">${data.label} ${has_required}</label>
-                    <span class="edit-evaluation_type btn btn-link float-right">edit</span>
-                    <span class="remove-evaluation_type btn btn-link text-secondary float-right">remove</span>
-                    ${form}
+                    <div class="row">
+                        <div class="col-md-10 col-xs-12">
+                            <label class="question_item" data-is_required="${has_required ? 1 : 0}" >${data.label} ${has_required}</label>
+                        </div>
+                        <div class="col-md-2 col-xs-12 d-flex justify-content-center">
+                            <span class="edit-evaluation_type btn btn-link float-right">edit</span>
+                            <span class="remove-evaluation_type btn btn-link text-secondary float-right">remove</span>
+                        </div>
+                        <div class="col-md-12">${form}</div>
+                    </div>
                 </li>`;
     }
 

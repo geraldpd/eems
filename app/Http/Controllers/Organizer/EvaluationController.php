@@ -29,7 +29,7 @@ class EvaluationController extends Controller
      */
     public function create()
     {
-        //
+        return view('organizer.evaluations.create');
     }
 
     /**
@@ -40,7 +40,9 @@ class EvaluationController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        //
+        $evaluation = Auth::user()->evaluations()->create($request->validated());
+
+        return redirect()->route('organizer.evaluations.edit', [$evaluation]);
     }
 
     /**
@@ -76,7 +78,7 @@ class EvaluationController extends Controller
     {
         $evaluation->update($request->validated());
         $request->session()->flash('clear_storage');
-        return redirect()->route('organizer.evaluations.edit', [$evaluation->id])->with('message', 'Evaluation  Successfully Updated');
+        return redirect()->route('organizer.evaluations.edit', [$evaluation->id])->with('message', 'Evaluation Successfully Updated');
     }
 
     /**
@@ -87,6 +89,8 @@ class EvaluationController extends Controller
      */
     public function destroy(Evaluation $evaluation)
     {
-        //
+        dd($evaluation);
+        $evaluation->delete();
+        return redirect()->route('organizer.evaluations.index')->with('message', 'Evaluation Successfully removed');
     }
 }

@@ -19,7 +19,7 @@ class Organizer
     {
         if (!Auth::check())
         {
-            return redirect()->route('organizer.login');
+            return redirect()->route('login');
         }
 
         if (in_array(Auth::user()->roles->first()->id, [1, 3]))
