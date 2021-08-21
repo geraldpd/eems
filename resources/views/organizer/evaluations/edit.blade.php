@@ -5,7 +5,7 @@
 
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('organizer.evaluations.index') }}">Evaluation Sheets</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ ucwords(strtolower($evaluation->name)) }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ ucwords($evaluation->name) }}</li>
         </ol>
 
         @if(session()->has('message'))
@@ -35,7 +35,7 @@
         <div class="alert alert-secondary">
             <ol class="questions-div">
                 @error('description')
-                <span class="text-danger">{{ $message }}</span>
+                    <span class="text-danger">{{ $message }}</span>
                 @enderror
 
                 {!! $evaluation->html_form ? $evaluation->html_form : '<h2 class="empty-form_text text-muted">No Evaluation Entries </h2>' !!}
@@ -46,7 +46,7 @@
             <div class="row">
                 <div class="col-md-8">
                     <select class="form-control" name="evaluation_type" id="evaluation_type">
-                        <option value=""> Select Item </option>
+                        <option value=""> Select Form Type </option>
                         @foreach (config('eems.evaluation_types') as $evaluation_type => $attributes)
                             <option value="{{ $evaluation_type }}" data-attributes='@json($attributes)'> {{ ucwords($evaluation_type) }} </option>
                         @endforeach
@@ -57,7 +57,7 @@
 
                 <div class="col-md-4">
                     <div class="form-creation-buttons">
-                        <button type="button" id="add-evaluation_type" class="btn btn-light mb-2 btn-block">Add Item</button>
+                        <button type="button" id="add-evaluation_type" class="btn btn-light mb-2 btn-block">Add Entry</button>
                         <button type="button" id="clear-evaluation_type" class="btn btn-secondary mb-2 btn-block">Clear Form</button>
                         <br>
 
@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="form-modification-buttons d-none">
-                        <button type="button" id="update-evaluation_type" class="btn btn-light mb-2 btn-block">Update Item</button>
+                        <button type="button" id="update-evaluation_type" class="btn btn-light mb-2 btn-block">Update Entry</button>
                         <button type="button" id="cancel-evaluation_type" class="btn btn-secondary mb-2 btn-block">Cancel</button>
                     </div>
                 </div>

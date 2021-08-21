@@ -5,10 +5,10 @@ $(function() {
     $('#save-evaluation_form').on('click', function() {
         const html_form = questions_div.html();
 
-        if(!questions_div.find('.evaluation_item').length) {
+        if(!questions_div.find('.evaluation_entry').length) {
             window.Swal.fire({
                 title: 'Evalaution Sheet can\'t be empty!',
-                text: 'Please provide at least 1 evalaution item',
+                text: 'Please provide at least 1 evalaution entry',
                 icon: 'info',
                 confirmButtonText: 'Okay',
                 confirmButtonColor: '#007bff',
@@ -18,7 +18,7 @@ $(function() {
 
         $('#name').val($('#preview-name').val());
         $('#description').val($('#preview-description').val());
-        $('#questions').val(JSON.stringify($.map(questions_div.find('.question_item'), label => $(label).text())));
+        $('#questions').val(JSON.stringify($.map(questions_div.find('.question_entry'), label => $(label).text())));
         $('#html_form').val(html_form);
         localStorage.setItem('html_form', html_form);
 
@@ -32,7 +32,7 @@ $(function() {
 
     $('#clear-evaluation_type').on('click', function() {
 
-        if(!questions_div.find('.evaluation_item').length) {
+        if(!questions_div.find('.evaluation_entry').length) {
             window.Swal.fire({
                 title: 'Nothing to clear!',
                 text: 'This evaluation sheet is empty',
@@ -121,7 +121,7 @@ $(function() {
     questions_div.on('click', '.remove-evaluation_type', function() {
         window.Swal.fire({
             title: 'Remove this Entry?',
-            text: 'Are you sure you want to remove this evaluation item?',
+            text: 'Are you sure you want to remove this evaluation entry?',
             icon: 'question',
             confirmButtonText: 'Yes',
             confirmButtonColor: '#007bff',
@@ -148,7 +148,7 @@ $(function() {
             if(!form_builder_div.find('.option').length) return;
         }
 
-        if(!label) return; //when no Query is provided, do not add to the evaluation item
+        if(!label) return; //when no Query is provided, do not add to the evaluation entry
 
         let data = formAttributeConstructor();
 
@@ -170,15 +170,15 @@ $(function() {
     function formModifier(edit_button) {
         questions_div.find('li').each((i, li) => $(li).removeClass('alert-info').addClass('alert-light')); //remove highlight of all list
 
-        let form_item =  $(edit_button).closest('li');
-        let form_element = form_item.find('input, select, textarea, checkbox, radio');
+        let form_entry =  $(edit_button).closest('li');
+        let form_element = form_entry.find('input, select, textarea, checkbox, radio');
 
-        let type = form_item.data('type');
-        let label = form_item.find('label.question_item').text().replace(' *', '');
-        let required = form_item.find('label.question_item').data('is_required'); // 1 or 0
+        let type = form_entry.data('type');
+        let label = form_entry.find('label.question_entry').text().replace(' *', '');
+        let required = form_entry.find('label.question_entry').data('is_required'); // 1 or 0
         let attributes = form_element.get(0).attributes;
 
-        form_item.removeClass('alert-light').addClass('alert-info'); //add highlight to the item
+        form_entry.removeClass('alert-light').addClass('alert-info'); //add highlight to the entry
 
         $('#evaluation_type').val(type).trigger('change');
 
@@ -222,9 +222,9 @@ $(function() {
                 if(!form_builder_div.find('.option').length) return;
             }
 
-            if(!label) return; //when no Query is provided, do not add to the evaluation item
+            if(!label) return; //when no Query is provided, do not add to the evaluation entry
 
-            form_item.replaceWith($(formBuilder())); //replace the list item with the new form_item
+            form_entry.replaceWith($(formBuilder())); //replace the list entry with the new form_entry
             stopModification();
         });
 
@@ -235,7 +235,7 @@ $(function() {
             $('#evaluation_type').val('').trigger('change'); //reset eht evalution type selector
             $('.form-creation-buttons').removeClass('d-none'); //return the add and clear buttons
             $('.form-modification-buttons').addClass('d-none'); //hide the update button
-            form_item.removeClass('alert-info').addClass('alert-light');
+            form_entry.removeClass('alert-info').addClass('alert-light');
         }
     }
 
@@ -371,10 +371,10 @@ $(function() {
 
         let has_required = data.attributes.includes('required') ? '<strong class="text-danger" title="required">*</strong>' : '';
 
-        return `<li draggable data-type="${data.type}" class="form-group evaluation_item alert alert-light">
+        return `<li draggable data-type="${data.type}" class="form-group evaluation_entry alert alert-light">
                     <div class="row">
                         <div class="col-md-10 col-xs-12">
-                            <label class="question_item" data-is_required="${has_required ? 1 : 0}" >${data.label} ${has_required}</label>
+                            <label class="question_entry" data-is_required="${has_required ? 1 : 0}" >${data.label} ${has_required}</label>
                         </div>
                         <div class="col-md-2 col-xs-12 d-flex justify-content-center">
                             <span class="edit-evaluation_type btn btn-link float-right">edit</span>
@@ -401,7 +401,7 @@ $(function() {
             }
 
             form_builder_div.find('.add_option_div').find('.option_list').append(`
-                <div class="input-group mb-3 option_item_div">
+                <div class="input-group mb-3 option_entry_div">
                     <input type="text" class="option form-control" value="${option_value.val()}">
                     <div class="input-group-append">
                         <button class="btn btn-light remove_option_button" type="button"> <i class="fas fa-trash"></i> </button>
@@ -410,7 +410,7 @@ $(function() {
             `);
 
             form_builder_div.find('.remove_option_button').on('click', function() {
-                $(this).closest('.option_item_div').remove();
+                $(this).closest('.option_entry_div').remove();
             });
 
             option_value.val('').focus();

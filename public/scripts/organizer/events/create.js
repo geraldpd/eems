@@ -23,8 +23,9 @@ $(function() {
         schedule_start.prop('max', $(this).val());
     });
 
-    window.ckeditor
-    .create($('#description').get(0), {
+    window.ClassicEditor
+    .create(document.querySelector('#description'), {
+        //plugins: window.Editor.Plugins,
         removePlugins: ['CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'Image', 'ImageCaption', 'ImageStyle', 'ImageToolbar', 'ImageUpload', 'MediaEmbed'],
     })
     .then( editor => {

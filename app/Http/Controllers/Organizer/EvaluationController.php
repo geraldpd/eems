@@ -42,7 +42,7 @@ class EvaluationController extends Controller
     {
         $evaluation = Auth::user()->evaluations()->create($request->validated());
 
-        return redirect()->route('organizer.evaluations.edit', [$evaluation]);
+        return redirect()->route('organizer.evaluations.edit', [$evaluation])->with('message', 'Evaluation Successfully Created');
     }
 
     /**
@@ -89,7 +89,6 @@ class EvaluationController extends Controller
      */
     public function destroy(Evaluation $evaluation)
     {
-        dd($evaluation);
         $evaluation->delete();
         return redirect()->route('organizer.evaluations.index')->with('message', 'Evaluation Successfully removed');
     }
