@@ -38,6 +38,7 @@ class Event extends Model
 
     protected $appends = [
         'group_date',
+        'notif_confirmed_attendee_count',
     ];
 
     public function getRouteKeyName()
@@ -60,6 +61,11 @@ class Event extends Model
         return $this->hasMany(Invitation::class);
     }
 
+    public function evaluations()
+    {
+        return $this->hasMany(EventEvaluation::class);
+    }
+
     public function attendees()
     {
         return $this->belongsToMany(User::class, 'event_attendees', 'event_id', 'attendee_id')
@@ -70,5 +76,10 @@ class Event extends Model
     public function getGroupDateAttribute()
     {
         return $this->schedule_start->format('d-m-y');
+    }
+
+    public function getNotifConfirmedAttendeeCountAttribute()
+    {
+        return $this->attendees()->whereIsConfirmed(1)->whereIsNotified(0)->count();
     }
 }

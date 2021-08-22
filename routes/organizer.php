@@ -12,8 +12,9 @@ Route::group([
     ], function(){
 
         Route::get('/', HomeController::class);
-        Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
+
         Route::resource('events', EventController::class);
+        Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
 
         Route::resource('evaluations', EvaluationController::class);
     });

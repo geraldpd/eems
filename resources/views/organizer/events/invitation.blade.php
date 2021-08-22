@@ -4,7 +4,7 @@
     <div class="container">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
-            <li class="breadcrumb-item active" aria-current="page"> <a href="{{ route('organizer.events.edit', [$event->code]) }}">{{ ucwords(strtolower($event->name)) }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page"> <a href="{{ route('organizer.events.show', [$event->code]) }}">{{ ucwords(strtolower($event->name)) }}</a></li>
             <li class="breadcrumb-item">Invitations</li>
         </ol>
     </div>

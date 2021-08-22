@@ -30,7 +30,7 @@
 
         <br>
 
-        {{ $event->description }}
+        {!! $event->description !!}
 
     </div>
 @endsection

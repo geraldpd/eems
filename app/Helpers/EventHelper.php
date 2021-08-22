@@ -22,3 +22,10 @@ if (! function_exists('eventHelperGetInvitationLink')) {
         return route('event.invitation', [$event->code, encrypt($email)]);
     }
 }
+
+if (! function_exists('resetNotifConfirmedAttendeeCount')) {
+    function resetNotifConfirmedAttendeeCount($event)
+    {
+        $event->attendees()->whereIsConfirmed(1)->whereIsNotified(0)->update(['is_notified' => true]);
+    }
+}

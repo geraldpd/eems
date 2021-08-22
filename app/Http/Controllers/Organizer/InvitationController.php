@@ -38,6 +38,7 @@ class InvitationController extends Controller
             return $invitation;
         });
 
+        resetNotifConfirmedAttendeeCount($event); //? reset the notification badge in /show to zero after viewing the /invitations page
 
         return view('organizer.events.invitation', compact('event'));
     }

@@ -75,6 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->profile_picture ? asset('storage/'.$this->profile_picture) : asset('assets/default-profile_picture.png');
     }
 
+    //! ORGANIZER RELATIONSHIPS
     public function organization() //for organizer
     {
         return $this->hasOne(Organization::class, 'organizer_id');
@@ -90,6 +91,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Event::class, 'organizer_id');
     }
 
+    //! ATTENDEE RELATIONSHIPS
     public function attendedEvents() //for attendees
     {
         return $this->belongsToMany(Event::class, 'event_attendees', 'attendee_id');
@@ -98,5 +100,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function invitations() //for attendees
     {
         return $this->hasMany(Invitation::class, 'email', 'email');
+    }
+
+    public function eventEvaluations() //for attendees
+    {
+        return $this->hasMany(Evaluation::class, 'attendee_id');
     }
 }

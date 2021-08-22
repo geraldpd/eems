@@ -17,8 +17,11 @@ class CreateEventsTable extends Migration
             $table->id();
             $table->string('code')->unique()->nullable()->comment('unique identifier to be used in invitation links');
             $table->text('qrcode')->nullable()->comment('qrcode path');
+
             $table->foreignId('organizer_id')->constrained('users');
             $table->foreignId('category_id')->constrained();
+            $table->foreignId('evaluation_id')->nullable()->constrained()->comment('Note: the entries are configurable, so there might not always be a 100% similarity. refer to the evaluation_questions field for the final questions used in the attendee evaluation');
+
             $table->string('name');
             $table->string('type');
             $table->text('description');
@@ -28,7 +31,11 @@ class CreateEventsTable extends Migration
             $table->text('documents')->nullable();
             $table->dateTime('schedule_start');
             $table->dateTime('schedule_end');
+
+            $table->text('evaluation_questions')->nullable()->comment('the final set of evaluation entries(modified or not) used in evaluating this event');
+
             $table->string('status')->default('Pending');
+
             $table->timestamps();
             $table->softDeletes();
         });

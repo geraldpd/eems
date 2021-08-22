@@ -17,7 +17,7 @@
                     <div class="card-body">
                         <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
 
-                        <p>{{ $event->description }}</p>
+                        <p>{!! $event->description !!}</p>
                     </div>
                 </div>
                 <br>
