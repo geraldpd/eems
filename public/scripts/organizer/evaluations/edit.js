@@ -16,13 +16,36 @@ $(function() {
             return;
         }
 
-        $('#name').val($('#preview-name').val());
-        $('#description').val($('#preview-description').val());
-        $('#questions').val(JSON.stringify($.map(questions_div.find('.question_entry'), label => $(label).text())));
-        $('#html_form').val(html_form);
-        localStorage.setItem('html_form', html_form);
+        if(config.events_count) {
+            let proper_sentence = config.events_count > 1 ? 'There are ' : 'There is ';
+            window.Swal.fire({
+                title: `${config.events_count} event will use this evaluation sheet`,
+                text: `${proper_sentence + config.events_count} booked event(s) that will use this evalution sheet, would you like to proceed?`,
+                icon: 'question',
+                confirmButtonText: 'Yes',
+                confirmButtonColor: '#007bff',
+                showCancelButton: true
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    updateEvaluationForm();
+                }
+                return;
+            });
+        } else {
+            updateEvaluationForm();
+        }
 
-        $('#evaluation-form').trigger('submit');
+        function updateEvaluationForm() {
+            $('#name').val($('#preview-name').val());
+            $('#description').val($('#preview-description').val());
+            $('#questions').val(JSON.stringify($.map(questions_div.find('.question_entry'), label => $(label).text())));
+            $('#html_form').val(html_form);
+            localStorage.setItem('html_form', html_form);
+
+            $('#evaluation-form').trigger('submit');
+        }
+
     });
 
     $('#add-evaluation_type').on('click', function() {

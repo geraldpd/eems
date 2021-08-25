@@ -93,6 +93,8 @@ class EvaluationController extends Controller
             ]);
         }
 
+        $evaluation->loadCount('events');
+
         return view('organizer.evaluations.edit', compact('evaluation', 'event'));
     }
 

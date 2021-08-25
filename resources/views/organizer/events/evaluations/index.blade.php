@@ -53,7 +53,7 @@
 
                                 <div class="col-md-6">
                                     <div class="float-right">
-                                        <a class="btn btn-link" href="{{ route('organizer.evaluations.edit', [$event->evaluation->id]) }}">Modify evaluation Entries</a>
+                                        <a class="btn btn-link" href="{{ route('organizer.evaluations.edit', [$event->evaluation->id, 'event' => $event->code]) }}">Modify evaluation Entries</a>
                                         <a class="btn btn-link" href="">Reuse another sheet</a>
                                         <a class="btn btn-link" href="">Remove</a>
                                     </div>

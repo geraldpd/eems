@@ -15,7 +15,6 @@ class EventEvaluationController extends Controller
      */
     public function index(Request $request, Event $event)
     {
-        dd($event->evaluation_questions);
         return view('organizer.events.evaluations.index', compact('event'));
     }
 

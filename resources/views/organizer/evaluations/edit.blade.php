@@ -4,8 +4,16 @@
     <div class="container">
 
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('organizer.evaluations.index') }}">Evaluation Sheets</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ ucwords($evaluation->name) }}</li>
+
+            @if($event)
+                <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('organizer.events.show', [$event->code]) }}">{{ $event->name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ ucwords($event->evaluation->name) }}</li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            @else
+                <li class="breadcrumb-item"><a href="{{ route('organizer.evaluations.index') }}">Evaluation Sheets</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ ucwords($evaluation->name) }}</li>
+            @endif
         </ol>
 
         @if(session()->has('message'))
@@ -92,14 +100,15 @@
 @endpush
 
 @push('scripts')
-    <script>
+    <script type="text/javascript">
         const sortable = new window.draggable.Sortable($('.questions-div').get(0), {
             draggable: 'li',
             delay: 1000,
         });
 
         const config = {
-            evaluation_type: @json(config('eems.evaluation_types'))
+            evaluation_type: @json(config('eems.evaluation_types')),
+            events_count: {{ $evaluation->events_count }}
         }
 
         if(parseInt({{ session()->has('clear_storage') ? 1: 0 }})) {
@@ -109,6 +118,8 @@
         if(localStorage.getItem('html_form')) {
             $('.questions-div').html(localStorage.getItem('html_form'));
         }
+
+        console.log(config)
     </script>
-    <script src="{{ asset('scripts/organizer/evaluations/edit.js') }}"></script>
+    <script src="{{ asset('scripts/organizer/evaluations/edit.js') }}" defer></script>
 @endpush
