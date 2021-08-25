@@ -64,6 +64,9 @@
                         <form id="evaluation-form" action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" onsubmit="save_evaluation_form.disabled=true; return true;" method="POST">
                             @csrf
                             @method('PUT')
+                            @if($event?->code)
+                                <input type="hidden" name="event" value="{{ $event->code }}">
+                            @endif
                             <input type="hidden" name="name" id="name" value="{{ old('name') }}">
                             <input type="hidden" name="description" id="description" value="{{ old('description') }}" required>
                             <input type="hidden" name="html_form" id="html_form" value="{{ old('html_form') }}" required>

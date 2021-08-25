@@ -22,7 +22,7 @@ class Evaluation extends Model
     ];
 
     protected $casts = [
-        'questions' => 'json',
+        'questions' => 'array',
     ];
 
     protected $appends = [
@@ -32,6 +32,11 @@ class Evaluation extends Model
     public function organizer()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
     }
 
     public function getQuestionsArrayAttribute()

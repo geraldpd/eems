@@ -7,8 +7,8 @@ $(function() {
 
         if(!questions_div.find('.evaluation_entry').length) {
             window.Swal.fire({
-                title: 'Evalaution Sheet can\'t be empty!',
-                text: 'Please provide at least 1 evalaution entry',
+                title: 'evaluation Sheet can\'t be empty!',
+                text: 'Please provide at least 1 evaluation entry',
                 icon: 'info',
                 confirmButtonText: 'Okay',
                 confirmButtonColor: '#007bff',
@@ -26,6 +26,15 @@ $(function() {
     });
 
     $('#add-evaluation_type').on('click', function() {
+        let evaluation_type = $('#evaluation_type').val();
+        let label = form_builder_div.find('#form_evaluation_query').val();
+
+        if(['select', 'checkbox', 'radio'].includes(evaluation_type)) { //when the evaluation is type and there is o option provided, do nothin
+            if(!form_builder_div.find('.option').length) return;
+        }
+
+        if(!label) return; //when no Query is provided, do not add to the evaluation entry
+
         questions_div.find('.empty-form_text').remove();
         questions_div.append($(formBuilder()));
     });

@@ -19,6 +19,8 @@ class Event extends Model
         'qrcode',
         'organizer_id',
         'category_id',
+        'evaluation_id',
+        'evaluation_questions',
         'name',
         'type',
         'description',
@@ -33,7 +35,8 @@ class Event extends Model
 
     protected $casts = [
         'schedule_start' => 'datetime:Y-m-d H:i:s',
-        'schedule_end' => 'datetime:Y-m-d H:i:s'
+        'schedule_end' => 'datetime:Y-m-d H:i:s',
+        'evaluation_questions' => 'array',
     ];
 
     protected $appends = [
@@ -61,7 +64,12 @@ class Event extends Model
         return $this->hasMany(Invitation::class);
     }
 
-    public function evaluations()
+    public function evaluation() //the evaluation sheet used
+    {
+        return $this->belongsTo(Evaluation::class);
+    }
+
+    public function evaluations()// the survey that the attendees provided
     {
         return $this->hasMany(EventEvaluation::class);
     }

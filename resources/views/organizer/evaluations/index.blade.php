@@ -12,7 +12,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <a class="btn btn-primary float-right" href="{{ route('organizer.evaluations.create') }}">Add Evalaution Sheet</a>
+                <a class="btn btn-primary float-right" href="{{ route('organizer.evaluations.create') }}">Add Evaluation Sheet</a>
             </div>
         </div>
 

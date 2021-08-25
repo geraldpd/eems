@@ -41,13 +41,13 @@
 
                     @endswitch
                 </a>
-                <a href="#" class="btn btn-link">
+                <a href="{{route('organizer.events.evaluations.index', [$event->code]) }}" class="btn btn-link">
                     Evaluations
-                    <span class="badge badge-primary">
-                        @if (!$event->evaluation_id && !$event->schedule_start->isPast())  {{-- when there is no set evaluation sheet, and has not yet started--}}
+                    @if (!$event->evaluation_id && !$event->schedule_start->isPast())  {{-- when there is no set evaluation sheet, and has not yet started--}}
+                        <span class="badge badge-primary">
                             <i title="Provide and evaluation sheet to this event" class="fas fa-clipboard-list"></i>
-                        @endif
-                    </span>
+                        </span>
+                    @endif
                 </a>
             </div>
 

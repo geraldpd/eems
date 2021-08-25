@@ -6,9 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Evaluation\StoreRequest;
 use App\Http\Requests\Evaluation\UpdateRequest;
 use App\Models\Evaluation;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class EvaluationController extends Controller
 {
     /**
@@ -16,7 +17,7 @@ class EvaluationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $evaluations = Auth::user()->evaluations;
         return view('organizer.evaluations.index', compact('evaluations'));
@@ -27,9 +28,16 @@ class EvaluationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('organizer.evaluations.create');
+        try {
+            $event = $request->has('event') ? Event::whereCode($request->event)->firstOrFail() : null;
+        }
+        catch(ModelNotFoundException $e){
+            abort(404);
+        }
+
+        return view('organizer.evaluations.create', compact('event'));
     }
 
     /**
@@ -41,8 +49,19 @@ class EvaluationController extends Controller
     public function store(StoreRequest $request)
     {
         $evaluation = Auth::user()->evaluations()->create($request->validated());
+        $params = [$evaluation->id];
 
-        return redirect()->route('organizer.evaluations.edit', [$evaluation])->with('message', 'Evaluation Successfully Created');
+        if($request->has('event')) {
+            $event = Event::whereCode($request->event)->first();
+
+            $event->update([
+                'evaluation_id' => $evaluation->id
+            ]);
+
+            $params = [$evaluation->id, 'event' => $event->code];
+        }
+
+        return redirect()->route('organizer.evaluations.edit', $params)->with('message', 'Evaluation Successfully Created');
     }
 
     /**
@@ -62,9 +81,19 @@ class EvaluationController extends Controller
      * @param  \App\Models\Evaluation  $evaluation
      * @return \Illuminate\Http\Response
      */
-    public function edit(Evaluation $evaluation)
+    public function edit(Request $request, Evaluation $evaluation)
     {
-        return view('organizer.evaluations.edit', compact('evaluation'));
+        $event = null;
+
+        if($request->has('event')) {
+            $event = Event::whereCode($request->event)->first();
+
+            $event->update([
+                'evaluation_id' => $evaluation->id
+            ]);
+        }
+
+        return view('organizer.evaluations.edit', compact('evaluation', 'event'));
     }
 
     /**
@@ -78,7 +107,19 @@ class EvaluationController extends Controller
     {
         $evaluation->update($request->validated());
         $request->session()->flash('clear_storage');
-        return redirect()->route('organizer.evaluations.edit', [$evaluation->id])->with('message', 'Evaluation Successfully Updated');
+        $params = [$evaluation->id];
+
+        if($request->has('event')) {
+            $event = Event::whereCode($request->event)->first();
+
+            $event->update([
+                'evaluation_questions' => $evaluation->questions
+            ]);
+
+            $params = [$evaluation->id, 'event' => $event->code];
+        }
+
+        return redirect()->route('organizer.evaluations.edit', $params)->with('message', 'Evaluation Successfully Updated');
     }
 
     /**

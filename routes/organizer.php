@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -13,9 +14,13 @@ Route::group([
 
         Route::get('/', HomeController::class);
 
+        Route::resource('evaluations', EvaluationController::class);
+
         Route::resource('events', EventController::class);
         Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
+        Route::resource('events/{event}/evaluations', EventEvaluationController::class, [
+            'as' => 'events'
+        ]);
 
-        Route::resource('evaluations', EvaluationController::class);
     });
 });
