@@ -7,9 +7,12 @@ use App\Http\Requests\Evaluation\StoreRequest;
 use App\Http\Requests\Evaluation\UpdateRequest;
 use App\Models\Evaluation;
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
+
 class EvaluationController extends Controller
 {
     /**
@@ -19,8 +22,11 @@ class EvaluationController extends Controller
      */
     public function index(Request $request)
     {
+        //dd($request->all());
         $evaluations = Auth::user()->evaluations;
-        return view('organizer.evaluations.index', compact('evaluations'));
+        $event = $request->has('event') ? $this->getEvent($request->event) : null;
+
+        return view('organizer.evaluations.index', compact('evaluations', 'event'));
     }
 
     /**
@@ -30,12 +36,7 @@ class EvaluationController extends Controller
      */
     public function create(Request $request)
     {
-        try {
-            $event = $request->has('event') ? Event::whereCode($request->event)->firstOrFail() : null;
-        }
-        catch(ModelNotFoundException $e){
-            abort(404);
-        }
+        $event = $request->has('event') ? $this->getEvent($request->event) : null;
 
         return view('organizer.evaluations.create', compact('event'));
     }
@@ -48,11 +49,13 @@ class EvaluationController extends Controller
      */
     public function store(StoreRequest $request)
     {
+        DB::beginTransaction();
+
         $evaluation = Auth::user()->evaluations()->create($request->validated());
         $params = [$evaluation->id];
 
         if($request->has('event')) {
-            $event = Event::whereCode($request->event)->first();
+            $event = $this->getEvent($request->event);
 
             $event->update([
                 'evaluation_id' => $evaluation->id
@@ -61,6 +64,7 @@ class EvaluationController extends Controller
             $params = [$evaluation->id, 'event' => $event->code];
         }
 
+        DB::commit();
         return redirect()->route('organizer.evaluations.edit', $params)->with('message', 'Evaluation Successfully Created');
     }
 
@@ -86,7 +90,7 @@ class EvaluationController extends Controller
         $event = null;
 
         if($request->has('event')) {
-            $event = Event::whereCode($request->event)->first();
+            $event = $this->getEvent($request->event);
 
             $event->update([
                 'evaluation_id' => $evaluation->id
@@ -94,6 +98,7 @@ class EvaluationController extends Controller
         }
 
         $evaluation->loadCount('events');
+        $evaluation->pending_events = $evaluation->events()->where('schedule_start', '>', Carbon::now())->get();
 
         return view('organizer.evaluations.edit', compact('evaluation', 'event'));
     }
@@ -107,12 +112,14 @@ class EvaluationController extends Controller
      */
     public function update(UpdateRequest $request, Evaluation $evaluation)
     {
+        DB::beginTransaction();
+
         $evaluation->update($request->validated());
-        $request->session()->flash('clear_storage');
+
         $params = [$evaluation->id];
 
         if($request->has('event')) {
-            $event = Event::whereCode($request->event)->first();
+            $event = $this->getEvent($request->event);
 
             $event->update([
                 'evaluation_questions' => $evaluation->questions
@@ -121,6 +128,15 @@ class EvaluationController extends Controller
             $params = [$evaluation->id, 'event' => $event->code];
         }
 
+        $evaluation->events()
+        ->where('schedule_start', '>', Carbon::now()) //TODO add additional condition, i.e. events with staus = pending
+        ->update([
+            'evaluation_questions' => $evaluation->questions
+        ]);
+
+        $request->session()->flash('clear_storage');
+
+        DB::commit();
         return redirect()->route('organizer.evaluations.edit', $params)->with('message', 'Evaluation Successfully Updated');
     }
 
@@ -134,5 +150,18 @@ class EvaluationController extends Controller
     {
         $evaluation->delete();
         return redirect()->route('organizer.evaluations.index')->with('message', 'Evaluation Successfully removed');
+    }
+
+    private function getEvent($code)
+    {
+        try {
+            $event = Event::whereCode($code)->firstOrFail();
+        }
+        catch(ModelNotFoundException $e){
+            DB::rollBack();
+            abort(404);
+        }
+
+        return $event;
     }
 }

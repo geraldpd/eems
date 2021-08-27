@@ -28,7 +28,7 @@
                             <h3><i class="fas fa-plus-square"></i> Create a new eveluation sheet</h3>
                         </a>
 
-                        <a href="{{ route('organizer.evaluations.create') }}"  class="btn btn-secondary btn-block">
+                        <a href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}"  class="btn btn-secondary btn-block">
                             <h3><i class="fas fa-recycle"></i> Reuse existing eveluation sheet</h3>
                         </a>
                     </div>
@@ -54,7 +54,7 @@
                                 <div class="col-md-6">
                                     <div class="float-right">
                                         <a class="btn btn-link" href="{{ route('organizer.evaluations.edit', [$event->evaluation->id, 'event' => $event->code]) }}">Modify evaluation Entries</a>
-                                        <a class="btn btn-link" href="">Reuse another sheet</a>
+                                        <a class="btn btn-link" href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}">Reuse another sheet</a>
                                         <a class="btn btn-link" href="">Remove</a>
                                     </div>
                                 </div>

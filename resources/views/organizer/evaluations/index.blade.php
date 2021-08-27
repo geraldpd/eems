@@ -11,7 +11,13 @@
         @endif
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-9">
+                @if ($event)
+                    <h1 class="text-secondary"> Evaluation sheet for <a href="{{ route('organizer.events.evaluations.index', [$event->code]) }}">{{ $event->name }}</a> </h1>
+                    <p>Select an evenaluation sheet to reuse for your event</p>
+                @endif
+            </div>
+            <div class="col-md-3">
                 <a class="btn btn-primary float-right" href="{{ route('organizer.evaluations.create') }}">Add Evaluation Sheet</a>
             </div>
         </div>
@@ -32,12 +38,21 @@
                     </div>
 
                     <div class="col-md-6">
-                    <form action="{{ route('organizer.evaluations.destroy', [$evaluation->id]) }}" method="post">
-                        @csrf
-                        @method('delete')
-                        <button type="button" class="btn btn-link text-secondary float-right remove-evaluation_sheet" href="">remove</button>
-                    </form>
-                    <a class="btn btn-link float-right" href="{{ route('organizer.evaluations.edit', [$evaluation->id]) }}">update</a>
+                        <a class="btn btn-link float-right" href="{{ route('organizer.evaluations.edit', [$evaluation->id]) }}">update</a>
+
+                        @if ($event)
+                            <form action="{{ route('organizer.events.evaluations.update', [$event->code, $evaluation->id]) }}" method="post">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="btn btn-primary float-right use-evaluation_sheet" href="">Use This Evaluation Sheet</button>
+                            </form>
+                        @else
+                            <form action="{{ route('organizer.evaluations.destroy', [$evaluation->id]) }}" method="post">
+                                @csrf
+                                @method('delete')
+                                <button type="button" class="btn btn-link text-secondary float-right remove-evaluation_sheet" href="">remove</button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

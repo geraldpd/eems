@@ -107,7 +107,9 @@
         });
 
         const config = {
+            evaluation: @json($evaluation),
             evaluation_type: @json(config('eems.evaluation_types')),
+            event: @json($event),
             events_count: {{ $evaluation->events_count }}
         }
 

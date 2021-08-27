@@ -5,6 +5,7 @@ $(function() {
     $('#save-evaluation_form').on('click', function() {
         const html_form = questions_div.html();
 
+        //! stop when - no entry is given
         if(!questions_div.find('.evaluation_entry').length) {
             window.Swal.fire({
                 title: 'evaluation Sheet can\'t be empty!',
@@ -16,11 +17,30 @@ $(function() {
             return;
         }
 
-        if(config.events_count) {
-            let proper_sentence = config.events_count > 1 ? 'There are ' : 'There is ';
+        //! when there is only one event set and has not yet concluded, this happens when a newly created event, gets its own evaluation
+        if(config.events_count == 1 && config.event != null) {
+            if(moment(config.event.scheduled_start).isBefore()) {
+                return updateEvaluationForm();
+            }
+        }
+
+        //!when there is more than one event using this evaluation sheet, this happens when an evaluation sheet has multiple pending events assigned to it
+        if(config.evaluation.pending_events.length > 1) {
+            let pending_event_rows = config.evaluation.pending_events.map((event) =>  `<tr> <td>${event.name}</td> <td>${event.schedule_start}</td> </tr>`);
+
             window.Swal.fire({
-                title: `${config.events_count} event will use this evaluation sheet`,
-                text: `${proper_sentence + config.events_count} booked event(s) that will use this evalution sheet, would you like to proceed?`,
+                title: `Modify Evaluation Sheet?`,
+                html: `
+                    <table class="table table-bordered">
+                        <thead>
+                            <th>Event</th>
+                            <th>Schedule</th>
+                        </thead>
+                        <tbody>${pending_event_rows}</tbody>
+                    </table>
+                    <br>
+                   There are ${config.evaluation.pending_events.length} booked events that will use this evalution sheet, Proceed Modification?
+                `,
                 icon: 'question',
                 confirmButtonText: 'Yes',
                 confirmButtonColor: '#007bff',
@@ -28,12 +48,12 @@ $(function() {
             })
             .then((result) => {
                 if (result.isConfirmed) {
-                    updateEvaluationForm();
+                    return updateEvaluationForm();
                 }
                 return;
             });
         } else {
-            updateEvaluationForm();
+            return updateEvaluationForm();
         }
 
         function updateEvaluationForm() {
