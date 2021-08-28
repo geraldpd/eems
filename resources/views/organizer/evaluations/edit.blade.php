@@ -4,10 +4,9 @@
     <div class="container">
 
         <ol class="breadcrumb">
-
             @if($event)
                 <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('organizer.events.show', [$event->code]) }}">{{ $event->name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('organizer.events.evaluations.index', [$event->code]) }}">{{ $event->name }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ ucwords($event->evaluation->name) }}</li>
                 <li class="breadcrumb-item active" aria-current="page">Edit</li>
             @else
@@ -20,6 +19,11 @@
             <div class="alert alert-info">
                 {{ session()->get('message') }}
             </div>
+        @endif
+
+        @if($event?->code)
+            <input type="hidden" name="event" value="{{ $event->code }}">
+            <h1 class="text-secondary">Evaluation Sheet for <a class="text-decoration-none" href="{{ route('organizer.events.show', [$event->code]) }}">{{ $event->name }}</a> </h1>
         @endif
 
         <div class="row">

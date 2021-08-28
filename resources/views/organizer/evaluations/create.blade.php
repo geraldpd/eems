@@ -18,7 +18,7 @@
             @csrf
             @if($event?->code)
                 <input type="hidden" name="event" value="{{ $event->code }}">
-                <h1 class="text-secondary">Evaluation Sheet for <a class="text-decoration-none" href="{{ route('organizer.events.show', [$event->code]) }}">{{ $event->name }}</a> </h1>
+                <h1 class="text-secondary">Evaluation Sheet for <a class="text-decoration-none" href="{{ route('organizer.events.evaluations.index', [$event->code]) }}">{{ $event->name }}</a> </h1>
             @endif
 
             <div class="row">

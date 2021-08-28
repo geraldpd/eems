@@ -114,8 +114,6 @@ class EvaluationController extends Controller
     {
         DB::beginTransaction();
 
-        $evaluation->update($request->validated());
-
         $params = [$evaluation->id];
 
         if($request->has('event')) {
@@ -127,6 +125,8 @@ class EvaluationController extends Controller
 
             $params = [$evaluation->id, 'event' => $event->code];
         }
+
+        $evaluation->update($request->validated());
 
         $evaluation->events()
         ->where('schedule_start', '>', Carbon::now()) //TODO add additional condition, i.e. events with staus = pending

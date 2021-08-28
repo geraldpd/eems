@@ -10,6 +10,14 @@
             </div>
         @endif
 
+        @if($event)
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('organizer.events.evaluations.index', [$event->code]) }}">{{ $event->name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Reuse Evaluation sheet</li>
+            </ol>
+        @endif
+
         <div class="row">
             <div class="col-md-9">
                 @if ($event)
@@ -18,7 +26,11 @@
                 @endif
             </div>
             <div class="col-md-3">
-                <a class="btn btn-primary float-right" href="{{ route('organizer.evaluations.create') }}">Add Evaluation Sheet</a>
+                @if($event)
+                    <a class="btn btn-primary float-right" href="{{ route('organizer.evaluations.create', ['event' => $event->code]) }}">Add Evaluation Sheet</a>
+                @else
+                    <a class="btn btn-primary float-right" href="{{ route('organizer.evaluations.create') }}">Add Evaluation Sheet</a>
+                @endif
             </div>
         </div>
 

@@ -26,7 +26,7 @@ $(function() {
 
         //!when there is more than one event using this evaluation sheet, this happens when an evaluation sheet has multiple pending events assigned to it
         if(config.evaluation.pending_events.length > 1) {
-            let pending_event_rows = config.evaluation.pending_events.map((event) =>  `<tr> <td>${event.name}</td> <td>${event.schedule_start}</td> </tr>`);
+            let pending_event_rows = config.evaluation.pending_events.map((event) =>  `<tr> <td>${event.name}</td> <td>${moment(event.schedule_start).format('MMM DD, YYYY HH:mm a')}</td> </tr>`);
 
             window.Swal.fire({
                 title: `Modify Evaluation Sheet?`,
