@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EventResource;
 use App\Models\Evaluation;
 use App\Models\Event;
 use Carbon\Carbon;
@@ -18,11 +19,13 @@ class EventEvaluationController extends Controller
      */
     public function index(Request $request, Event $event)
     {
+        $event->loadCount('attendees');
+
         return view('organizer.events.evaluations.index', compact('event'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * REUSE an existing event
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Event  $event
@@ -33,13 +36,15 @@ class EventEvaluationController extends Controller
     {
         DB::beginTransaction();
 
-        if(! count($evaluation->questions_array)) {
+        if(!$evaluation->questions_array) {
             return redirect()->back()->with('message', 'The selected evaluation sheet has no entries. reuse of this sheet is not allowed');
         }
 
         $event->update([
             'evaluation_id' => $evaluation->id,
-            'questions' => $evaluation->questions
+            'evaluation_name' => $evaluation->name,
+            'evaluation_description' => $evaluation->description,
+            'evaluation_questions' => $evaluation->questions
         ]);
 
         DB::commit();
@@ -49,8 +54,9 @@ class EventEvaluationController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * REMOVE an evaluation sheet to an event
      *
+     * @param  \App\Models\Event  $event
      * @param  \App\Models\Evaluation  $evaluation
      * @return \Illuminate\Http\Response
      */
@@ -59,9 +65,10 @@ class EventEvaluationController extends Controller
 
         $event->update([
             'evaluation_id' => null,
+            'evaluation_name' => null,
+            'evaluation_description' => null,
             'evaluation_questions' => null
         ]);
-
 
         return redirect()->route('organizer.events.evaluations.index', [$event->code])->with('message', 'Evaluation Successfully removed');
     }

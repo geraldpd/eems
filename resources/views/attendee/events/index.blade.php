@@ -1,36 +1,60 @@
 @extends('layouts.auth.attendee')
 
 @section('content')
-<div class="container">
-    <h1>MY EVENTS</h1>
-    <div class="row justify-content-center">
+    @php
+        $color_status = [
+            'PENDING' => 'text-primary',
+            'ONGOING' => 'text-success',
+            'CONCLUDED' => 'text-secondary'
+        ]
+    @endphp
 
-        <div class="col-md-12">
-            @forelse ($attended_events as $event)
-                <div class="card" style="margin-bottom: 10px">
-                    <div class="card-header">
-                        <h2>
-                            <a href="{{ route('events.show', [$event->code]) }}">{{ $event->name }}</a>
+    <div class="container">
 
-                            @if ($event->is_confirmed)
-                                <i title="You have accepted the invitation to this event." class="float-right text-success fas fa-check-circle"></i>
+        @if(session()->has('message'))
+            <div class="alert alert-info">
+                {{ session()->get('message') }}
+            </div>
+        @endif
+
+        <h1 class="text-secondary">MY EVENTS</h1>
+        <div class="row justify-content-center">
+
+            <div class="col-md-12">
+                @forelse ($attended_events as $event)
+
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h3>
+                                <a class="text-decoration-none {{ $color_status[$event->dynamic_status] }}" href="{{ route('events.show', [$event->code]) }}">{{ $event->name }}</a>
+
+                                @if ($event->is_confirmed)
+                                    <i title="You have accepted the invitation to this event." class="float-right text-success fas fa-check-circle"></i>
+                                @endif
+                            </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
+
+                            {{ $event->type }}
+                            {{ $event->category_name}}
+
+                            @if($event->has_evaluation && $event->schedule_Start->isPast())
+                                <div class="float-right">
+                                    <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evalaute</a>
+                                </div>
                             @endif
-                        </h2>
+                        </div>
                     </div>
 
-                    <div class="card-body">
-                        <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
-
-                        <p>{{ $event->description }}</p>
+                @empty
+                    <div class="card">
+                        <div class="card-header">You have not yet attended nor invited to any events</div>
                     </div>
-                </div>
-            @empty
-                <div class="card">
-                    <div class="card-header">You have not yet attended nor invited to any events</div>
-                </div>
-            @endforelse
+                @endforelse
+            </div>
+
         </div>
-
     </div>
-</div>
 @endsection

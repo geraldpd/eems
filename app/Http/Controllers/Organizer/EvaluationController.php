@@ -98,7 +98,7 @@ class EvaluationController extends Controller
         }
 
         $evaluation->loadCount('events');
-        $evaluation->pending_events = $evaluation->events()->where('schedule_start', '>', Carbon::now())->get();
+        $evaluation->pending_events = $this->getPendingEvents($evaluation)->get();;
 
         return view('organizer.evaluations.edit', compact('evaluation', 'event'));
     }
@@ -116,23 +116,37 @@ class EvaluationController extends Controller
 
         $params = [$evaluation->id];
 
+        $evaluation->update($request->validated());
+
+        //means evaluation is being modified for an event
         if($request->has('event')) {
             $event = $this->getEvent($request->event);
 
+            if($event->schedule_start->isPast()) {
+                return redirect()->back()->with('message', 'This event does not have an evaluation sheet');
+            }
+
             $event->update([
+                'evaluation_name' => $evaluation->name,
+                'evaluation_description' => $evaluation->description,
                 'evaluation_questions' => $evaluation->questions
             ]);
 
             $params = [$evaluation->id, 'event' => $event->code];
         }
 
-        $evaluation->update($request->validated());
+        if($this->getPendingEvents($evaluation)->count()){
 
-        $evaluation->events()
-        ->where('schedule_start', '>', Carbon::now()) //TODO add additional condition, i.e. events with staus = pending
-        ->update([
-            'evaluation_questions' => $evaluation->questions
-        ]);
+            $evaluation
+            ->events()
+            ->where('schedule_start', '>', Carbon::now()) //TODO add additional condition, i.e. events with staus = pending
+            ->update([
+                'evaluation_name' => $evaluation->name,
+                'evaluation_description' => $evaluation->description,
+                'evaluation_questions' => $evaluation->questions
+            ]);
+
+        }
 
         $request->session()->flash('clear_storage');
 
@@ -152,6 +166,12 @@ class EvaluationController extends Controller
         return redirect()->route('organizer.evaluations.index')->with('message', 'Evaluation Successfully removed');
     }
 
+    /**
+     * Retrieve the event resource using the provided code
+     *
+     * @param  $code
+     * @return App\Model\Event
+     */
     private function getEvent($code)
     {
         try {
@@ -163,5 +183,16 @@ class EvaluationController extends Controller
         }
 
         return $event;
+    }
+
+    /**
+     * Retrieves all the pending events based on the scuede_start column
+     *
+     * @param App\Model\Evaluation
+     * @return App\Model\Evaluation
+     */
+    private function getPendingEvents($evaluation)
+    {
+        return $evaluation->events()->where('schedule_start', '>', Carbon::now());
     }
 }

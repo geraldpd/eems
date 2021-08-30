@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Attendee\EventController as Event;
+
 Route::group([
-    'middleware' => ['attendee'], //'verified' // add verified middleware to methods/controllers/views where an attendee must verify thier account first
+    'middleware' => ['attendee'], //'verified' // add verified middleware to methods/controllers/views where an attendee must verify their account first
 ], function(){
 
     Route::resource('profile', ProfileController::class)->only(['index', 'update']);
@@ -13,6 +15,9 @@ Route::group([
     ], function(){
 
         Route::get('/', HomeController::class);
-        Route::resource('events', EventController::class);
+
+        Route::get('events/{event}/evaluation', [Event::class, 'evaluation'])->name('events.evaluation');
+        Route::post('events/{event}/evaluate', [Event::class, 'evaluate'])->name('events.evaluate');
+        Route::resource('events', EventController::class)->only(['index']);
     });
 });

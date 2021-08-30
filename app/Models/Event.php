@@ -19,8 +19,6 @@ class Event extends Model
         'qrcode',
         'organizer_id',
         'category_id',
-        'evaluation_id',
-        'evaluation_questions',
         'name',
         'type',
         'description',
@@ -31,17 +29,24 @@ class Event extends Model
         'schedule_start',
         'schedule_end',
         'status',
+
+        'evaluation_id',
+        'evaluation_name', // the final name of the evalaution used at the time setup
+        'evaluation_description', // the final description of the evalaution used at the time setup
+        'evaluation_questions', // the final questions of the evalaution used at the time setup
     ];
 
     protected $casts = [
         'schedule_start' => 'datetime:Y-m-d H:i:s',
         'schedule_end' => 'datetime:Y-m-d H:i:s',
-        'evaluation_questions' => 'array',
+        'evaluation_questions' => 'json',
     ];
 
     protected $appends = [
         'group_date',
         'notif_confirmed_attendee_count',
+        'has_evaluation',
+        'evaluation_questions_array',
     ];
 
     public function getRouteKeyName()
@@ -89,5 +94,16 @@ class Event extends Model
     public function getNotifConfirmedAttendeeCountAttribute()
     {
         return $this->attendees()->whereIsConfirmed(1)->whereIsNotified(0)->count();
+    }
+
+    public function getEvaluationQuestionsArrayAttribute()
+    {
+        return $this->evaluation_questions;
+        return json_decode($this->evaluation_questions, true);
+    }
+
+    public function getHasEvaluationAttribute()
+    {
+        return eventHelperHasEvaluation($this);
     }
 }

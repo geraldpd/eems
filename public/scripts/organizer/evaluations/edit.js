@@ -57,9 +57,19 @@ $(function() {
         }
 
         function updateEvaluationForm() {
+
+            let questions = [];
+            $.map(questions_div.find('.question_entry'), label => {
+                let key = $(label).data('question_key');
+                let value =  $(label).text().replace(' *', '');
+
+                questions.push({[key]: value})
+                //return questions[$(label).data('question_key')] = $(label).text().replace(' *', '')
+            });
+
             $('#name').val($('#preview-name').val());
             $('#description').val($('#preview-description').val());
-            $('#questions').val(JSON.stringify($.map(questions_div.find('.question_entry'), label => $(label).text())));
+            $('#questions').val(JSON.stringify(questions));
             $('#html_form').val(html_form);
             localStorage.setItem('html_form', html_form);
 
@@ -208,7 +218,8 @@ $(function() {
             label: form_builder_div.find('#form_evaluation_query').val(),
             type: evaluation_type,
             attributes: data.attributes,
-            options: data.options
+            options: data.options,
+            name: data.name
         });
 
         form_builder_div.slideUp().empty();
@@ -298,6 +309,7 @@ $(function() {
         let options = '';
 
         let questionToName = text => text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'_');
+        let name = (Math.random() + 1).toString(36).substring(7);
 
         switch (evaluation_type) {
             case 'checkbox':
@@ -385,11 +397,13 @@ $(function() {
 
         return {
             attributes: attributes,
-            options: options
+            options: options,
+            name: name
         };
     }
 
     function formInputConstructor(data) {
+
         switch (data.type) {
             case 'checkbox':
                 var form = data.options;
@@ -404,19 +418,19 @@ $(function() {
                 break;
 
             case 'date':
-                var form = `<input type="date" class="form-control" ${data.attributes}>`;
+                var form = `<input name="${data.name}" type="date" class="form-control" ${data.attributes}>`;
 
                 break;
             case 'number':
-                var form = `<input type="number" class="form-control" ${data.attributes}>`;
+                var form = `<input name="${data.name}" type="number" class="form-control" ${data.attributes}>`;
 
                 break;
             case 'select':
-                var form = `<select class="form-control" ${data.attributes}> ${data.options} </select>`;
+                var form = `<select name="${data.name}" class="form-control" ${data.attributes}> ${data.options} </select>`;
 
                 break;
             case 'text':
-                var form = `<textarea class="form-control" placeholder="Your answer" ${data.attributes}></textarea>`;
+                var form = `<textarea name="${data.name}" class="form-control" placeholder="Your answer" ${data.attributes}></textarea>`;
 
                 break;
         }
@@ -426,7 +440,7 @@ $(function() {
         return `<li draggable data-type="${data.type}" class="form-group evaluation_entry alert alert-light">
                     <div class="row">
                         <div class="col-md-10 col-xs-12">
-                            <label class="question_entry" data-is_required="${has_required ? 1 : 0}" >${data.label} ${has_required}</label>
+                            <label class="question_entry" data-question_key="${data.name}" data-is_required="${has_required ? 1 : 0}">${data.label} ${has_required}</label>
                         </div>
                         <div class="col-md-2 col-xs-12 d-flex justify-content-center">
                             <span class="edit-evaluation_type btn btn-link float-right">edit</span>

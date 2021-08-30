@@ -76,7 +76,9 @@ class EventController extends Controller
                 if($is_qrcode_scanned) {
 
                     $event->invitations()->create(['email' => $email]);
-                    $event->attendees()->attach($invitee->id, ['is_confirmed'=> 1]);
+                    $event->attendees()->attach($invitee->id, [
+                        'is_confirmed'=> 1
+                    ]);
                     $event->save();
 
                     $message = 'You have been invited to this event.';
@@ -109,6 +111,7 @@ class EventController extends Controller
                     $event->attendees()->attach($invitee->id, [
                         'is_confirmed'=> 1
                     ]);
+                    $event->save();
 
                     $message = 'Successfuly confirmed invitation';
                 }

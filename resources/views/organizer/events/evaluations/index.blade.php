@@ -17,32 +17,39 @@
 
         <div class="row">
             @switch(true)
-                @case(!$event->evaluation_id) {{-- WHEN NO EVALUATION IS PROVIDED --}}
-                        <div class="col-md-6">
-                            @if($event->schedule_start->isPast()) {{-- WHEN EVENT HAS CONCLUDED --}}
+                @case(!$event->has_evaluation) {{-- WHEN NO EVALUATION IS PROVIDED --}}
+                    <div class="col-md-6">
+                        @if($event->schedule_start->isPast()) {{-- WHEN EVENT HAS CONCLUDED --}}
 
-                                <h1 class="text-secondary">No Evauation Sheet has been applied to this event.</h1>
-                                <p>No result to show</p>
+                            <h1 class="text-secondary">No evaluation sheet has been applied to this event.</h1>
+                            <p>No results to show</p>
 
-                            @else {{-- WHEN EVENT HAS CONCLUDED --}}
+                        @else {{-- WHEN EVENT HAS CONCLUDED --}}
 
-                                <h1 class="text-secondary">You don't seem to have set any evaluation sheet for this event.</h1>
-                                <p>Why dont you give it an evaluation sheet so you can get what your attendees think about your event.</p>
+                            <h1 class="text-secondary">You don't seem to have set any evaluation sheet for this event.</h1>
+                            <p>Why dont you give it an evaluation sheet so you can get what your attendees think about your event.</p>
 
-                                <br>
+                            <br>
 
-                                <a href="{{ route('organizer.evaluations.create', ['event' => $event->code]) }}"  class="btn btn-secondary btn-block">
-                                    <h3><i class="fas fa-plus-square"></i> Create a new eveluation sheet</h3>
-                                </a>
+                            <a href="{{ route('organizer.evaluations.create', ['event' => $event->code]) }}"  class="btn btn-secondary btn-block">
+                                <h3><i class="fas fa-plus-square"></i> Create a new evaluation sheet</h3>
+                            </a>
 
-                                <a href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}"  class="btn btn-secondary btn-block">
-                                    <h3><i class="fas fa-recycle"></i> Reuse existing eveluation sheet</h3>
-                                </a>
+                            <a href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}"  class="btn btn-secondary btn-block">
+                                <h3><i class="fas fa-recycle"></i> Reuse existing evaluation sheet</h3>
+                            </a>
 
-                             @endif
-                        </div>
-                    @break
-                @case($event->evaluation_id && !$event->schedule_start->isPast() && !$event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT HAS NOT STARTED --}}
+                            <br>
+
+
+                            @if(!$event->attendees_count)
+                                <p>Dont forget to <a href="{{ route('organizer.invitations.index', [$event->code]) }}"> invite attendees</a> </p>
+                            @endif
+                        @endif
+
+                    </div>
+                @break
+                @case($event->has_evaluation && !$event->schedule_start->isPast() && !$event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT HAS NOT STARTED --}}
                     <div class="col-md-6">
                         <h1 class="text-secondary">{{ $event->name }}</h1>
                     </div>
@@ -50,24 +57,24 @@
                     <div class="col-md-12">
                         <div class="jumbotron">
                             <span>This event will be using:</span>
-                            <h1 class="display-4">{{ ucwords($event->evaluation->name) }}</h1>
+                            <h1 class="display-4">{{ ucwords($event->evaluation_name) }}</h1>
 
-                            <p class="lead">{{ $event->evaluation->description }}</p>
+                            <p class="lead">{{ $event->evaluation_description }}</p>
 
                             <hr class="my-4">
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    {{ $event->evaluation->questions_array ? count($event->evaluation->questions_array).' Entries' : 'No questions set' }}
+                                    {{ $event->evaluation_questions_array ? count($event->evaluation_questions_array).' Entries' : 'No questions set' }}
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="float-right">
-                                        <form id="remove-evaluation-sheet-form" action="{{ route('organizer.events.evaluations.destroy', [$event->code, $event->evaluation->id]) }}" method="post">
+                                        <form id="remove-evaluation-sheet-form" action="{{ route('organizer.events.evaluations.destroy', [$event->code, $event->evaluation_id]) }}" method="post">
                                             @csrf
                                             @method('DELETE')
 
-                                            <a class="btn btn-link" href="{{ route('organizer.evaluations.edit', [$event->evaluation->id, 'event' => $event->code]) }}">Modify evaluation Entries</a>
+                                            <a class="btn btn-link" href="{{ route('organizer.evaluations.edit', [$event->evaluation_id, 'event' => $event->code]) }}">Modify evaluation Entries</a>
 
                                             <a class="btn btn-link" href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}">Reuse another sheet</a>
 
@@ -77,24 +84,80 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if(!$event->attendees_count)
+                            <p>Dont forget to <a href="{{ route('organizer.invitations.index', [$event->code]) }}"> invite attendees</a> </p>
+                        @endif
                     </div>
 
                     <br>
+                @break
+                @case($event->has_evaluation && $event->schedule_start->isPast() && !$event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT IS ONGOING --}}
+                    <div class="col-md-12">
 
-                    @break
-                @case($event->evaluation_id && $event->schedule_start->isPast() && !$event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT IS ONGOING --}}
-                    <div class="col-md-6">
-                        <h1 class="text-secondary">Event is ongoin</h1>
-                        <p>Evalautions will sheet results will be shown here after the event concludes</p>
-                        <h3>{{ $event->evaluation->name }}</h3>
+                        <h1 class="text-secondary">{{ $event->name }} is in progress</h1>
+
+                        <div class="jumbotron">
+                            <span>Evaluation sheet used:</span>
+                            <h1 class="display-4">{{ ucwords($event->evaluation_name) }}</h1>
+
+                            <p class="lead">{{ $event->evaluation_description }}</p>
+
+                            <hr class="my-4">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ $event->evaluation_questions_array ? count($event->evaluation_questions_array).' Entries' : 'No questions set' }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="float-right">
+                                        @if($event->attendees_count)
+                                            <p>Evaluation results will be shown here after the event concludes</p>
+                                        @else
+                                            <p> No one is invited in this event, Evaluation result could not be provided</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                    @break
-                @case($event->evaluation_id && $event->schedule_start->isPast() && $event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT HAS CONCLUDED --}}
-                    <div class="col-md-6">
-                        <h1 class="text-secondary">{{ $event->evaluation->name }}</h1>
-                        show result
-                    </div>
-                    @break
+                @break
+                @case($event->has_evaluation && $event->schedule_start->isPast() && $event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT HAS CONCLUDED --}}
+                    @if($event->attendees_count)
+
+                        <h1 class="text-secondary">{{ ucwords($event->evaluation_name) }}</h1>
+                        @include('organizer.events.evaluations.partials.result')
+
+                    @else
+
+                        <div class="col-md-12">
+
+                            <h1 class="text-secondary">{{ $event->name }} has concluded</h1>
+
+                            <div class="jumbotron">
+                                <span>Evaluation sheet used:</span>
+                                <h1 class="display-4">{{ ucwords($event->evaluation_name) }}</h1>
+
+                                <p class="lead">{{ $event->evaluation_description }}</p>
+
+                                <hr class="my-4">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ $event->evaluation_questions_array ? count($event->evaluation_questions_array).' Entries' : 'No questions set' }}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <p>You did not invite anyone to this event, No evaluation sheet result available.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    @endif
+                @break
             @endswitch
         </div>
 

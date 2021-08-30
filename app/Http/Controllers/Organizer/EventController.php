@@ -96,7 +96,7 @@ class EventController extends Controller
 
         $event = Event::create($event_data->all());
 
-        $event->code = eventHelperGetCode($event->id);
+        $event->code = eventHelperSetCode($event->id);
         $qrcode_path = "storage/events/$event->id/";
         $qrcode_invitation_link = route('events.show', $event->code).'?invite=true';
 

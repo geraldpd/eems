@@ -50,20 +50,28 @@
                     </div>
 
                     <div class="col-md-6">
-                        <a class="btn btn-link float-right" href="{{ route('organizer.evaluations.edit', [$evaluation->id]) }}">update</a>
-
                         @if ($event)
-                            <form action="{{ route('organizer.events.evaluations.update', [$event->code, $evaluation->id]) }}" method="post">
-                                @csrf
-                                @method('PUT')
-                                <button type="submit" class="btn btn-primary float-right use-evaluation_sheet" href="">Use This Evaluation Sheet</button>
-                            </form>
+
+                            @if($event->evaluation_id == $evaluation->id)
+                                <button class="btn btn-light float-right" disabled>Selected Evaluation</button>
+                            @else
+                                <form action="{{ route('organizer.events.evaluations.update', [$event->code, $evaluation->id]) }}" method="post">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-primary float-right use-evaluation_sheet" href="">Use This Evaluation Sheet</button>
+                                </form>
+                            @endif
+
                         @else
+
+                            <a class="btn btn-link float-right" href="{{ route('organizer.evaluations.edit', [$evaluation->id]) }}">update</a>
+
                             <form action="{{ route('organizer.evaluations.destroy', [$evaluation->id]) }}" method="post">
                                 @csrf
                                 @method('delete')
                                 <button type="button" class="btn btn-link text-secondary float-right remove-evaluation_sheet" href="">remove</button>
                             </form>
+
                         @endif
                     </div>
                 </div>
