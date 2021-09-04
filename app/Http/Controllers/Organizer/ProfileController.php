@@ -33,7 +33,7 @@ class ProfileController extends Controller
         }
 
         if($request->has('profile_picture')) {
-            $location = "users/attendees/$user->id/";
+            $location = "users/organizers/$user->id/";
 
             $path = $request->file('profile_picture')->store(
                 $location, 'public'

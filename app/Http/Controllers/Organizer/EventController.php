@@ -4,18 +4,20 @@ namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Mail\EventInvitation;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Carbon\Carbon;
+
+use App\Mail\EventInvitation;
 use App\Models\Category;
 use App\Models\Event;
-use Carbon\Carbon;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
 use App\Http\Requests\Event\{
     StoreRequest,
     UpdateRequest
 };
-use Illuminate\Support\Facades\File;
 
 class EventController extends Controller
 {
@@ -69,7 +71,10 @@ class EventController extends Controller
             'end' => $is_same_day ? Carbon::now()->addHours(2)->toTimeString() : $default_event_min_time['end']
         ];
 
-        return view('organizer.events.create', compact('categories', 'date', 'min_sched'));
+        $documents = $this->getTemporayDocs();
+
+        //dd($documents);
+        return view('organizer.events.create', compact('categories', 'date', 'min_sched', 'documents'));
     }
 
     /**
@@ -80,6 +85,8 @@ class EventController extends Controller
      */
     public function store(StoreRequest $request)
     {
+        DB::beginTransaction();
+
         $data = collect($request->validated());
 
         //TODO assuming that the date picked is single day
@@ -97,14 +104,24 @@ class EventController extends Controller
         $event = Event::create($event_data->all());
 
         $event->code = eventHelperSetCode($event->id);
-        $qrcode_path = "storage/events/$event->id/";
+        $event_folder_path = "storage/events/$event->id/";
         $qrcode_invitation_link = route('events.show', $event->code).'?invite=true';
 
-        File::makeDirectory($qrcode_path);
-        QrCode::generate($qrcode_invitation_link, $qrcode_path.'qrcode.svg');
-        $event->qrcode = $qrcode_path.'qrcode.svg';
+        File::makeDirectory($event_folder_path);
+        QrCode::generate($qrcode_invitation_link, $event_folder_path.'qrcode.svg');
+        $event->qrcode = $event_folder_path.'qrcode.svg';
 
         $event->save();
+
+        //move the files from temp to events folder
+        $temporary_document_path = "storage/users/organizers/".Auth::user()->id."/temp_docs";
+        $documents = $this->getTemporayDocs();
+
+        foreach($documents as $name => $path) {
+            File::move(public_path("$temporary_document_path/$name"), public_path("$event_folder_path/$name"));
+        }
+
+        DB::commit();
 
         return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Created');
     }
@@ -201,5 +218,21 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         //
+    }
+
+    private function getTemporayDocs()
+    {
+        $temporary_document_path = "storage/users/organizers/".Auth::user()->id."/temp_docs";
+        $documents = array_diff(scandir($temporary_document_path), array('.', '..'));
+
+        $document_paths = collect();
+        collect(array_values($documents))->map(function($document) use ($temporary_document_path, $document_paths){
+            $document_paths->put($document, [
+                'public' => public_path("$temporary_document_path/$document"),
+                'asset' => asset("$temporary_document_path/$document")
+            ]);
+        });
+
+        return $document_paths->all();
     }
 }

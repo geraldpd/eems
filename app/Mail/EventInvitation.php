@@ -41,7 +41,7 @@ class EventInvitation extends Mailable
         $this->sender = $sender;
         $this->recipient = $recipient; // email of the recipient
 
-        $this->invitation_link = eventHelperGetInvitationLink($event, $recipient);
+        $this->invitation_link = eventHelperSetInvitationLink($event, $recipient);
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Event;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 if (! function_exists('eventHelperSetCode')) {
     function eventHelperSetCode($id)
@@ -53,5 +55,23 @@ if (! function_exists('eventHelperHasEvaluation')) {
     function eventHelperHasEvaluation($event)
     {
         return $event->evaluation_id && $event->evaluation_name && $event->evaluation_description && $event->evaluation_questions;
+    }
+}
+
+if (! function_exists('eventHelperTemporaryDocumentHolder')) {
+    function eventHelperTemporaryDocumentHolder()
+    {
+        $organizer = Auth::user();
+        $temporary_document_path = "storage/users/organizers/$organizer->id/temp_docs";
+
+        if (file_exists($temporary_document_path)) {
+            foreach (glob($temporary_document_path."/*") as $filename) {
+                unlink($filename);
+            }
+            return $temporary_document_path;
+        }
+
+        File::makeDirectory($temporary_document_path);
+        return $temporary_document_path;
     }
 }

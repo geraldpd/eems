@@ -17,6 +17,5 @@ $(function() {
         console.error( error );
     } );
 
-
     $('#location').trigger('change');
 });
