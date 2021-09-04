@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
 class TemporaryDocumentController extends Controller
 {
@@ -28,8 +29,35 @@ class TemporaryDocumentController extends Controller
     public function destroy(Request $request)
     {
         $organizer = Auth::user();
-        $temporary_document_path = "storage/users/organizers/$organizer->id/temp_docs";
+        $document_path = "storage/users/organizers/$organizer->id/temp_docs";
 
-        return File::delete(public_path("$temporary_document_path/$request->name"));
+        if($request->has('code')) {
+            $event = $this->getEvent($request->code);
+
+            $document_path = "storage/events/".$event->id."/documents";
+        }
+
+        return File::delete(public_path("$document_path/$request->name"));
     }
+
+
+    /**
+     * Retrieve the event resource using the provided code
+     *
+     * @param  $code
+     * @return App\Model\Event
+     */
+    private function getEvent($code)
+    {
+        try {
+            $event = Event::whereCode($code)->firstOrFail();
+        }
+        catch(ModelNotFoundException $e){
+            abort(404);
+        }
+
+        return $event;
+    }
+
+
 }

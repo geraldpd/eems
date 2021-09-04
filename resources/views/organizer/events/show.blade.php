@@ -61,6 +61,24 @@
                 <br>
                 <h3>Share this QR code to directly invite them to this event</h3>
                 <p>Users will need to signup(for unregistered) and login to their EEMS account <br> to be automatically booked to this event.</p>
+
+                @forelse ($event->uploaded_documents as $name => $path)
+                    @if ($loop->first)
+                        <br>
+                        <hr>
+                        <p>Uploaded Documents:</p>
+                    @endif
+                    <a href="{{ $path['asset'] }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                        {{ $name }}
+                    </a>
+                    @if ($loop->last)
+                        <br>
+                        <br>
+                        <p>Uploaded documents will only be available for the events attendees.</p>
+                    @endif
+                @empty
+
+                @endforelse
             </div>
         </div>
     </div>

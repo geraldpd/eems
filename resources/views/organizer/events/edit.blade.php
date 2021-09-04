@@ -121,15 +121,30 @@
 
       </div>
 
-      <div class="form-group">
-        <label for="documents">Documents</label>
-        <input type="text" {{ $event->documents }}class="form-control" placeholder="documents">
+      <div class="form-group alert alert-secondary">
+        <label>Documents</label>
 
-        @if ($errors->has('documents'))
-        <small class="help-block text-danger">
-          <strong>{{ $errors->first('documents') }}</strong>
-        </small>
-        @endif
+        <div class="documents"></div>
+
+        <div class="documents-progressbar"></div>
+
+        <table class="uploaded-documents table-sm table table-condensed table-hover">
+          <thead>
+            <tr>
+                <th>Document</th>
+                <th class="text-center">Action</th>
+            </tr>
+            <tbody>
+              @foreach ($event->uploaded_documents as $name => $path)
+                <tr>
+                    <td><a href="{{ $path['asset'] }}" target="_blank"> {{ $name }} </a></td>
+                    <td class="text-center"> <button type="button" data-name="{{ $name }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </thead>
+        </table>
+
       </div>
 
       <div class="float-right">
@@ -150,5 +165,15 @@
 @endpush
 
 @push('scripts')
+  <script>
+    const config = {
+      event: @json($event),
+      tempdocs: {
+        store: "{{ route('organizer.tempdocs.store') }}",
+        destroy: "{{ route('organizer.tempdocs.destroy') }}"
+      },
+      csrf: '{{ csrf_token() }}'
+    }
+  </script>
   <script src="{{ asset('scripts/organizer/events/edit.js') }}"></script>
 @endpush

@@ -113,13 +113,7 @@ class EventController extends Controller
 
         $event->save();
 
-        //move the files from temp to events folder
-        $temporary_document_path = "storage/users/organizers/".Auth::user()->id."/temp_docs";
-        $documents = $this->getTemporayDocs();
-
-        foreach($documents as $name => $path) {
-            File::move(public_path("$temporary_document_path/$name"), public_path("$event_folder_path/$name"));
-        }
+        $this->moveTemporayDocsToEvents($event_folder_path);
 
         DB::commit();
 
@@ -135,7 +129,6 @@ class EventController extends Controller
     public function show(Event $event)
     {
         $preview = new EventInvitation($event, Auth::user()->email, Auth::user()->email);
-
         return view('organizer.events.show', compact('event', 'preview'));
     }
 
@@ -198,6 +191,9 @@ class EventController extends Controller
 
         $event->update($request->validated());
 
+        $event_folder_path = "storage/events/$event->id/";
+        $this->moveTemporayDocsToEvents($event_folder_path);
+
         return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
     }
 
@@ -226,7 +222,7 @@ class EventController extends Controller
         $documents = array_diff(scandir($temporary_document_path), array('.', '..'));
 
         $document_paths = collect();
-        collect(array_values($documents))->map(function($document) use ($temporary_document_path, $document_paths){
+        collect(array_values($documents))->map(function($document) use ($temporary_document_path, $document_paths) {
             $document_paths->put($document, [
                 'public' => public_path("$temporary_document_path/$document"),
                 'asset' => asset("$temporary_document_path/$document")
@@ -235,4 +231,21 @@ class EventController extends Controller
 
         return $document_paths->all();
     }
+
+    private function moveTemporayDocsToEvents($event_folder_path)
+    {
+        //get temp files
+        $temporary_document_path = "storage/users/organizers/".Auth::user()->id."/temp_docs";
+        $documents = $this->getTemporayDocs();
+
+        if (! file_exists($temporary_document_path)) {
+            File::makeDirectory($event_folder_path.'documents/');
+        }
+
+        foreach($documents as $name => $path) {
+            //move temp files to event folder
+            File::move(public_path("$temporary_document_path/$name"), public_path($event_folder_path.'documents/'.$name));
+        }
+    }
+
 }

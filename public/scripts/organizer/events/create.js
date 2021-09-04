@@ -73,25 +73,24 @@ $(function() {
     $('.uploaded-documents').on('click', '.remove-document', function() {
         let document = $(this);
 
-        let uppy_doc = uppy.getFiles().filter(doc => {
-            return doc.name === document.data('name')
-        })[0];
+        document.attr('disabled', true).html('<i class="fas fa-spin fa-spinner"></i>');
+        let uppy_doc = uppy.getFiles().filter(doc => doc.name === document.data('name'))[0];
 
         axios.post(config.tempdocs.destroy, {
             _method: 'DELETE',
             name: document.data('name')
         })
         .then(_ =>  {
-            uppy.removeFile(uppy_doc.id)
             document.closest('tr').remove();
             if(!$('.uploaded-documents').find('tbody tr').length) {
                 $('.uploaded-documents').addClass('d-none')
             }
+            uppy.removeFile(uppy_doc.id);
         })
         .catch(_ => {
           console.warn(_);
         });
-    })
+    });
 
     if(!config.tempdocs.count) {
         $('.uploaded-documents').addClass('d-none')

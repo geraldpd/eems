@@ -47,6 +47,7 @@ class Event extends Model
         'notif_confirmed_attendee_count',
         'has_evaluation',
         'evaluation_questions_array',
+        'uploaded_documents',
     ];
 
     public function getRouteKeyName()
@@ -105,5 +106,22 @@ class Event extends Model
     public function getHasEvaluationAttribute()
     {
         return eventHelperHasEvaluation($this);
+    }
+
+    function getUploadedDocumentsAttribute()
+    {
+        $event = $this;
+        $event_document_path = "storage/events/$event->id/documents";
+        $documents = array_diff(scandir($event_document_path), array('.', '..'));
+
+        $document_paths = collect();
+        collect(array_values($documents))->map(function($document) use ($document_paths, $event_document_path) {
+            $document_paths->put($document, [
+                'public' => public_path("$event_document_path/$document"),
+                'asset' => asset("$event_document_path/$document")
+            ]);
+        });
+
+        return $document_paths->all();
     }
 }
