@@ -313,6 +313,7 @@ $(function() {
 
         switch (evaluation_type) {
             case 'checkbox':
+                var is_required = form_builder_div.find("[name='required']").val() ? 'required' : '';
                 form_builder_div.find('input, select').map((i, input) => {
                     let attribute = $(input);
                     if(attribute.attr('name') == 'required' && attribute.val()) {
@@ -322,7 +323,7 @@ $(function() {
                     if($(input).hasClass('option')) {
                         options += `<div class="form-check">
                                         <label>
-                                            <input class="form-check-input" type="checkbox" name="${questionToName(form_builder_div.find('#form_evaluation_query').val())}[]" value="${$(input).val()}">
+                                            <input class="form-check-input" type="checkbox" name="${name}[]" value="${$(input).val()}">
                                             ${$(input).val()}
                                         </label>
                                     </div>`;
@@ -330,6 +331,7 @@ $(function() {
                 });
                 break;
             case 'radio':
+                var is_required = form_builder_div.find("[name='required']").val() ? 'required' : '';
                 form_builder_div.find('input, select').map((i, input) => {
                     let attribute = $(input);
                     if(attribute.attr('name') == 'required' && attribute.val()) {
@@ -341,7 +343,7 @@ $(function() {
                                         <label>
                                             ${$(input).val()}
                                             <br>
-                                            <input class="form-check-input" type="radio" name="${questionToName(form_builder_div.find('#form_evaluation_query').val())}[]" value="${$(input).val()}">
+                                            <input ${is_required} class="form-check-input" type="radio" name="${name}" value="${$(input).val()}">
                                         </label>
                                     </div>`;
                     }
@@ -440,7 +442,7 @@ $(function() {
         return `<li draggable data-type="${data.type}" class="form-group evaluation_entry alert alert-light">
                     <div class="row">
                         <div class="col-md-10 col-xs-12">
-                            <label class="question_entry" data-question_key="${data.name}" data-is_required="${has_required ? 1 : 0}">${data.label} ${has_required}</label>
+                            <label class="question_entry" data-question_key="${data.name.trim()}" data-is_required="${has_required ? 1 : 0}">${data.label.trim()} ${has_required}</label>
                         </div>
                         <div class="col-md-2 col-xs-12 d-flex justify-content-center">
                             <span class="edit-evaluation_type btn btn-link float-right">edit</span>

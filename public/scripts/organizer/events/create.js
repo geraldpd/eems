@@ -42,60 +42,10 @@ $(function() {
         additional_field.find(`.location-${location}`).removeClass('d-none');
     });
 
-    const uppy = new window.Uppy({ debug: true, autoProceed: true })
-    uppy.use(window.FileInput, {
-      target: '.documents',
-    })
-    uppy.use(window.ProgressBar, {
-      target: '.documents-progressbar',
-      hideAfterFinish: true,
-    })
-    uppy.use(window.XHRUpload, {
-      endpoint: config.tempdocs.store,
-      formData: true,
-      fieldName: 'documents[]',
-      headers: {'X-CSRF-TOKEN': config.csrf}
-    });
-
-    // And display uploaded files
-    uppy.on('upload-success', (file, response) => {
-        const url = response.uploadURL
-        const file_name = file.name
-        let document =`
-            <tr>
-                <td><a href="${url}" target="_blank">${file_name}</a></td>
-                <td class="text-center"> <button type="button" data-name="${file_name}" class="btn btn-sm btn-secondary remove-document">remove</button> </td>
-            </tr>
-        `;
-        $('.uploaded-documents').removeClass('d-none').find('tbody').append(document);
-    });
-
-    $('.uploaded-documents').on('click', '.remove-document', function() {
-        let document = $(this);
-
-        document.attr('disabled', true).html('<i class="fas fa-spin fa-spinner"></i>');
-        let uppy_doc = uppy.getFiles().filter(doc => doc.name === document.data('name'))[0];
-
-        axios.post(config.tempdocs.destroy, {
-            _method: 'DELETE',
-            name: document.data('name')
-        })
-        .then(_ =>  {
-            document.closest('tr').remove();
-            if(!$('.uploaded-documents').find('tbody tr').length) {
-                $('.uploaded-documents').addClass('d-none')
-            }
-            uppy.removeFile(uppy_doc.id);
-        })
-        .catch(_ => {
-          console.warn(_);
-        });
-    });
+    //run in the end of the script
+    $('#location').trigger('change');
 
     if(!config.tempdocs.count) {
         $('.uploaded-documents').addClass('d-none')
     }
-
-    //run in the end of the script
-    $('#location').trigger('change');
 })

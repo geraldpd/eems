@@ -54,7 +54,7 @@ if (! function_exists('eventHelperGetDynamicStatus')) {
 if (! function_exists('eventHelperHasEvaluation')) {
     function eventHelperHasEvaluation($event)
     {
-        return $event->evaluation_id && $event->evaluation_name && $event->evaluation_description && $event->evaluation_questions;
+        return $event->evaluation_id && $event->evaluation_name && $event->evaluation_description && $event->evaluation_questions && $event->evaluation_html_form;
     }
 }
 
@@ -73,5 +73,26 @@ if (! function_exists('eventHelperTemporaryDocumentHolder')) {
 
         File::makeDirectory($temporary_document_path);
         return $temporary_document_path;
+    }
+}
+
+if (! function_exists('eventHelperGetUploadedDocuments')) {
+    function eventHelperGetUploadedDocuments($event)
+    {
+        $event_document_path = "storage/events/$event->id/documents";
+
+        $documents = File::allFiles($event_document_path);
+
+        return collect($documents)
+        ->sortBy(function ($file) {
+            return $file->getCTime();
+        })
+        ->mapWithKeys(function ($file) {
+            return [$file->getBaseName() => [
+                'public' => $file->getLinkTarget(),
+                'asset' => asset($file->getPathName())
+            ]];
+        })
+        ->all();
     }
 }

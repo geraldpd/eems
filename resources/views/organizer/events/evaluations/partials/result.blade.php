@@ -1,33 +1,53 @@
 
+@php
+    $questions = $event->evaluation_questions_array->keys()->all();
+@endphp
+
 <table id="table" class="table table-sm table-striped table-bordered">
     <thead>
         <th><small>Attendee Info</small></th>
-
-        @foreach ($event->evaluation_questions_array as $index => $entry)
-            @php
-                $key = array_keys($entry)[0];
-                $value = array_values($entry)[0];
-            @endphp
-
+        @foreach ($event->evaluation_questions_array as $name => $question)
             <th>
-                <small>{{ $value }}</small>
+                <small>{{ $question }}</small>
             </th>
         @endforeach
-        <th><small>Questions</small></th>
     </thead>
 
     <tbody>
-        <tr>
 
-            @forelse($event->evaluations as $evaluation)
 
-            @empty
-                <tr>
-                    <td colspan="{{ count($event->evaluation_questions_array) + 2 }}">
-                        <h3 class="text-center"> No evaluations yet</h3>
+        @forelse($event->evaluations as $evaluation)
+            <tr>
+                <td>
+                    <strong>{{ $evaluation->attendee->fullname }}</strong>
+                    <br>
+                    {{ $evaluation->attendee->email }}
+                </td>
+
+                @foreach ($questions as $question)
+                    <td class="text-center">
+                        @if(array_key_exists($question, $evaluation->feedback))
+
+                            @php $feedback = $evaluation->feedback[$question] @endphp
+
+                            @if (gettype($feedback) === 'string')
+                                {{ $feedback }}
+                            @else
+                                {{ collect($feedback)->join(', ') }}
+                            @endif
+
+                        @endif
                     </td>
-                </tr>
-            @endforelse
+                @endforeach
+            </tr>
+        @empty
+            <tr>
+                <td colspan="{{ $event->evaluation_questions_array->count() + 2 }}">
+                    <h3 class="text-center"> No evaluations yet</h3>
+                </td>
+            </tr>
+        @endforelse
+
     </tbody>
 
 </table>

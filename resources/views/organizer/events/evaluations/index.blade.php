@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
 
-        <ol class="breadcrumb">
+        <ol class="breadcrumb d-print-none">
             <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
             <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('organizer.events.show', [$event->code]) }}">{{ ucwords(strtolower($event->name)) }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">Evaluations</li>
@@ -42,7 +42,7 @@
                             <br>
 
 
-                            @if(!$event->attendees_count)
+                            @if(!$event->invitations->count())
                                 <p>Dont forget to <a href="{{ route('organizer.invitations.index', [$event->code]) }}"> invite attendees</a> </p>
                             @endif
                         @endif
@@ -85,7 +85,7 @@
                             </div>
                         </div>
 
-                        @if(!$event->attendees_count)
+                        @if(!$event->invitations->count())
                             <p>Dont forget to <a href="{{ route('organizer.invitations.index', [$event->code]) }}"> invite attendees</a> </p>
                         @endif
                     </div>
@@ -127,13 +127,32 @@
                 @case($event->has_evaluation && $event->schedule_start->isPast() && $event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT HAS CONCLUDED --}}
                     @if($event->attendees_count)
 
-                        <h1 class="text-secondary">{{ ucwords($event->evaluation_name) }}</h1>
-                        @include('organizer.events.evaluations.partials.result')
+                        <div class="printable-evaluation col-md-12">
+                            <h4 class="text-secondary">{{ ucwords($event->name) }}</h4>
+                            <strong class="d-print-block d-none text-secondary">{{ ucwords($event->evaluation_name) }}</strong>
+                            <p class="d-print-block d-none">{{ $event->evaluation_description }}</p>
+                            @include('organizer.events.evaluations.partials.result')
+                        </div>
+
+                        @if ($event->evaluations->count())
+                            <div class="col-md-12 fixed-bottom pb-3 d-print-none">
+                                <div class="btn-group float-right" role="group">
+                                    <button class="print-button float-right btn btn-primary">Print</button>
+                                    <div class="btn-group" role="group">
+                                        <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                          Download as
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                          <a class="dropdown-item" href="{{ route('organizer.events.evaluations.download', [$event->code, 'as' => 'CSV']) }}">CSV</a>
+                                          <a class="dropdown-item" href="{{ route('organizer.events.evaluations.download', [$event->code, 'as' => 'JSON']) }}">JSON</a>
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+                        @endif
 
                     @else
-
                         <div class="col-md-12">
-
                             <h1 class="text-secondary">{{ $event->name }} has concluded</h1>
 
                             <div class="jumbotron">
@@ -155,7 +174,6 @@
                                 </div>
                             </div>
                         </div>
-
                     @endif
                 @break
             @endswitch
@@ -174,7 +192,6 @@
 @push('scripts')
     <script>
         $(function() {
-
             $('.remove-evaluation-sheet').on('click', _ => {
                 window.Swal.fire({
                     title: `Remove Evaluation Sheet?`,
@@ -192,6 +209,9 @@
 
             });
 
+            $('.print-button').on('click', _ => {
+                window.print()
+            });
         })
     </script>
 @endpush

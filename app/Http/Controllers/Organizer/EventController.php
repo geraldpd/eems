@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Carbon\Carbon;
+use Exception;
 
 use App\Mail\EventInvitation;
 use App\Models\Category;
@@ -113,6 +114,7 @@ class EventController extends Controller
 
         $event->save();
 
+        File::makeDirectory($event_folder_path.'documents/');
         $this->moveTemporayDocsToEvents($event_folder_path);
 
         DB::commit();
@@ -168,6 +170,9 @@ class EventController extends Controller
         $categories = Category::all();
         $event->load('category');
 
+        $event->documents = $event->uploaded_documents;
+        $event->temporary_documents = $this->getTemporayDocs();
+
         return view('organizer.events.edit', compact('event','categories'));
     }
 
@@ -180,6 +185,8 @@ class EventController extends Controller
      */
     public function update(UpdateRequest $request, Event $event)
     {
+        DB::beginTransaction();
+
         //disable editing events that is almost about to start
         if($event->schedule_start < Carbon::now()->addHour()) {
             return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
@@ -193,6 +200,8 @@ class EventController extends Controller
 
         $event_folder_path = "storage/events/$event->id/";
         $this->moveTemporayDocsToEvents($event_folder_path);
+
+        DB::commit();
 
         return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
     }
@@ -219,32 +228,28 @@ class EventController extends Controller
     private function getTemporayDocs()
     {
         $temporary_document_path = "storage/users/organizers/".Auth::user()->id."/temp_docs";
-        $documents = array_diff(scandir($temporary_document_path), array('.', '..'));
+        $documents = File::allFiles($temporary_document_path);
 
-        $document_paths = collect();
-        collect(array_values($documents))->map(function($document) use ($temporary_document_path, $document_paths) {
-            $document_paths->put($document, [
-                'public' => public_path("$temporary_document_path/$document"),
-                'asset' => asset("$temporary_document_path/$document")
-            ]);
-        });
-
-        return $document_paths->all();
+        return collect($documents)
+        ->sortBy(function ($file) {
+            return $file->getCTime();
+        })
+        ->mapWithKeys(function ($file) {
+            return [$file->getBaseName() => [
+                'public' => $file->getLinkTarget(),
+                'asset' => asset($file->getPathName())
+            ]];
+        })
+        ->all();
     }
 
     private function moveTemporayDocsToEvents($event_folder_path)
     {
         //get temp files
-        $temporary_document_path = "storage/users/organizers/".Auth::user()->id."/temp_docs";
         $documents = $this->getTemporayDocs();
 
-        if (! file_exists($temporary_document_path)) {
-            File::makeDirectory($event_folder_path.'documents/');
-        }
-
         foreach($documents as $name => $path) {
-            //move temp files to event folder
-            File::move(public_path("$temporary_document_path/$name"), public_path($event_folder_path.'documents/'.$name));
+            File::move($path['public'], public_path($event_folder_path.'documents/'.$name));
         }
     }
 

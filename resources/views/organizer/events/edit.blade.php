@@ -123,6 +123,7 @@
 
       <div class="form-group alert alert-secondary">
         <label>Documents</label>
+        <p>All attached documents will only be available for download for attending users.</p>
 
         <div class="documents"></div>
 
@@ -135,16 +136,21 @@
                 <th class="text-center">Action</th>
             </tr>
             <tbody>
-              @foreach ($event->uploaded_documents as $name => $path)
+              @foreach ($event->documents as $name => $path)
                 <tr>
                     <td><a href="{{ $path['asset'] }}" target="_blank"> {{ $name }} </a></td>
-                    <td class="text-center"> <button type="button" data-name="{{ $name }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
+                    <td class="text-center"> <button type="button" data-name="{{ $name }}" data-_method="DELETE" data-code="{{ $event->code }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
+                </tr>
+              @endforeach
+              @foreach ($event->temporary_documents as $name => $path)
+                <tr title="This document is tot yet attached to this event, press the update button to save it to this events document folder">
+                    <td><a href="{{ $path['asset'] }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
+                    <td class="text-center"> <button type="button" data-name="{{ $name }}" data-_method="DELETE" data-code="{{ $event->code }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
                 </tr>
               @endforeach
             </tbody>
           </thead>
         </table>
-
       </div>
 
       <div class="float-right">
@@ -167,13 +173,16 @@
 @push('scripts')
   <script>
     const config = {
+      save_button: 'update',
       event: @json($event),
+      csrf: '{{ csrf_token() }}',
       tempdocs: {
         store: "{{ route('organizer.tempdocs.store') }}",
         destroy: "{{ route('organizer.tempdocs.destroy') }}"
       },
-      csrf: '{{ csrf_token() }}'
     }
   </script>
+
+  <script src="{{ asset('scripts/organizer/events/helper.uploads.js') }}"></script>
   <script src="{{ asset('scripts/organizer/events/edit.js') }}"></script>
 @endpush

@@ -40,9 +40,22 @@
                             {{ $event->type }}
                             {{ $event->category_name}}
 
-                            @if($event->has_evaluation && $event->schedule_Start->isPast())
+                            @forelse ($event->uploaded_documents as $name => $path)
+                                @if ($loop->first)
+                                    <hr>
+                                    <br>
+                                    <p>Uploaded Documents:</p>
+                                @endif
+                                <a title="click to download attached document" href="{{ $path['asset'] }}" download class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                                    <i class="fas fa-download"></i> {{ $name }}
+                                </a>
+                            @empty
+                                {{-- no attachments --}}
+                            @endforelse
+
+                            @if($event->has_evaluation && $event->schedule_start->isPast())
                                 <div class="float-right">
-                                    <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evalaute</a>
+                                    <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evaluate</a>
                                 </div>
                             @endif
                         </div>

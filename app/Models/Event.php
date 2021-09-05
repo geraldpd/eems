@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 
 class Event extends Model
 {
@@ -31,9 +32,10 @@ class Event extends Model
         'status',
 
         'evaluation_id',
-        'evaluation_name', // the final name of the evalaution used at the time setup
-        'evaluation_description', // the final description of the evalaution used at the time setup
-        'evaluation_questions', // the final questions of the evalaution used at the time setup
+        'evaluation_name', // the final name of the evaluation used at the time setup
+        'evaluation_description', // the final description of the evaluation used at the time setup
+        'evaluation_questions', // the final questions of the evaluation used at the time setup
+        'evaluation_html_form', // the final questions of the evaluation used at the time setup
     ];
 
     protected $casts = [
@@ -99,8 +101,15 @@ class Event extends Model
 
     public function getEvaluationQuestionsArrayAttribute()
     {
-        return $this->evaluation_questions;
-        return json_decode($this->evaluation_questions, true);
+        //return $this->evaluation_questions;
+        //return json_decode($this->evaluation_questions, true);
+
+        return collect($this->evaluation_questions)->mapWithKeys(function ($item, $key) {
+            $key = array_keys($item)[0];
+            $value = array_values($item)[0];
+            return [$key => $value];
+        });
+
     }
 
     public function getHasEvaluationAttribute()
@@ -110,18 +119,6 @@ class Event extends Model
 
     function getUploadedDocumentsAttribute()
     {
-        $event = $this;
-        $event_document_path = "storage/events/$event->id/documents";
-        $documents = array_diff(scandir($event_document_path), array('.', '..'));
-
-        $document_paths = collect();
-        collect(array_values($documents))->map(function($document) use ($document_paths, $event_document_path) {
-            $document_paths->put($document, [
-                'public' => public_path("$event_document_path/$document"),
-                'asset' => asset("$event_document_path/$document")
-            ]);
-        });
-
-        return $document_paths->all();
+        return eventHelperGetUploadedDocuments($this);
     }
 }

@@ -9,6 +9,16 @@ class EventEvaluation extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'event_id',
+        'attendee_id',
+        'feedback',
+    ];
+
+    protected $casts = [
+        'feedback' => 'json'
+    ];
+
     public function event()
     {
         return $this->belongsTo(Event::class);

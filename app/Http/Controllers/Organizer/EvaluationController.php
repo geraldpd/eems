@@ -129,7 +129,8 @@ class EvaluationController extends Controller
             $event->update([
                 'evaluation_name' => $evaluation->name,
                 'evaluation_description' => $evaluation->description,
-                'evaluation_questions' => $evaluation->questions
+                'evaluation_questions' => $evaluation->questions,
+                'evaluation_html_form' => $evaluation->html_form
             ]);
 
             $params = [$evaluation->id, 'event' => $event->code];
@@ -143,7 +144,8 @@ class EvaluationController extends Controller
             ->update([
                 'evaluation_name' => $evaluation->name,
                 'evaluation_description' => $evaluation->description,
-                'evaluation_questions' => $evaluation->questions
+                'evaluation_questions' => $evaluation->questions,
+                'evaluation_html_form' => $evaluation->html_form
             ]);
 
         }

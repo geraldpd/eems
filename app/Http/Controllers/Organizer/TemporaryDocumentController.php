@@ -37,7 +37,9 @@ class TemporaryDocumentController extends Controller
             $document_path = "storage/events/".$event->id."/documents";
         }
 
-        return File::delete(public_path("$document_path/$request->name"));
+        File::delete(public_path("$document_path/$request->name"));
+
+        return;
     }
 
 

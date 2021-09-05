@@ -140,6 +140,7 @@
 
       <div class="form-group alert alert-secondary">
         <label>Documents</label>
+        <p>All attached documents will only be available for download for attending users.</p>
 
         <div class="documents"></div>
 
@@ -153,15 +154,14 @@
             </tr>
             <tbody>
               @foreach ($documents as $name => $path)
-                <tr>
-                    <td><a href="{{ $path['asset'] }}" target="_blank"> {{ $name }} </a></td>
+                <tr title="This document is tot yet attached to this event, press the submit button to save it to this events document folder">
+                    <td><a href="{{ $path['asset'] }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
                     <td class="text-center"> <button type="button" data-name="{{ $name }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
                 </tr>
               @endforeach
             </tbody>
           </thead>
         </table>
-
       </div>
 
       <div class="float-right">
@@ -185,14 +185,16 @@
 @push('scripts')
   <script>
     const config = {
+      save_button: 'submit',
+      csrf: '{{ csrf_token() }}',
       tempdocs: {
         count: {{ count($documents) }},
         store: "{{ route('organizer.tempdocs.store') }}",
         destroy: "{{ route('organizer.tempdocs.destroy') }}"
       },
-      csrf: '{{ csrf_token() }}'
     }
   </script>
 
+  <script src="{{ asset('scripts/organizer/events/helper.uploads.js') }}"></script>
   <script src="{{ asset('scripts/organizer/events/create.js') }}"></script>
 @endpush

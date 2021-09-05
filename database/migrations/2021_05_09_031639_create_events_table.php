@@ -32,9 +32,10 @@ class CreateEventsTable extends Migration
             $table->dateTime('schedule_start');
             $table->dateTime('schedule_end');
 
-            $table->text('evaluation_name')->nullable()->comment('the name of evalaution used, we save it here because there is a chance that the evalaution will be renamed in the future');
-            $table->text('evaluation_description')->nullable()->comment('the description of evalaution used');
+            $table->text('evaluation_name')->nullable()->comment('the name of evaluation used, we save it here because there is a chance that the evaluation will be renamed in the future');
+            $table->text('evaluation_description')->nullable()->comment('the description of evaluation used');
             $table->text('evaluation_questions')->nullable()->comment('the final set of evaluation entries(modified or not) used in evaluating this event');
+            $table->text('evaluation_html_form')->nullable()->comment('the final set of evaluation entries(modified or not) used in evaluating this event');
 
             $table->string('status')->default('Pending');
 
