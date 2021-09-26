@@ -10,8 +10,17 @@
                 <a href="{{ route('events.show', [$event->code]) }}" class="text-decoration-none text-secondary">
                     <div class="card">
                         <div class="card-header">
-                            @if ($event->attendees->pluck('id')->contains(Auth::user()->roles()->first()->id))
-                                <i class="float-right text-success fas fa-check-circle" title="you have attended this event"></i>
+                            @if ($event->attendees->pluck('id')->contains(Auth::user()->id))
+
+                                @switch(eventHelperGetDynamicStatus($event))
+                                    @case('PENDING')
+                                    @case('ONGOING')
+                                        <i class="float-right text-success fas fa-check-circle" title="you will attend this event"></i>
+                                        @break
+                                    @default {{-- CONCLUDED --}}
+                                        <i class="float-right text-success fas fa-check-circle" title="you have attended this event"></i>
+                                @endswitch
+
                             @endif
                             <h2 class="text-dark">
                                 {{ $event->name }}
