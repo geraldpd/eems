@@ -82,18 +82,18 @@
                 </ul>
             </div>
         </div>
-    </nav>
+        </nav>
 
-    <div class="container-fluid">
-        <br>
-        @yield('content')
-        <br>
-        <br>
-        <br>
+        <div class="container-fluid">
+            <br>
+            @yield('content')
+            <br>
+            <br>
+            <br>
+        </div>
+
+        @stack('modals')
     </div>
-
-    @stack('modals')
-</div>
 
 <!-- Scripts -->
 <script src="{{ asset('js/app.js') }}"></script>

@@ -8,12 +8,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Invitation;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+use App\Jobs\SendEventInvitation;
+use App\Models\EventAttendee;
 
 class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::orderBy('schedule_start')
+        $events = Event::orderByDesc('schedule_start')
             ->with(['attendees'])
             ->withCount('attendees')
             ->get();
@@ -60,6 +66,79 @@ class EventController extends Controller
         }
 
         return $this->attend($event, $email);
+    }
+
+    public function book(Event $event, Request $request)
+    {
+        if($event->invitations()->whereIn('email', $request->email)->exists()) {
+            return redirect()->back()->with('message', 'Error! You tried to book an attendee that has already been invited.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            //create the data for the invitees
+            $invitees = collect($request->email)
+            ->map(function($email) use ($event){
+                return [
+                    'event_id' => $event->id,
+                    'email' => $email,
+                    'updated_at' => Carbon::now(),
+                    'created_at' => Carbon::now(),
+                ];
+            })
+            ->toArray();
+
+            //insert to database
+            $event->invitations()->insert($invitees);
+
+            //collect the invitation
+            $invitations = collect($invitees)->pluck('email');
+
+            //check if the user booked for himself
+            if (in_array(Auth::user()->email, $request->email)) {
+                //automatically accept the invitation
+
+                //create event_attendees record
+                EventAttendee::create([
+                    'event_id' => $event->id,
+                    'attendee_id' => Auth::user()->id,
+                    'is_confirmed' => true,
+                ]);
+
+                //remove the current user from the invitation, so they dont get sent an email since they are auto conmfirmed
+                $invitations = $invitations->filter(fn($email) => $email !== Auth::user()->email);
+            }
+
+            DB::commit();
+
+            //if there is still invitations, send them
+            if(count($invitations)) {
+
+                SendEventInvitation::dispatch($event, Auth::user()->email, $invitations);
+
+            }
+
+            return redirect()->back()->with('message', 'You have successfully booked for this event');
+
+        } catch (Throwable $th) {
+
+            DB::rollBack();
+            return redirect()->back()->with('message', $th->getMessage());
+        }
+
+    }
+
+    public function acceptBookingInvitation(Event $event)
+    {
+        $event->attendees()->attach(Auth::user()->id, [
+            'is_confirmed'=> 1,
+        ]);
+
+        $event->save();
+
+        return redirect()->route('events.show', [$event->code])->with('message', 'Successfuly confirmed invitation');
     }
 
     private function attend(Event $event, $email, $is_qrcode_scanned = false)

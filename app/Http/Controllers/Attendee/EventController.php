@@ -39,6 +39,7 @@ class EventController extends Controller
                $event->dynamic_status = eventHelperGetDynamicStatus($event);
                $event->has_evaluation = eventHelperHasEvaluation($event);
                $event->uploaded_documents = eventHelperGetUploadedDocuments($event);
+               $event->evaluated_attendees = Event::find($event->id)->evaluations->pluck('attendee_id')->all();
 
                return $event;
             });

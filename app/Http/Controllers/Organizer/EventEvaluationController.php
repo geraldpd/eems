@@ -97,34 +97,50 @@ class EventEvaluationController extends Controller
 
         $event->downloadable_filename = Carbon::now()->format('y-m-d').' - '.$event->name.' Evaluations';
 
-       $file = $request->as == 'JSON'
+       $downlodable = $request->as == 'JSON'
         ? $this->asJSON($data, $event)
         : $this->asCSV($data, $event, $questions);
 
-       return response()->download($file);
+       return response()->download($downlodable['path'], $event->downloadable_filename.$downlodable['extension_name']);
     }
 
     private function asJSON($data, $event)
     {
-        file_put_contents($event->downloadable_filename.'.json', $data->toJson(JSON_PRETTY_PRINT));
+        $path = "storage/events/$event->id/evaluation.json";
 
-        return public_path($event->downloadable_filename.'.json');
+        file_put_contents($path, $data->toJson(JSON_PRETTY_PRINT));
+
+        return [
+            'path' => public_path($path),
+            'extension_name' => '.json'
+        ];
     }
 
     private function asCSV($data, $event, $questions)
     {
-        $filename = $event->downloadable_filename.'.csv';
-        $handle = fopen($filename, 'w');
+        $path = "storage/events/$event->id/evaluation.csv";
 
+        $handle = fopen($path, 'w');
+
+        //adds the title
+        fputcsv($handle, [$event->name.' Evaluation']);
+
+        //adds a spacer
+        fputcsv($handle, []);
+
+        //headers
         $headers = array_values($questions->all());
         array_unshift($headers, 'Attendee');
 
         fputcsv($handle, $headers);
 
         foreach ($data as $attendee => $feedback) {
+
+            //appends the attendee email to the evaluation
             $evaluation = array_values($feedback);
             array_unshift($evaluation, $attendee);
 
+            //iterate through the evaluations
             $evaluation = collect($evaluation)->map(function($item) {
                 if(gettype($item) === 'string') {
                     return $item;
@@ -138,7 +154,10 @@ class EventEvaluationController extends Controller
 
         fclose($handle);
 
-        return public_path($filename);
+        return [
+            'path' => public_path($path),
+            'extension_name' => '.csv'
+        ];
     }
 
 }

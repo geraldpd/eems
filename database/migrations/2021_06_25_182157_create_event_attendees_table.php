@@ -18,7 +18,7 @@ class CreateEventAttendeesTable extends Migration
             $table->foreignId('event_id')->constrained();
             $table->foreignId('attendee_id')->constrained('users');
             $table->boolean('is_confirmed')->default(false)->comment('confirm attendance to the event');
-            $table->boolean('is_notified')->default(false)->comment('used to count recent users who accepted invitation');
+            $table->boolean('is_notified')->default(false)->comment('used by ORGANIZER - used to count recent users who accepted invitation');
             $table->timestamps();
         });
     }

@@ -106,6 +106,7 @@
 
 <!-- Scripts -->
 <script src="{{ asset('js/app.js') }}"></script>
+<script type="text/javascript" src="{{ asset('scripts/plugins/DataTables/datatables.min.js') }}"></script>
 
 @stack('scripts')
 </body>

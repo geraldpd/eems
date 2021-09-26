@@ -53,7 +53,7 @@
                                 {{-- no attachments --}}
                             @endforelse
 
-                            @if($event->has_evaluation && $event->schedule_start->isPast())
+                            @if($event->has_evaluation && $event->schedule_start->isPast() && !in_array(Auth::user()->id, $event->evaluated_attendees))
                                 <div class="float-right">
                                     <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evaluate</a>
                                 </div>

@@ -14,7 +14,7 @@
         <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
         <!-- Styles -->
-        <link rel="stylesheet" type="text/css" href="{{ asset('plugins/DataTables/datatables.min.css') }}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{{ asset('scripts/plugins/DataTables/datatables.min.css') }}"/>
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
         @stack('styles')
@@ -98,9 +98,9 @@
             </main>
         </div>
 
-        <script src="{{ asset('js/app.js') }}" defer></script>
-        <script src="{{ asset('js/jquery.js') }}"></script>
-        <script src="{{ asset('plugins/axios.js') }}"></script>
+        <!-- Scripts -->
+        <script src="{{ asset('js/app.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('scripts/plugins/DataTables/datatables.min.js') }}"></script>
         @stack('scripts')
     </body>
 </html>

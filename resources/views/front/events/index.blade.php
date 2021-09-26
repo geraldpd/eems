@@ -7,19 +7,29 @@
     <div class="row justify-content-center">
         @forelse ($events as $event)
             <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>
-                            <a href="{{ route('events.show', [$event->code]) }}">{{ $event->name }}</a>
-                        </h2>
-                    </div>
+                <a href="{{ route('events.show', [$event->code]) }}" class="text-decoration-none text-secondary">
+                    <div class="card">
+                        <div class="card-header">
+                            @if ($event->attendees->pluck('id')->contains(Auth::user()->roles()->first()->id))
+                                <i class="float-right text-success fas fa-check-circle" title="you have attended this event"></i>
+                            @endif
+                            <h2 class="text-dark">
+                                {{ $event->name }}
+                            </h2>
+                        </div>
 
-                    <div class="card-body">
-                        <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
+                        <div class="card-body">
+                            <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
 
-                        <p>{!! $event->description !!}</p>
+                            <div class="description-div">
+                                {!! $event->description !!}
+                            </div>
+
+                            <a href="{{ route('events.show', [$event->code]) }}">...Read More</a>
+
+                        </div>
                     </div>
-                </div>
+                </a>
                 <br>
             </div>
         @empty
@@ -29,3 +39,13 @@
 </div>
 
 @endsection
+
+@push('styles')
+    <style>
+        .description-div {
+            max-height: 350px;
+            overflow: hidden;
+        }
+
+    </style>
+@endpush

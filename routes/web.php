@@ -27,6 +27,9 @@ Route::get('/email/verify', function () {
 Route::get('/', [FrontController::class, 'index']);
 Route::get('/home', [FrontController::class, 'index']);
 
+
+Route::post('/events/{event}/book', [Event::class, 'book'])->name('event.book');
+Route::post('/events/{event}/book/accept_invitation', [Event::class, 'acceptBookingInvitation'])->name('event.accept_booking_invitation');
 Route::get('/events/{event}/{email}/invitation', [Event::class, 'invitation'])->name('event.invitation');
 Route::resource('events', EventController::class)->only(['show', 'index']);
 

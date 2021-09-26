@@ -101,15 +101,13 @@ class Event extends Model
 
     public function getEvaluationQuestionsArrayAttribute()
     {
-        //return $this->evaluation_questions;
-        //return json_decode($this->evaluation_questions, true);
+        $evaluation_questions = gettype($this->evaluation_questions) === 'string' ? json_decode($this->evaluation_questions, true) : $this->evaluation_questions;
 
-        return collect($this->evaluation_questions)->mapWithKeys(function ($item, $key) {
+        return collect($evaluation_questions)->mapWithKeys(function ($item, $key) {
             $key = array_keys($item)[0];
             $value = array_values($item)[0];
             return [$key => $value];
         });
-
     }
 
     public function getHasEvaluationAttribute()
