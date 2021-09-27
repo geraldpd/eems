@@ -177,6 +177,7 @@
 
     <script>
         const config = {
+            event_is_past: '{{ $event->schedule_start->isPast() }}',
             routes: {
                 suggest_attendees : '{{ route('helpers.suggest_attendees') }}'
             },

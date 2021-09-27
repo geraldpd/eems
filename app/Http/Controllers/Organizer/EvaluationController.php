@@ -164,6 +164,13 @@ class EvaluationController extends Controller
      */
     public function destroy(Evaluation $evaluation)
     {
+        $evaluation->load('events');
+        $pending_event_count = $evaluation->events()->where('schedule_start', '>=', Carbon::now())->count();
+
+        if($pending_event_count) {
+            return redirect()->back()->with('message', "$pending_event_count pending event(s) are attached to this evaluation. Please remove or transfer them to another evaluation sheet first.");
+        }
+
         $evaluation->delete();
         return redirect()->route('organizer.evaluations.index')->with('message', 'Evaluation Successfully removed');
     }

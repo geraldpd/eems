@@ -96,14 +96,16 @@ $(function() {
         : send_invitation_button.attr('disabled', true).addClass('btn-secondary').removeClass('btn-primary');
     }
 
-    tagify.on('input', onInputTag)
-          .on('add', onAddTag)
-          .on('add', onEditTag)
-          .on('remove', onRemoveTag)
-          .on('blur', onTagifyFocusBlur)
+    if(! config.event_is_past) {
+        tagify.on('input', onInputTag)
+        .on('add', onAddTag)
+        .on('add', onEditTag)
+        .on('remove', onRemoveTag)
+        .on('blur', onTagifyFocusBlur)
+    }
 
     $('#table').DataTable({
-        order: [[0, 'desc']],
+        order: [[2, 'desc'], [0, 'desc']],
         columnDefs: [
             {
                 "targets": [ 0 ],

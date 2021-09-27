@@ -15,7 +15,7 @@ class CreateEvaluationsTable extends Migration
     {
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organizer_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('organizer_id')->constrained('users'); //->onDelete('cascade');
             $table->string('name')->default('Default Evaluation Sheet');
             $table->text('description')->nullable();
             $table->text('questions')->json()->nullable();

@@ -103,8 +103,9 @@
                 showCancelButton: true
             })
             .then((result) => {
-
-                $(this).closest('form').submit();
+                if(result.isConfirmed) {
+                    $(this).closest('form').submit();
+                }
             });
 
 

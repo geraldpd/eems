@@ -128,6 +128,7 @@
                     @if($event->attendees_count)
 
                         <div class="printable-evaluation col-md-12">
+                            <strong class="d-print-block d-none float-right">Print Date: {{ date('Y-m-d') }}</strong>
                             <h4 class="text-secondary">{{ ucwords($event->name) }}</h4>
                             <strong class="d-print-block d-none text-secondary">{{ ucwords($event->evaluation_name) }}</strong>
                             <p class="d-print-block d-none">{{ $event->evaluation_description }}</p>

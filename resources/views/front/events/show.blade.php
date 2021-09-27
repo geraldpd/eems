@@ -21,13 +21,21 @@
 
                         @if($event->schedule_end->ispast())
                             <button class="btn btn-light float-right" disabled>You have attended this event</button>
+
+                            @if($event->has_evaluation && $event->schedule_start->isPast() && !in_array(Auth::user()->id, $event->evaluated_attendees))
+                                <div class="float-right">
+                                    <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evaluate</a>
+                                </div>
+                            @endif
                         @else
                             <button class="btn btn-light float-right" disabled>This event is on going</button>
                         @endif
 
                     @else
-                        <button class="btn mr-2 btn-secondary float-right" data-toggle="modal" data-target="#book_us-modal">Book for other attendees</button>
-                        <button class="btn mr-2 btn-light float-right" disabled>You will be attending this event</button>
+                        <div class="float-right">
+                            <button class="btn mr-2 btn-secondary" data-toggle="modal" data-target="#book_us-modal">Book for other attendees</button>
+                            <button class="btn mr-2 btn-light" disabled>You will be attending this event</button>
+                        </div>
                     @endif
 
                 @else
@@ -39,7 +47,7 @@
 
             @else
 
-                @if(!$event->schedule_end->ispast())
+                @if(! $event->schedule_start->ispast())
                     @if (Auth::user()->hasRole('attendee'))
                         <button class="btn btn-primary text-white float-right" id="book-event" data-code="{{ $event->code }}" data-toggle="modal" data-target="#book_me-modal"> Book this event </button>
                     @endif
@@ -56,74 +64,83 @@
 
         <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
 
+        @if ($event->location == 'venue')
+            <p>Venue : <i> {{ $event->venue }} </i> </p>
+        @else {{-- $event->location == 'online' --}}
+            <p>Online : <a href="{{ $event->online }}" target="_blank"> {{ $event->online }} </a> </p>
+        @endif
+
         <br>
 
         {!! $event->description !!}
 
     </div>
 
-    <div class="modal fade" id="book_me-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <form action="{{ route('event.book', [$event->code]) }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="email[]" value="{{ Auth::user()->email }}">
+    @if(Auth::check())
+        <div class="modal fade" id="book_me-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form action="{{ route('event.book', [$event->code]) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="email[]" value="{{ Auth::user()->email }}">
 
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="book_me-modal-label">Booking</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="book_me-modal-label">Booking</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
 
-                    <div class="modal-body">
-                        <h3>Book yourself to <span class="event-name">{{ $event->name }}?</span></h3>
-                        <p>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</p>
-                    </div>
+                        <div class="modal-body">
+                            <h3>Book yourself to <span class="event-name">{{ $event->name }}?</span></h3>
+                            <p>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</p>
+                        </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-light" data-dismiss="modal" data-toggle="modal" data-target="#book_us-modal">Book for other attendees</button>
-                        <button type="submit" class="btn btn-primary">Book me</button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal" data-toggle="modal" data-target="#book_us-modal">Book for other attendees</button>
+                            <button type="submit" class="btn btn-primary">Book me</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="book_us-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="book-us-label" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="book-us-label">Book This Event</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
+        <div class="modal fade" id="book_us-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="book-us-label" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="book-us-label">Book This Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
 
-                <form method="POST" action="{{ route('event.book', [$event->code]) }}" method="POST" id="mass-booking">
-                    @csrf
+                    <form method="POST" action="{{ route('event.book', [$event->code]) }}" method="POST" id="mass-booking">
+                        @csrf
 
-                    <div class="emails-div"></div>
+                        <div class="emails-div"></div>
 
-                    <div class="input-group mb-3">
-                        <input type="text" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="email" aria-label="email" value="{{ $event->invitations()->exists(Auth::user()->email) ? '' : Auth::user()->email }}" aria-describedby="basic-addon2">
-                    </div>
+                        <div class="input-group mb-3">
+                            <input type="text" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="email" aria-label="email" value="{{ $event->invitations()->exists(Auth::user()->email) ? '' : Auth::user()->email }}" aria-describedby="basic-addon2">
+                        </div>
 
-                    @if ($errors->has('email'))
-                        {{ $message }}
-                    @endif
-                </form>
+                        @if ($errors->has('email'))
+                            {{ $message }}
+                        @endif
+                    </form>
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-secondary send-invitation" form="mass-booking" disabled> <i class="fas fa-paper-plane"></i> send </button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary send-invitation" form="mass-booking" disabled> <i class="fas fa-paper-plane"></i> send </button>
+                </div>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
+
 @endsection
 
 @push('styles')
