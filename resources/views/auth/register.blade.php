@@ -118,12 +118,46 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label for="firstname" class="col-md-4 col-form-label text-md-right">{{ __('Department / College') }}</label>
+                                    <label for="department" class="col-md-4 col-form-label text-md-right">{{ __('Department / College') }}</label>
 
                                     <div class="col-md-6">
                                         <input id="department" type="text" class="form-control @error('department') is-invalid @enderror" name="department" value="{{ old('department') }}" required autocomplete="department" required autofocus>
 
                                         @error('department')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                            </div>
+                        @else
+                            <div class="step-2">
+                                <br>
+                                <h4>Other Information</h4>
+
+                                <div class="form-group row">
+                                    <label for="firstname" class="col-md-4 col-form-label text-md-right">{{ __('Organization') }}</label>
+
+                                    <div class="col-md-6">
+                                        <input id="attendee_organization_name" type="text" class="form-control @error('organization') is-invalid @enderror" name="attendee_organization_name" value="{{ old('attendee_organization_name') }}" required autofocus>
+
+                                        @error('attendee_organization_name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="attendee_occupation" class="col-md-4 col-form-label text-md-right">{{ __('Occupation') }}</label>
+
+                                    <div class="col-md-6">
+                                        <input id="attendee_occupation" type="text" class="form-control @error('attendee_occupation') is-invalid @enderror" name="attendee_occupation" value="{{ old('attendee_occupation') }}" required autofocus>
+
+                                        @error('attendee_occupation')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </span>

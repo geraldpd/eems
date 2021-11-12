@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
 				'password' => bcrypt('password'),
                 'remember_token' => Str::random(10),
 	        ]);
+
 	        $user->assignRole($role);
 
             if($role == 'organizer') {
@@ -39,6 +40,10 @@ class UserSeeder extends Seeder
                     'description' => 'The default evaluation sheet for organizations',
                     'questions' => null
                 ]);
+            } else {
+                $user->attendee_organization_name = 'Organization';
+                $user->attendee_occupation = 'Occupation';
+                $user->save();
             }
 		}
 

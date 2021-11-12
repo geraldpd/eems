@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,7 +12,8 @@ class ProfileController extends Controller
 {
     public function index(Request $request)
     {
-        return view('organizer.profile.index');
+        $organizer = User::find(Auth::user()->id);
+        return view('organizer.profile.index', compact('organizer'));
     }
 
     public function update(Request $request)

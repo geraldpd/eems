@@ -11,14 +11,14 @@
 
     <h1>Organizer Profile</h1>
     <hr>
-    <form method="POST" action="{{ route('organizer.profile.update', [Auth::user()->id]) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('organizer.profile.update', [$organizer->id]) }}" enctype="multipart/form-data">
       @method('PUT')
       @csrf
 
       <div class="row">
         <div class="col-md-4 col-lg-4 col-sm-12">
             <label for="profile_picture" id="profile_picture_label" class="mx-auto d-block">
-              <img src="{{ asset(Auth::user()->profile_picture_path) }}" alt="profile picture" id="profile_picture_preview" class="img-circle img-responsive">
+              <img src="{{ asset($organizer->profile_picture_path) }}" alt="profile picture" id="profile_picture_preview" class="img-circle img-responsive">
                 <h3  id="profile_picture_edit"> edit </h3>
                 <input type="file" name="profile_picture" id="profile_picture" accept="image/*">
             </label>
@@ -28,13 +28,13 @@
 
             <div class="form-group">
                <h3>
-                  @if (Auth::user()->email_verified_at )
+                  @if ($organizer->email_verified_at )
                     <i class="fas fa-check-circle text-success"></i>
                   @endif
-                  {{ Auth::user()->email }}
+                  {{ $organizer->email }}
                 </h3>
 
-                @if (!Auth::user()->email_verified_at)
+                @if (!$organizer->email_verified_at)
                   <button type="submit" form="verification-resend" class="btn btn-link p-0 m-0 align-baseline">Resend verification email</button>.
                 @endif
             </div>
@@ -45,7 +45,7 @@
 
             <div class="form-group">
                 <label for="firstname">First Name:</label>
-                <input type="text" name="firstname" id="firstname" class="form-control" value="{{ old('firstname') ?? Auth::user()->firstname }}" required>
+                <input type="text" name="firstname" id="firstname" class="form-control" value="{{ old('firstname') ?? $organizer->firstname }}" required>
                 @error('firstname')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -53,7 +53,7 @@
 
             <div class="form-group">
                 <label for="lastname">Last Name:</label>
-                <input type="text" name="lastname" id="lastname" class="form-control" value="{{ old('lastname') ?? Auth::user()->lastname }}" required>
+                <input type="text" name="lastname" id="lastname" class="form-control" value="{{ old('lastname') ?? $organizer->lastname }}" required>
                 @error('lastname')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -61,7 +61,7 @@
 
             <div class="form-group">
                 <label for="mobile_number">Mobile Number:</label>
-                <input type="text" name="mobile_number" id="mobile_number" class="form-control" value="{{ old('mobile_number') ?? Auth::user()->mobile_number }}" placeholder="09 *** *** ***" required>
+                <input type="text" name="mobile_number" id="mobile_number" class="form-control" value="{{ old('mobile_number') ?? $organizer->mobile_number }}" placeholder="09 *** *** ***" required>
                 @error('mobile_number')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -91,7 +91,7 @@
 
             <br>
 
-            @if (Auth::user()->email_verified_at)
+            @if ($organizer->email_verified_at)
               <div class="float-right">
                   <button type="submit" class="btn btn-primary pull-right">Update</button>
               </div>
@@ -105,7 +105,7 @@
 
   </div>
 
-  @if (!Auth::user()->email_verified_at)
+  @if (!$organizer->email_verified_at)
     <form id="verification-resend" method="POST" action="{{ route('verification.resend') }}">
         @csrf
     </form>

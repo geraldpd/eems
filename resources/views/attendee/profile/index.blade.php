@@ -11,14 +11,14 @@
 
     <h1>Attendee Profile</h1>
     <hr>
-    <form method="POST" action="{{ route('attendee.profile.update', [Auth::user()->id]) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('attendee.profile.update', [$attendee->id]) }}" enctype="multipart/form-data">
       @method('PUT')
       @csrf
 
       <div class="row">
         <div class="col-md-4 col-lg-4 col-sm-12">
             <label for="profile_picture" id="profile_picture_label" class="mx-auto d-block">
-                <img src="{{ asset(Auth::user()->profile_picture_path) }}" alt="profile picture" id="profile_picture_preview" class="img-circle img-responsive">
+                <img src="{{ asset($attendee->profile_picture_path) }}" alt="profile picture" id="profile_picture_preview" class="img-circle img-responsive">
                 <h3  id="profile_picture_edit"> edit </h3>
                 <input type="file" name="profile_picture" id="profile_picture" accept="image/*">
             </label>
@@ -28,13 +28,13 @@
 
             <div class="form-group">
                <h3>
-                  @if (Auth::user()->email_verified_at)
+                  @if ($attendee->email_verified_at)
                     <i class="fas fa-check-circle text-success"></i>
                   @endif
-                  {{ Auth::user()->email }}
+                  {{ $attendee->email }}
                 </h3>
 
-                @if (!Auth::user()->email_verified_at)
+                @if (!$attendee->email_verified_at)
                   <button type="submit" form="verification-resend" class="btn btn-link p-0 m-0 align-baseline">Resend verification email</button>.
                 @endif
             </div>
@@ -45,7 +45,7 @@
 
             <div class="form-group">
                 <label for="firstname">First Name:</label>
-                <input type="text" name="firstname" id="firstname" class="form-control" value="{{ old('firstname') ?? Auth::user()->firstname }}" required>
+                <input type="text" name="firstname" id="firstname" class="form-control" value="{{ old('firstname') ?? $attendee->firstname }}" required>
                 @error('firstname')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -53,7 +53,7 @@
 
             <div class="form-group">
                 <label for="lastname">Last Name:</label>
-                <input type="text" name="lastname" id="lastname" class="form-control" value="{{ old('lastname') ?? Auth::user()->lastname }}" required>
+                <input type="text" name="lastname" id="lastname" class="form-control" value="{{ old('lastname') ?? $attendee->lastname }}" required>
                 @error('lastname')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -61,8 +61,28 @@
 
             <div class="form-group">
                 <label for="mobile_number">Mobile Number:</label>
-                <input type="text" name="mobile_number" id="mobile_number" class="form-control" value="{{ old('mobile_number') ?? Auth::user()->mobile_number }}" placeholder="09 *** *** ***" required>
+                <input type="text" name="mobile_number" id="mobile_number" class="form-control" value="{{ old('mobile_number') ?? $attendee->mobile_number }}" placeholder="09 *** *** ***" required>
                 @error('mobile_number')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <br>
+            <h2>Other Information</h2>
+            <hr>
+
+            <div class="form-group">
+                <label for="lastname">Organization:</label>
+                <input type="text" name="attendee_organization_name" id="attendee_organization_name" class="form-control" value="{{ old('attendee_organization_name') ?? $attendee->attendee_organization_name }}" required>
+                @error('attendee_organization_name')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="attendee_occupation">Mobile Number:</label>
+                <input type="text" name="attendee_occupation" id="attendee_occupation" class="form-control" value="{{ old('attendee_occupation') ?? $attendee->attendee_occupation }}" placeholder="09 *** *** ***" required>
+                @error('attendee_occupation')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
@@ -91,7 +111,7 @@
 
             <br>
 
-            @if (Auth::user()->email_verified_at)
+            @if ($attendee->email_verified_at)
               <div class="float-right">
                   <button type="submit" class="btn btn-primary pull-right">Update</button>
               </div>
@@ -105,7 +125,7 @@
 
   </div>
 
-  @if (!Auth::user()->email_verified_at)
+  @if (!$attendee->email_verified_at)
     <form id="verification-resend" method="POST" action="{{ route('verification.resend') }}">
         @csrf
     </form>

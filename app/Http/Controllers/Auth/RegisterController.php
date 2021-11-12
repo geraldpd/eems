@@ -71,7 +71,10 @@ class RegisterController extends Controller
             'as' => ['required', Rule::in(['attendee', 'organizer'])],
 
             'organization_name' => ['required_if:as,organizer'],
-            'department' => ['required_if:as,organizer']
+            'department' => ['required_if:as,organizer'],
+
+            'attendee_organization_name' => ['required_if:as,attendee'],
+            'attendee_occupation' => ['required_if:as,attendee']
         ]);
     }
 
@@ -99,6 +102,12 @@ class RegisterController extends Controller
             } catch (ModelNotFoundException $e) {
               return abort(404); //TODO: specif why an error occured to the user
             }
+        }
+
+        if($data['as'] === 'attendee') {
+            $user->attendee_organization_name = $data['attendee_organization_name'];
+            $user->attendee_occupation = $data['attendee_occupation'];
+            $user->save();
         }
 
         if($event && $data['as'] === 'attendee') {

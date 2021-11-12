@@ -23,7 +23,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'lastname',
         'email',
         'mobile_number',
-        'password'
+        'password',
+        'attendee_organization_name', //! exclusively for attendees
+        'attendee_occupation' //! exclusively for attendees
     ];
 
     /**

@@ -21,7 +21,7 @@ $(function() {
         const url = response.uploadURL
         const file_name = file.name
         let document =`
-            <tr title="This document is tot yet attached to this event, press ${config.save_button} button to save it to this events document folder">
+            <tr title="This document is not yet attached to this event, press ${config.save_button} button to save it to this events document folder">
                 <td><a href="${url}" target="_blank" class="text-warning">${file_name}</a></td>
                 <td class="text-center"> <button type="button" data-name="${file_name}" data-_method="DELETE" class="btn btn-sm btn-secondary remove-document">remove</button> </td>
             </tr>

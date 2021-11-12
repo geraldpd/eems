@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Attendee;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +13,8 @@ class ProfileController extends Controller
 {
     public function index(Request $request)
     {
-        return view('attendee.profile.index');
+        $attendee = User::find(Auth::user()->id);
+        return view('attendee.profile.index', compact('attendee'));
     }
 
     public function update(Request $request)
@@ -28,6 +30,8 @@ class ProfileController extends Controller
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->mobile_number = $request->mobile_number;
+        $user->attendee_organization_name = $request->attendee_organization_name;
+        $user->attendee_occupation = $request->attendee_occupation;
 
         if($request->password && $request->password_confirmation) {
             $user->password =  Hash::make($request->password);
