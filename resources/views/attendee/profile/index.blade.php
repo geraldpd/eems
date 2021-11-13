@@ -80,8 +80,8 @@
             </div>
 
             <div class="form-group">
-                <label for="attendee_occupation">Mobile Number:</label>
-                <input type="text" name="attendee_occupation" id="attendee_occupation" class="form-control" value="{{ old('attendee_occupation') ?? $attendee->attendee_occupation }}" placeholder="09 *** *** ***" required>
+                <label for="attendee_occupation">Occupation:</label>
+                <input type="text" name="attendee_occupation" id="attendee_occupation" class="form-control" value="{{ old('attendee_occupation') ?? $attendee->attendee_occupation }}" required>
                 @error('attendee_occupation')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror

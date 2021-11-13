@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
@@ -127,6 +128,9 @@ class RegisterController extends Controller
                 'description' => 'The default evaluation sheet for organizations',
                 'questions' => null
             ]);
+
+            $event_folder_path = "storage/users/organizers/$user->id/temp_docs"; // temp docs for uploading event files
+            File::makeDirectory($event_folder_path, 0777, true);
         }
 
         $user->assignRole($data['as']);

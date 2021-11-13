@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Organizer;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Carbon\Carbon;
@@ -29,14 +29,21 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Auth::user()->organizedEvents()->with('category')->get()->map(function($event) {
+        $background_color = [
+            'PENDING' => '#007bff',
+            'ONGOING' => '#28a745',
+            'CONCLUDED' => '#6c757d',
+        ];
+
+        $events = Auth::user()->organizedEvents()->with('category')->get()->map(function($event) use ($background_color) {
             return [
                 'id' => $event->id,
                 'title' => $event->name,
                 'start' => $event->schedule_start->format('Y-m-d'),
                 'end' => $event->schedule_end->format('Y-m-d'),
                 'event' => $event,
-                'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),
+                //'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),
+                'backgroundColor' => $background_color[eventHelperGetDynamicStatus($event)],
             ];
         })
         ->groupBy(function ($item, $key) {
