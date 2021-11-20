@@ -19,13 +19,23 @@ use Throwable;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $events = Event::orderByDesc('schedule_start')
             ->with(['attendees'])
             ->withCount('attendees')
-            ->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray()) //except for those events that the current user already has attended to
-            ->paginate(10);
+            //->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray()); //except for those events that the current user already has attended to
+            ->when($request->filled('keyword'), function($query) {
+                $query->where(function($qeury) {
+                    $qeury
+                    ->orWhere('name', 'like', '%'.request()->keyword.'%')
+                    ->orWhere('type', 'like', '%'.request()->keyword.'%');
+                });
+            })
+            ->when(! $request->filled('keyword'), function($query) {
+                $query->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray());
+            })
+            ->paginate(15);
 
         return view('front.events.index', compact('events'));
     }

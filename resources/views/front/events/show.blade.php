@@ -86,7 +86,7 @@
                 </div>
 
                 <div class="float-right">
-                    <button class="btn btn-lg btn-primary" id="invite_link_button">Copy link to clipboard</button>
+                    <button class="btn btn-lg btn-light" id="invite_link_button">Copy link to clipboard</button>
                 </div>
             </div>
         </div>
@@ -225,7 +225,10 @@
             config.modals.book_us.modal('show')
         @endif
 
-        $('#invite_link_button').on('click', _ => {
+        $('#invite_link_button').on('click', function() {
+            $(this).addClass('btn-success').removeClass('btn-light').html('<i class="fas fa-check"></i> Copied to clipboard');
+            setTimeout(() => { $(this).addClass('btn-light').removeClass('btn-success').text('Copy link to clipboard')}, 1000);
+
             const invite_link = document.querySelector('#invite_link')
             invite_link.select();
             document.execCommand('copy')
