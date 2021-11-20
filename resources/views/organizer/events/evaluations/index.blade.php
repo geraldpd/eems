@@ -41,7 +41,6 @@
 
                             <br>
 
-
                             @if(!$event->invitations->count())
                                 <p>Dont forget to <a href="{{ route('organizer.invitations.index', [$event->code]) }}"> invite attendees</a> </p>
                             @endif
@@ -49,6 +48,7 @@
 
                     </div>
                 @break
+
                 @case($event->has_evaluation && !$event->schedule_start->isPast() && !$event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT HAS NOT STARTED --}}
                     <div class="col-md-6">
                         <h1 class="text-secondary">{{ $event->name }}</h1>
@@ -89,9 +89,8 @@
                             <p>Dont forget to <a href="{{ route('organizer.invitations.index', [$event->code]) }}"> invite attendees</a> </p>
                         @endif
                     </div>
-
-                    <br>
                 @break
+
                 @case($event->has_evaluation && $event->schedule_start->isPast() && !$event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT IS ONGOING --}}
                     <div class="col-md-12">
 
@@ -124,6 +123,7 @@
 
                     </div>
                 @break
+
                 @case($event->has_evaluation && $event->schedule_start->isPast() && $event->schedule_end->isPast())  {{-- WHEN EVALUATION IS PROVIDED AND EVENT HAS CONCLUDED --}}
                     @if($event->attendees_count)
 
@@ -170,7 +170,7 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <p>You did not invite anyone to this event, No evaluation sheet result available.</p>
+                                        <p>No one has attended this event. No evaluation sheet result available.</p>
                                     </div>
                                 </div>
                             </div>
@@ -178,6 +178,21 @@
                     @endif
                 @break
             @endswitch
+
+            @if($event->has_evaluation)
+                <div class="col-md-12">
+                    <form action="{{ route('organizer.events.evalautions.close-open', [$event]) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn {{ $event->evaluation_is_released ? 'btn-primary' : 'btn-secondary' }} evaluation_is_released">
+                            @if($event->evaluation_is_released)
+                                <i class="fas fa-lock-open"></i> Open for Evaluation
+                            @else
+                                <i class="fas fa-lock"></i> Closed for Evaluation
+                            @endif
+                        </button>
+                    </form>
+                </div>
+            @endif
         </div>
 
     </div>
@@ -193,6 +208,19 @@
 @push('scripts')
     <script>
         $(function() {
+
+            const evaluation_is_released = {!! $event->evaluation_is_released !!};
+            const open_evaluation = _ => _.addClass('btn-primary').removeClass('btn-secondary').html('<i class="fas fa-lock-open"></i> Open for Evaluation');
+            const close_evaluation = _ => _.addClass('btn-secondary').removeClass('btn-primary').html('<i class="fas fa-lock"></i> Close for Evaluation');
+
+            $('.evaluation_is_released')
+            .mouseover(function() {
+                evaluation_is_released ? close_evaluation($(this)) : open_evaluation($(this));
+            })
+            .mouseleave(function() {
+                evaluation_is_released ? open_evaluation($(this)) : close_evaluation($(this));
+            });
+
             $('.remove-evaluation-sheet').on('click', _ => {
                 window.Swal.fire({
                     title: `Remove Evaluation Sheet?`,

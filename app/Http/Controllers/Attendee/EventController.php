@@ -39,7 +39,7 @@ class EventController extends Controller
                $event->dynamic_status = eventHelperGetDynamicStatus($event);
                $event->has_evaluation = eventHelperHasEvaluation($event);
                $event->uploaded_documents = eventHelperGetUploadedDocuments($event);
-               $event->evaluated_attendees = Event::find($event->id)->evaluations->pluck('attendee_id')->all();
+               $event->evaluated_attendees = DB::table('event_evaluations')->where('event_id', $event->id)->pluck('attendee_id')->all() ?? [];
 
                return $event;
             });
@@ -51,7 +51,7 @@ class EventController extends Controller
     public function evaluation(Request $request, Event $event)
     {
         if(!$event->evaluation_questions || !$event->evaluation_id) {
-            return redirect()->back()->with('message', 'This event does not have and evaluation sheet');
+            return redirect()->back()->with('message', 'This event does not have an evaluation sheet');
         }
 
         return view('attendee.events.evaluation', compact('event'));
@@ -66,6 +66,27 @@ class EventController extends Controller
             3. the user has not evaluated this event
             3. the user must have a record of attendance, and is an actual attendee user role
         */
+
+        //! 1
+        if(! $event->schedule_end->isPast()) {
+            return redirect()->back()->with('message', 'Submitting Evaliation is not yet allowed.');
+        }
+
+        //! 2
+        if(! eventHelperHasEvaluation($event)) {
+            return redirect()->back()->with('message', 'This event does not have an evaluation sheet attaced.');
+        }
+
+        //! 3
+        $evaluated_attendees = DB::table('event_evaluations')->where('event_id', $event->id)->pluck('attendee_id')->all() ?? [];
+        if(in_array(Auth::user()->id, $evaluated_attendees)) {
+            return redirect()->back()->with('message', 'You have already evaluated this event.');
+        }
+
+        //! 4
+        if(in_array(Auth::user()->id, $event->attendees->pluck('id')->all())) {
+            return redirect()->back()->with('message', "You have no participation for $event->name, submitting evaluation is prohibited.");
+        }
 
         DB::beginTransaction();
 

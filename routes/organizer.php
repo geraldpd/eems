@@ -23,7 +23,6 @@ Route::group([
         Route::POST('events/temp-docs', [TemporaryDocumentController::class, 'store'])->name('tempdocs.store');
         Route::DELETE('events/temp-docs', [TemporaryDocumentController::class, 'destroy'])->name('tempdocs.destroy');
 
-        Route::get('events/{event}/evaluations/download', [EventEvaluation::class, 'download'])->name('events.evaluations.download');
 
         //EVENTS
         Route::resource('events', EventController::class);
@@ -33,6 +32,8 @@ Route::group([
 
         //EVENT EVALUATIONS
         Route::resource('events/{event}/evaluations', EventEvaluationController::class, ['as' => 'events']);
+        Route::get('events/{event}/evaluations/download', [EventEvaluation::class, 'download'])->name('events.evaluations.download');
+        Route::post('events/{event}/evaluations/close-open', [EventEvaluation::class, 'close_open'])->name('events.evalautions.close-open');
 
 
     });

@@ -77,6 +77,20 @@ class EventEvaluationController extends Controller
         return redirect()->route('organizer.events.evaluations.index', [$event->code])->with('message', 'Evaluation Successfully removed');
     }
 
+    /**
+     * closes or opens the evaluation sheet to the attendees
+     *
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\Http\Response
+     */
+    public function close_open(Event $event)
+    {
+        $event->evaluation_is_released = $event->evaluation_is_released ? 0 : 1;
+        $event->save();
+
+        return redirect()->route('organizer.events.evaluations.index', [$event->code])->with('message', $event->name.' evaluations has been updated.');
+    }
+
     public function download(Request $request, Event $event)
     {
         $event->load('evaluations.attendee');

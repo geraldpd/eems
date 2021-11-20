@@ -44,6 +44,12 @@
         @empty
             No Event
         @endforelse
+
+        @if($events->count())
+            <div class="d-flex justify-content-center">
+                {!! $events->links() !!}
+            </div>
+        @endif
     </div>
 </div>
 

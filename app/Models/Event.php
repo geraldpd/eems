@@ -35,7 +35,8 @@ class Event extends Model
         'evaluation_name', // the final name of the evaluation used at the time setup
         'evaluation_description', // the final description of the evaluation used at the time setup
         'evaluation_questions', // the final questions of the evaluation used at the time setup
-        'evaluation_html_form', // the final questions of the evaluation used at the time setup
+        'evaluation_html_form', // the final html form that the attendee will fill on evaluation
+        'evaluation_is_released', // control over the evaluation sheet, whether it can be evaluated or not
     ];
 
     protected $casts = [

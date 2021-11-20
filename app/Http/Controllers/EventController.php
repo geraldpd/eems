@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendEventInvitation;
+
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+
+use App\Models\EventAttendee;
 use App\Models\Event;
 use App\Models\User;
-use App\Models\Invitation;
+
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Throwable;
-use App\Jobs\SendEventInvitation;
-use App\Models\EventAttendee;
 
 class EventController extends Controller
 {
@@ -22,7 +24,8 @@ class EventController extends Controller
         $events = Event::orderByDesc('schedule_start')
             ->with(['attendees'])
             ->withCount('attendees')
-            ->get();
+            ->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray()) //except for those events that the current user already has attended to
+            ->paginate(10);
 
         return view('front.events.index', compact('events'));
     }
@@ -43,6 +46,8 @@ class EventController extends Controller
 
             }
         }
+
+        $event->evaluated_attendees = $event->evaluations->pluck('attendee_id')->all() ?? []; //ids of attendees that has evalauted this event
 
         $event->load(['invitations', 'attendees']);
 
