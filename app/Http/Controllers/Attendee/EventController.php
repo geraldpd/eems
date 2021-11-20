@@ -17,7 +17,7 @@ class EventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $attended_events = DB::table('users')
             ->where('users.id', Auth::user()->id)
@@ -32,6 +32,13 @@ class EventController extends Controller
                 'categories.name as category_name',
                 'events.*',
             )
+            ->when($request->filled('keyword'), function($query) {
+                $query->where(function($qeury) {
+                    $qeury
+                    ->orWhere('events.name', 'like', '%'.request()->keyword.'%')
+                    ->orWhere('events.type', 'like', '%'.request()->keyword.'%');
+                });
+            })
             ->get()
             ->map(function ($event) {
                $event->schedule_start = Carbon::parse($event->schedule_start);
@@ -42,7 +49,9 @@ class EventController extends Controller
                $event->evaluated_attendees = DB::table('event_evaluations')->where('event_id', $event->id)->pluck('attendee_id')->all() ?? [];
 
                return $event;
-            });
+            })
+            ->sortByDesc('schedule_start');
+            //->paginate(15);
 
         //dd($attended_events);
         return view('attendee.events.index', compact('attended_events'));
