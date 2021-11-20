@@ -79,16 +79,18 @@
                 @endif
             </div>
 
-            <div class="col-md-5">
-                <p>Share the Qrcode or copy the link to share this event to other users</p>
-                <div class="float-left">
-                    <img  src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 150%;">
-                </div>
+            @if(! $event->schedule_start->isPast())
+                <div class="col-md-5">
+                    <p>Share the Qrcode or copy the link to share this event to other users</p>
+                    <div class="float-left">
+                        <img  src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 150%;">
+                    </div>
 
-                <div class="float-right">
-                    <button class="btn btn-lg btn-light" id="invite_link_button">Copy link to clipboard</button>
+                    <div class="float-right">
+                        <button class="btn btn-lg btn-light" id="invite_link_button">Copy link to clipboard</button>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
 
         <br>
