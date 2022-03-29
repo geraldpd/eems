@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 class ProfileController extends Controller
 {
     public function index(Request $request)
@@ -30,7 +32,7 @@ class ProfileController extends Controller
         }
 
         if($request->has('profile_picture')) {
-            $location = "users/attendees/$user->id/";
+            $location = "users/admin/$user->id/";
 
             $path = $request->file('profile_picture')->store(
                 $location, 'public'
@@ -41,6 +43,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return redirect()->route('organizer.profile.index')->with('message', 'Profile Successfully Updated');
+        return redirect()->route('admin.profile.index')->with('message', 'Profile Successfully Updated');
     }
 }

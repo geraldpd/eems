@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Carbon\Carbon;
-use Exception;
 
 use App\Mail\EventInvitation;
 use App\Models\Category;
@@ -78,6 +77,13 @@ class EventController extends Controller
             'start' => $is_same_day ? Carbon::now()->addHour()->toTimeString() : $default_event_min_time['start'],
             'end' => $is_same_day ? Carbon::now()->addHours(2)->toTimeString() : $default_event_min_time['end']
         ];
+
+        $user = Auth::user();
+        $event_folder_path = "storage/users/organizers/$user->id/temp_docs"; // temp docs for uploading event files
+
+        if(!File::exists($event_folder_path)) {
+            File::makeDirectory($event_folder_path, 0777, true);
+        }
 
         $documents = $this->getTemporayDocs();
 

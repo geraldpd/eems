@@ -11,7 +11,7 @@
 
     <h1>Admin Profile</h1>
     <hr>
-    <form method="POST" action="{{ route('organizer.profile.update', [Auth::user()->id]) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('admin.profile.update', [Auth::user()->id]) }}" enctype="multipart/form-data">
       @method('PUT')
       @csrf
 

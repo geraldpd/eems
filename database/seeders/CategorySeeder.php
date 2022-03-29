@@ -14,8 +14,15 @@ class CategorySeeder extends Seeder
      */
     public function run()
     {
-        Category::factory()
-        ->count(50)
-        ->create();
+        //Category::factory()
+        //->count(50)
+        //->create();
+
+        foreach(['Business', 'Government', 'IT'] as $category) {
+            Category::create([
+                'name' => $category,
+                'is_active' => 1
+            ]);
+        }
     }
 }

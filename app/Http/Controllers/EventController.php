@@ -33,7 +33,9 @@ class EventController extends Controller
                 });
             })
             ->when(! $request->filled('keyword'), function($query) {
-                $query->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray());
+                if(Auth::check()) {
+                    $query->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray());
+                }
             })
             ->paginate(15);
 

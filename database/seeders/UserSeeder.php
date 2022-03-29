@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Models\User;
+use Illuminate\Support\Facades\File;
 
 class UserSeeder extends Seeder
 {
@@ -40,6 +41,7 @@ class UserSeeder extends Seeder
                     'description' => 'The default evaluation sheet for organizations',
                     'questions' => null
                 ]);
+
             } else {
                 $user->attendee_organization_name = 'Organization';
                 $user->attendee_occupation = 'Occupation';
