@@ -33,8 +33,8 @@
                         @forelse ($event->invitations->sortBy('created_at') as $invitation)
                             <tr>
                                 <td style="display:none">{{ $invitation->created_at }}</td> <!-- just for ordering -->
-                                <td>{{ $invitation->guest?->email ?? $invitation->email }}</td>
-                                <td class="text-center">{{ $invitation->guest?->has_confirmed }}</td>
+                                <td>{{ $invitation->guest ? $invitation->guest->email : $invitation->email }}</td>
+                                <td class="text-center">{{ $invitation->guest ? $invitation->guest->has_confirmed : 'none' }}</td>
                             </tr>
                         @empty
                             <tr>
