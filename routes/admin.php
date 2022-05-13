@@ -18,5 +18,7 @@ Route::group([
 
     Route::resource('categories', CategoryController::class);
 
+    Route::resource('types', TypeController::class);
+
     Route::resource('events', EventController::class);
 });

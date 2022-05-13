@@ -3,6 +3,12 @@
 @section('content')
   <div class="container">
 
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ route('admin.categories.index') }}">Categories</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{  $category->name }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Edit</a></li>
+    </ol>
+
     <h1>Edit Category</h1>
 
     <form method="POST" action="{{ route('admin.categories.update', [$category->id]) }}">

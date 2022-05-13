@@ -32,6 +32,7 @@ class EventController extends Controller
                 'categories.name as category_name',
                 'events.*',
             )
+            ->whereDate('schedule_end', '>', Carbon::now()) //to only show future events
             ->when($request->filled('keyword'), function($query) {
                 $query->where(function($qeury) {
                     $qeury

@@ -114,7 +114,7 @@ $(function() {
         ],
         language: {
             search: "",
-            searchPlaceholder: "Seach Invited Guests",
+            searchPlaceholder: "Search Invited Guests",
         },
         bLengthChange: false,
         bFilter: true,

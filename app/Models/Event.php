@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\File;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     const Pending = 'Pending'; //initial status
     const Active = 'Active';
@@ -21,7 +21,7 @@ class Event extends Model
         'organizer_id',
         'category_id',
         'name',
-        'type',
+        'type_id',
         'description',
         'location',
         'venue', //depending on the location field
@@ -66,6 +66,11 @@ class Event extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(Type::class);
     }
 
     public function invitations()

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\organizer\TemporaryDocumentController as TemporaryDocumentController;
 use App\Http\Controllers\organizer\EventEvaluationController as EventEvaluation;
+use App\Http\Controllers\organizer\InvitationController as Invitation;
 
 Route::group([
     'middleware' => ['organizer'],
@@ -23,12 +24,14 @@ Route::group([
         Route::POST('events/temp-docs', [TemporaryDocumentController::class, 'store'])->name('tempdocs.store');
         Route::DELETE('events/temp-docs', [TemporaryDocumentController::class, 'destroy'])->name('tempdocs.destroy');
 
-
         //EVENTS
         Route::resource('events', EventController::class);
 
         //EVENT INVITATIONS
-        Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
+        Route::get('events/{event}/invitations/{filter?}', [Invitation::class, 'index'])->name('invitations.index');
+        Route::get('events/{event}/invitations/{filter}/download', [Invitation::class, 'download'])->name('invitations.download');
+        Route::post('events/{event}/invitations', [Invitation::class, 'store'])->name('invitations.store');
+        //Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
 
         //EVENT EVALUATIONS
         Route::resource('events/{event}/evaluations', EventEvaluationController::class, ['as' => 'events']);

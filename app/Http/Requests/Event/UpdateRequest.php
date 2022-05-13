@@ -26,7 +26,7 @@ class UpdateRequest extends FormRequest
         return [
             'name' => ['required'],
             'category_id' => ['required', 'exists:categories,id'],
-            'type' => ['required'],
+            'type_id' => ['required', 'exists:types,id'],
             'description' => ['required'],
             'location' => ['required'],
             'venue' => ['required_if:location,venue'],

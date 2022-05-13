@@ -7,7 +7,7 @@
 <br>
 {{ $event->location }}
 
-Category: <strong>{{ $event->category->name }}</strong> | Type: <strong>{{ $event->type }}</strong>
+Category: <strong>{{ $event->category->name }}</strong> | Type: <strong>{{ $event->type->name }}</strong>
 
 {!! $event->description !!}
 
@@ -18,6 +18,7 @@ Category: <strong>{{ $event->category->name }}</strong> | Type: <strong>{{ $even
 <br>
 
 <img class="mx-auto d-block" src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 30%;">
+<br>
 <small class="mx-auto d-block" style="width: 30%;"> Share this qrcode to your friends to invite them too.</small>
 
 Thanks,<br>

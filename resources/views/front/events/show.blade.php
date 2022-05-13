@@ -75,7 +75,11 @@
                 @if ($event->location == 'venue')
                     <p>Venue : <i> {{ $event->venue }} </i> </p>
                 @else {{-- $event->location == 'online' --}}
-                    <p>Online : <a href="{{ $event->online }}" target="_blank"> {{ $event->online }} </a> </p>
+                    @auth
+                        @if($event->attendees()->whereAttendeeId(Auth::user()->id)->exists())
+                            <p>Online : <a href="{{ $event->online }}" target="_blank"> {{ $event->online }} </a> </p>
+                        @endif
+                    @endauth
                 @endif
             </div>
 

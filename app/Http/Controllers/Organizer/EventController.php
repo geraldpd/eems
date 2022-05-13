@@ -13,6 +13,7 @@ use Carbon\Carbon;
 
 use App\Mail\EventInvitation;
 use App\Models\Category;
+use App\Models\Type;
 use App\Models\Event;
 use App\Http\Requests\Event\{
     StoreRequest,
@@ -71,8 +72,11 @@ class EventController extends Controller
         }
 
         $is_same_day = $date->copy()->startOfDay() == Carbon::now()->startOfDay(); //? check if the selected day is the same as the current date
-        $default_event_min_time =  config('eems.default_event_min_time');
-        $categories = Category::all();
+        $default_event_min_time = config('eems.default_event_min_time');
+
+        $categories = Category::whereIsActive(true)->get();
+        $types = Type::whereIsActive(true)->get();
+
         $min_sched = [
             'start' => $is_same_day ? Carbon::now()->addHour()->toTimeString() : $default_event_min_time['start'],
             'end' => $is_same_day ? Carbon::now()->addHours(2)->toTimeString() : $default_event_min_time['end']
@@ -88,7 +92,7 @@ class EventController extends Controller
         $documents = $this->getTemporayDocs();
 
         //dd($documents);
-        return view('organizer.events.create', compact('categories', 'date', 'min_sched', 'documents'));
+        return view('organizer.events.create', compact('types', 'categories', 'date', 'min_sched', 'documents'));
     }
 
     /**
@@ -115,6 +119,7 @@ class EventController extends Controller
             'status' => Event::Pending,
         ]);
 
+        //dd($event_data->all());
         $event = Event::create($event_data->all());
 
         $event->code = eventHelperSetCode($event->id);

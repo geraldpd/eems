@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Type;
 use Illuminate\Http\Request;
 
-use App\Http\Requests\Category\{
+use App\Http\Requests\Type\{
     StoreRequest,
     UpdateRequest
 };
 
-class CategoryController extends Controller
+
+class TypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,8 +21,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
-        return view('admin.categories.index', compact('categories'));
+        $types = Type::all();
+        return view('admin.types.index', compact('types'));
     }
 
     /**
@@ -31,7 +32,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.categories.create');
+        return view('admin.types.create');
     }
 
     /**
@@ -42,18 +43,18 @@ class CategoryController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        Category::create($request->validated());
+        Type::create($request->validated());
 
-        return redirect()->route('admin.categories.index')->with('message', 'Category Successfully Created');
+        return redirect()->route('admin.types.index')->with('message', 'Event Type Successfully Created');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\category  $category
+     * @param  \App\Models\type  $type
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function show(type $type)
     {
         //
     }
@@ -61,22 +62,22 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\category  $category
+     * @param  \App\Models\type  $type
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit(type $type)
     {
-        return view('admin.categories.edit', compact('category'));
+        return view('admin.types.edit', compact('type'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\category  $category
+     * @param  \App\Models\type  $type
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Category $category)
+    public function update(UpdateRequest $request, type $type)
     {
         $data = $request->validated();
 
@@ -84,28 +85,29 @@ class CategoryController extends Controller
             $data['is_active'] = 0;
         }
 
-        $category->update($data);
+        $type->update($data);
 
-        return redirect()->route('admin.categories.index')->with('message', $category->name.' Successfully Updated');
+        return redirect()->route('admin.types.index')->with('message', $type->name.' Successfully Updated');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\category  $category
+     * @param  \App\Models\type  $type
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy(type $type)
     {
-        if($category->events->count()) {
+
+        if($type->events->count()) {
             return response()->json([
                 'result' => 'fail',
                 'message' => 'existing_event_relationship'
             ]);
         }
 
-        $category->delete();
+        $type->delete();
 
-        return redirect()->back()->with('message', $category->name.' Successfully Deleted');
+        return redirect()->back()->with('message', $type->name.' Successfully Deleted');
     }
 }

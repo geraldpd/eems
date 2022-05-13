@@ -20,10 +20,10 @@ class CreateEventsTable extends Migration
 
             $table->foreignId('organizer_id')->constrained('users');
             $table->foreignId('category_id')->constrained();
+            $table->foreignId('type_id')->constrained();
             $table->foreignId('evaluation_id')->nullable()->constrained()->comment('Note: the entries are configurable, so there might not always be a 100% similarity. refer to the evaluation_questions field for the final questions used in the attendee evaluation');
 
             $table->string('name');
-            $table->string('type');
             $table->text('description');
             $table->text('location');
             $table->text('venue')->nullable()->comment('required if location field is venue');

@@ -11,10 +11,10 @@
 
         <div class="row">
             <div class="col-md-6">
-                <h1>Category Management</h1>
+                <h1>Event Type Management</h1>
             </div>
             <div class="col-md-6">
-                <a href="{{ route('admin.categories.create') }}" class="btn btn-primary float-right mt-2">Add Category</a>
+                <a href="{{ route('admin.types.create') }}" class="btn btn-primary float-right mt-2">Add Event Type</a>
             </div>
         </div>
 
@@ -28,16 +28,16 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($categories as $category)
-                    <tr id="{{ $category->id }}">
-                        <td style="display:none">{{ $category->created_at }}</td>
-                        <td>{{ $category->name }}</td>
-                        <td class="text-center">{{ $category->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>
+                @forelse ($types as $type)
+                    <tr id="{{ $type->id }}">
+                        <td style="display:none">{{ $type->created_at }}</td>
+                        <td>{{ $type->name }}</td>
+                        <td class="text-center">{{ $type->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>
                         <td>
                             <div class="float-right">
-                                <a class="btn btn-link" href="{{ route('admin.categories.index') }}">Events</a>
-                                <a class="btn btn-primary" href="{{ route('admin.categories.edit', [$category->id]) }}">edit</a>
-                                <span class="btn btn-secondary delete-row" data-id="{{ $category->id }}">delete</span>
+                                <a class="btn btn-link" href="{{ route('admin.types.index') }}">Events</a>
+                                <a class="btn btn-primary" href="{{ route('admin.types.edit', [$type->id]) }}">edit</a>
+                                <span class="btn btn-secondary delete-row" data-id="{{ $type->id }}">delete</span>
                             </div>
                         </td>
                     </tr>
@@ -48,12 +48,12 @@
         </table>
     </div>
 
-    <form action="{{ route('admin.categories.destroy', ['category_id']) }}" method="post" id="delete-resource-form">
+    <form action="{{ route('admin.types.destroy', ['type_id']) }}" method="post" id="delete-resource-form">
         @csrf
         @method('delete')
     </form>
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('scripts/admin/categories/index.js') }}"></script>
+    <script src="{{ asset('scripts/admin/types/index.js') }}"></script>
 @endpush

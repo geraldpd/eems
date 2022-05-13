@@ -4,13 +4,13 @@
   <div class="container">
 
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ route('admin.categories.index') }}">Categories</a></li>
+      <li class="breadcrumb-item"><a href="{{ route('admin.types.index') }}">Event Types</a></li>
       <li class="breadcrumb-item active" aria-current="page">Create</a></li>
     </ol>
 
-    <h1>Create Category</h1>
+    <h1>Create Event Type</h1>
 
-    <form method="POST" action="{{ route('admin.categories.store') }}">
+    <form method="POST" action="{{ route('admin.types.store') }}">
       @csrf
 
         <div class="form-group">

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\Type;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +25,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'unique:categories,'.$this->category->id],
+            'name' => ['required', 'unique:types,name,'.$this->type->id],
             'is_active' => ['boolean'],
         ];
     }

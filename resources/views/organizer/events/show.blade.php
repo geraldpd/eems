@@ -24,7 +24,7 @@
                     <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
                 @endif
 
-                <a href="{{ route('organizer.invitations.index', [$event->code]) }}" class="btn btn-link">
+                <a href="{{ route('organizer.invitations.index', [$event->code, $event->schedule_start->isPast() ? 'confirmed' : '']) }}" class="btn btn-link">
                     Invitations
                     @switch(true)
                         @case(!$event->invitations->count() && !$event->schedule_start->isPast()) {{-- when there is no one invited yet and has not yet started--}}
@@ -60,7 +60,7 @@
             <div class="col-md-9">
                 <br>
                 <h3>Share this QR code to directly invite them to this event</h3>
-                <p>Users will need to signup(for unregistered) and login to their EEMS account <br> to be automatically booked to this event.</p>
+                <p>Users will need to signup(for unregistered) and login to their {{ config('app.name') }} account <br> to be automatically booked to this event.</p>
 
                 @forelse ($event->uploaded_documents as $name => $path)
                     @if ($loop->first)

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\Type;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class UpdateRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +25,8 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'unique:categories,'.$this->category->id],
-            'is_active' => ['boolean'],
+            'name' => ['required', 'unique:categories'],
+            'is_active' => ['nullable'],
         ];
     }
 }
