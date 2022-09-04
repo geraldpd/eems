@@ -130,7 +130,9 @@ class RegisterController extends Controller
             ]);
 
             $event_folder_path = "storage/users/organizers/$user->id/temp_docs"; // temp docs for uploading event files
-            File::makeDirectory($event_folder_path, 0777, true);
+            if (!file_exists($event_folder_path)) {
+                File::makeDirectory($event_folder_path, 0777, true);
+            }
         }
 
         $user->assignRole($data['as']);

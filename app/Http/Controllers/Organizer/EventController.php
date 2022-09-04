@@ -10,15 +10,16 @@ use Illuminate\Http\Request;
 
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 use App\Mail\EventInvitation;
 use App\Models\Category;
 use App\Models\Type;
 use App\Models\Event;
-use App\Http\Requests\Event\{
-    StoreRequest,
-    UpdateRequest
-};
+use App\Http\Requests\Event\StoreRequest;
+use App\Http\Requests\Event\UpdateRequest;
+
+use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
 {
@@ -47,7 +48,9 @@ class EventController extends Controller
             ];
         })
         ->groupBy(function ($item, $key) {
-            return $item['event']->schedule_start->format('Y-m-d');
+            $start = $item['event']->schedule_start->format('Y-m-d');
+            $end = $item['event']->schedule_end->format('Y-m-d');
+            return "$start,$end";
         });
 
         return view('organizer.events.index', compact('events'));
@@ -93,6 +96,25 @@ class EventController extends Controller
 
         //dd($documents);
         return view('organizer.events.create', compact('types', 'categories', 'date', 'min_sched', 'documents'));
+    }
+
+    public function createMultiple(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'start' => 'required',
+            'end' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('organizer.events.index')->with('message', 'Something went wrong, please select proper dates!');
+        }
+
+        $period = CarbonPeriod::create($request->start, $request->end);
+        $categories = Category::whereIsActive(true)->get();
+        $types = Type::whereIsActive(true)->get();
+        $documents = [];
+
+        return view('organizer.events.create_multiple', compact('types', 'categories', 'documents', 'period'));
     }
 
     /**
@@ -198,30 +220,36 @@ class EventController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Event  $event
+     * @param  \App\Models\Event  $event´
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Event $event)
+    public function update(Request $request, Event $event)
     {
-        DB::beginTransaction();
 
-        //disable editing events that is almost about to start
-        if($event->schedule_start < Carbon::now()->addHour()) {
-            return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
+        try {
+            DB::beginTransaction();
+
+            //disable editing events that is almost about to start
+            if($event->schedule_start < Carbon::now()->addHour()) {
+                return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
+            }
+
+            if($event->organizer_id != Auth::user()->id) {
+                return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
+            }
+
+            $event->update($request->all());
+
+            $event_folder_path = "storage/events/$event->id/";
+            $this->moveTemporayDocsToEvents($event_folder_path);
+
+            DB::commit();
+            return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
+
+        } catch (\Throwable $th) {
+            throw $th;
         }
 
-        if($event->organizer_id != Auth::user()->id) {
-            return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
-        }
-
-        $event->update($request->validated());
-
-        $event_folder_path = "storage/events/$event->id/";
-        $this->moveTemporayDocsToEvents($event_folder_path);
-
-        DB::commit();
-
-        return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
     }
 
     //? RESCHEDULE METHOD
@@ -254,7 +282,7 @@ class EventController extends Controller
         })
         ->mapWithKeys(function ($file) {
             return [$file->getBaseName() => [
-                'public' => $file->getLinkTarget(),
+                'public' => $file->getRealPath(),
                 'asset' => asset($file->getPathName())
             ]];
         })

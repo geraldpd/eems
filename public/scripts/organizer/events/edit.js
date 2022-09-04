@@ -19,7 +19,7 @@ $(function() {
 
     $('#location').trigger('change');
 
-    if(!  _.keys(config.event.uploaded_documents).length) {
-        $('.uploaded-documents').addClass('d-none')
-    }
+    // if(!  _.keys(config.event.uploaded_documents).length) {
+    //     $('.uploaded-documents').addClass('d-none')
+    // }
 });

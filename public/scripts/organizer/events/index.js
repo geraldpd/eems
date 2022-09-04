@@ -20,17 +20,34 @@ $(function() {
             window.location.href = config.routes.show.replace('resource_id', event.code)
         },
         dateClick: info => { //single date
-            if(!config.events[info.dateStr] && moment(info.dateStr).isBefore()) {
+            //hide multi day events button
+            $('.add-events-button').hide();
+
+            let eventsOfTheDay = Object.keys(config.events).map(function(key) {
+                let keyRange = key.split(',')
+                if (
+                    info.dateStr > keyRange[0] && info.dateStr < keyRange[1] ||
+                    (info.dateStr == keyRange[0])
+                    ) {
+                    return config.events[key]
+                }
+            })
+            .filter(Boolean)
+            .flat();
+
+            if(!eventsOfTheDay.length && moment(info.dateStr).isBefore()) {
                 return;
             }
 
-            let events = config.events[info.dateStr] ?? false
-                ? constructEventList(config.events[info.dateStr])
+            let events = eventsOfTheDay.length
+                ? constructEventList(eventsOfTheDay)
                 : '<h3>No event scheduled for this date!</h3>';
 
             dateModal(info, events, moment(info.dateStr).isAfter()); //moment(info.dateStr).isAfter() compares the moment object if its after NOW date
         },
         select: info => { //multi date
+
+            //show the select multi-day event button
             let start = moment(info.startStr).add(1, 'days').format(moment_format); //full calendar adds 1 day to info.endStr so we need to add 1 day to start to compensate
             let end = moment(info.endStr).format(moment_format);
 
@@ -38,21 +55,40 @@ $(function() {
                 return;
             }
 
+            //show multi day events button
+            $('.add-events-button')
+            .attr('href', config.routes.createMultiple + `/?start=${start}&end=${end}`)
+            .show()
+
             let selected_dates = constructListOfIntervals(info.startStr, info.endStr, 'days');
 
-            let events = $.map(selected_dates, date => {
-                if(!config.events[date]) {
-                    return;
-                }
+            let eventRows = '';
 
-                return `<h3>${moment(date).format('MMMM D YYYY')}</h3> <div class="col-md-12"> ${constructEventList(config.events[date])}</div>`;
-            }).join('<hr>');
+            selected_dates.forEach(date => {
 
-            if(!events) {
-                return;
+                let eventsOfTheDates = Object.keys(config.events).map(function(key) {
+                    let keyRange = key.split(',')
+                    if (
+                        date > keyRange[0] && date < keyRange[1] ||
+                        (date == keyRange[0])
+                    ) {
+                        return config.events[key]
+                    }
+                })
+                .filter(Boolean)
+                .flat();
+
+                if(!eventsOfTheDates.length) return;
+
+                eventRows += `<h3>${moment(date).format('MMMM D YYYY')}</h3> <div class="col-md-12"> ${constructEventList(eventsOfTheDates)}</div><hr>`
+            })
+
+            if(!eventRows) {
+                //return;
+                eventRows = '<h3>No event scheduled for this date!</h3>'
             }
 
-            dateModal(info, events, false);
+            dateModal(info, eventRows, false);
         }
     });
 

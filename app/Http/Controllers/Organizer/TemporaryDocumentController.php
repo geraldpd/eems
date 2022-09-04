@@ -7,7 +7,7 @@ use App\Models\Event;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class TemporaryDocumentController extends Controller
 {
@@ -29,17 +29,17 @@ class TemporaryDocumentController extends Controller
     public function destroy(Request $request)
     {
         $organizer = Auth::user();
-        $document_path = "storage/users/organizers/$organizer->id/temp_docs";
 
-        if($request->has('code')) {
+        if($request->has('code')) { //! the file being deleted is already attached, exists in the events folder
             $event = $this->getEvent($request->code);
-
-            $document_path = "storage/events/".$event->id."/documents";
+            $document_path = "public/events/".$event->id."/documents";
+        } else { //! file being deleted is still in temps, exists in the users/organizers folder
+            $document_path = "public/users/organizers/$organizer->id/temp_docs";
         }
 
-        File::delete(public_path("$document_path/$request->name"));
+        Storage::delete("$document_path/$request->name");
 
-        return;
+        return "$document_path/$request->name";
     }
 
 

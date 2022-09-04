@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\organizer\TemporaryDocumentController as TemporaryDocumentController;
 use App\Http\Controllers\organizer\EventEvaluationController as EventEvaluation;
 use App\Http\Controllers\organizer\InvitationController as Invitation;
+use App\Http\Controllers\organizer\EventController as Event;
 
 Route::group([
     'middleware' => ['organizer'],
@@ -21,10 +22,11 @@ Route::group([
         Route::resource('evaluations', EvaluationController::class);
 
         //TEMPORARY DOCUMENTS
-        Route::POST('events/temp-docs', [TemporaryDocumentController::class, 'store'])->name('tempdocs.store');
-        Route::DELETE('events/temp-docs', [TemporaryDocumentController::class, 'destroy'])->name('tempdocs.destroy');
+        Route::post('events/temp-docs', [TemporaryDocumentController::class, 'store'])->name('tempdocs.store');
+        Route::delete('events/temp-docs', [TemporaryDocumentController::class, 'destroy'])->name('tempdocs.destroy');
 
         //EVENTS
+        Route::get('events/create-multiple', [Event::class, 'createMultiple'])->name('events.create-multiple');
         Route::resource('events', EventController::class);
 
         //EVENT INVITATIONS
@@ -37,7 +39,6 @@ Route::group([
         Route::resource('events/{event}/evaluations', EventEvaluationController::class, ['as' => 'events']);
         Route::get('events/{event}/evaluations/download', [EventEvaluation::class, 'download'])->name('events.evaluations.download');
         Route::post('events/{event}/evaluations/close-open', [EventEvaluation::class, 'close_open'])->name('events.evalautions.close-open');
-
 
     });
 });

@@ -89,7 +89,7 @@ if (! function_exists('eventHelperGetUploadedDocuments')) {
         })
         ->mapWithKeys(function ($file) {
             return [$file->getBaseName() => [
-                'public' => $file->getLinkTarget(),
+                'public' => $file->getRealPath(),
                 'asset' => asset($file->getPathName())
             ]];
         })

@@ -19,6 +19,7 @@ class CreateEventsTable extends Migration
             $table->text('qrcode')->nullable()->comment('qrcode path');
 
             $table->foreignId('organizer_id')->constrained('users');
+            $table->foreignId('event_grpup_id')->nullable()->constrained()->comment('for events with multiple days');
             $table->foreignId('category_id')->constrained();
             $table->foreignId('type_id')->constrained();
             $table->foreignId('evaluation_id')->nullable()->constrained()->comment('Note: the entries are configurable, so there might not always be a 100% similarity. refer to the evaluation_questions field for the final questions used in the attendee evaluation');

@@ -145,7 +145,7 @@
               @foreach ($event->temporary_documents as $name => $path)
                 <tr title="This document is not yet attached to this event, press the update button to save it to this events document folder">
                     <td><a href="{{ $path['asset'] }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
-                    <td class="text-center"> <button type="button" data-name="{{ $name }}" data-_method="DELETE" data-code="{{ $event->code }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
+                    <td class="text-center"> <button type="button" data-name="{{ $name }}" data-_method="DELETE" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
                 </tr>
               @endforeach
             </tbody>

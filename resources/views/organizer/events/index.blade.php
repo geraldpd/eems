@@ -40,6 +40,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <a href="#" class="btn btn-primary add-event-button">Add Event</a>
+                    <a href="#" class="btn btn-primary add-events-button">Add multi-day Events</a>
                 </div>
             </div>
         </div>
@@ -75,6 +76,10 @@
         .event-countdown-timer {
             font-family: 'digital7', sans-serif;
         }
+
+        .add-events-button {
+            display:none;
+        }
     </style>
 @endpush
 
@@ -86,6 +91,7 @@
         }
 
         config.routes.invitations = '{{ route('organizer.invitations.index', ['resource_id']) }}'
+        config.routes.createMultiple = '{{ route('organizer.events.create-multiple') }}'
     </script>
     <script src="{{ asset('scripts/organizer/events/index.js') }}"></script>
 @endpush

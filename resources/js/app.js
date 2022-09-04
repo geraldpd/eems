@@ -17,6 +17,7 @@ import interaction from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
+
 window.Fullcalendar = {};
 window.Fullcalendar.Calendar = Calendar;
 window.Fullcalendar.Plugins = [interaction, dayGridPlugin, timeGridPlugin, listPlugin];
