@@ -96,7 +96,6 @@ $(function() {
     });
 
     function dateModal(info, events, add_buton_bool = true) {
-        let today = moment();
         let readableFormat = date => moment(date).format('MMMM Do YYYY');
         let event_for = info.dateStr
                     ? readableFormat(info.dateStr)
@@ -108,119 +107,45 @@ $(function() {
 
 
         modals.date.find('.event-status').each((i, status_div) => {
-            let status = $(status_div).data();
+            let status_data = $(status_div).data();
 
-            let event_day = status.day
-            let schedule_start = moment(status.start)
-            let schedule_end = moment(status.end)
+            let schedule_start = moment(status_data.start)
+            let schedule_end = moment(status_data.end)
 
-            //console.log({schedule_start, schedule_end})
-            /*
-                if sched == day
-                    if time already startd = ongoing
-                    else = status
-                if day > sched
-                    concluded
-                if day < sched
-                    days/month/year left
-            */
+            $(status_div).html(`<div class="spinner-border spinner-border-sm" role="status"></div>`);
 
-            let status_html = ''
-            switch (status.status) {
-                case 'CONCLUDED':
-                    status_html = '<b class="text-muted">CONCLUDED</b >'
-                    break;
-
-                case 'ONGOING':
-                    status_html = '<b class="text-success">ONGOING</b >'
-                    break;
-
-                case 'SOON':
-                    status_html = '<b class="text-warning">SOON</b >'
-                    break;
-
-                default: //*PENDING
-
-                    let duration = moment.duration(moment(schedule_start).diff(moment()));
-                console.log(duration)
-                    switch (true) {
-                        case duration.years() >= 1:
-                            let year = duration.format("Y") == 1 ? 'year' : 'years';
-                            display_duration = `<p title="Event Countdown"><b>${duration.format("Y")} ${year} left</b></p>`;
+            intervals[i] = setInterval(_ => {
+                let status_html = ''
+                switch (status_data.status) {
+                    case 'CONCLUDED':
+                        status_html = '<b class="text-muted">CONCLUDED</b >'
                         break;
 
-                        case duration.months() >= 1:
-                            let month = duration.format("M") == 1 ? 'month' : 'months';
-                            display_duration = `<p title="Event Countdown"><b>${duration.format("M")} ${month} left</b></p>`;
+                    case 'ONGOING':
+                        status_html = '<b class="text-success">ONGOING</b >'
                         break;
 
-                        case duration.days() >= 1:
-                            let day = duration.format("D") == 1 ? 'day' : 'days';
-                            display_duration = `<p title="Event Countdown"><b>${duration.format("D")} ${day} left</b></p>`;
+                    case 'PENDING':
+                        status_html = '<b class="text-muted">PENDING</b >'
                         break;
 
-                        //case duration.hours() <= 24:
-                        case moment(schedule_start).isSame(today):
-                            if(duration.hours() <= 24) {
-                                display_duration = `<h4 title="Event Countdown" ><b class="event-status-timer text-warning">${duration.format("hh : mm : ss")}</b></h4>`;
-                            }
+                    default: //*SOON
+                        let timeDiff = moment.duration(moment(schedule_start).diff(moment()));
+                        let countdown = timeDiff.format("hh : mm : ss")
+                        let secondsLeft = parseFloat(timeDiff.format("s").replace(/,/g, ''))
+
+                        if(secondsLeft > 0) {
+                            status_html = `<small>starts in</small> <h4 title="Event Countdown" ><b class="event-status-timer-disabled text-warning">${countdown}</b></h4>`;
+                        } else {
+                            //let timeDiff = moment.duration(moment(schedule_end).diff(moment())); //! for ongoing to concluded
+                            status_html = '<b class="text-success">ONGOING</b >'
+                            clearInterval(i);
+                        }
                         break;
-                    }
-
-                    status_html = `<b class="text-muted">${display_duration}</b >`
-                    break;
-            }
-
-            $(status_div).html(status_html);
-            return;
-
-            if(today.isSame(event_day, 'day')) {
-                //clearInterval(i);
-
-                if(today.isBetween(schedule_start, schedule_end, 'hours')) { //event is ongoing
-                    duration = '<b class="text-success">Ongoing Event</b >'
-                } else {
-                    duration = 'status'
                 }
 
-                //let status_div = ''//moment(schedule_end).isBefore() ? '<b class="text-secondary">Event has concluded</b>' : '<b class="text-success">Ongoing Event</b >'
-                return $(status_div).html(duration).prev().addClass('text-secondary');
-
-            } else {
-
-                //intervals[i] = setInterval(_ => {
-                    let duration = moment.duration(moment(schedule_start).diff(moment()));
-
-                    let display_duration = '';
-
-                    switch (true) {
-                        case duration.years() >= 1:
-                            let year = duration.format("Y") == 1 ? 'year' : 'years';
-                            display_duration = `<p title="Event Countdown"><b>${duration.format("Y")} ${year} left</b></p>`;
-                        break;
-
-                        case duration.months() >= 1:
-                            let month = duration.format("M") == 1 ? 'month' : 'months';
-                            display_duration = `<p title="Event Countdown"><b>${duration.format("M")} ${month} left</b></p>`;
-                        break;
-
-                        case duration.days() >= 1:
-                            let day = duration.format("D") == 1 ? 'day' : 'days';
-                            display_duration = `<p title="Event Countdown"><b>${duration.format("D")} ${day} left</b></p>`;
-                        break;
-
-                        //case duration.hours() <= 24:
-                        case moment(schedule_start).isSame(today):
-                            if(duration.hours() <= 24) {
-                                display_duration = `<h4 title="Event Countdown" ><b class="event-status-timer text-warning">${duration.format("hh : mm : ss")}</b></h4>`;
-                            }
-                        break;
-                    }
-
-                    $(status_div).html(display_duration);
-                //}, 1000);
-
-            }
+                $(status_div).html(status_html);
+            }, 1000);
         });
     }
 

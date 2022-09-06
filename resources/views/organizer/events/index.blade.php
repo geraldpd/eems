@@ -72,7 +72,7 @@
             src: url('{{asset('/fonts/custom/digital-7.ttf')}}') format('truetype');
         }
 
-        .event-countdown-timer {
+        .event-status-timer {
             font-family: 'digital7', sans-serif;
         }
 

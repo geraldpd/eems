@@ -1,29 +1,6 @@
 
 $(function() {
 
-    // let schedule_start = $('#schedule_start');
-    // let schedule_end = $('#schedule_end');
-    // let date = window.moment($('input[name="date"]').val());
-
-    // schedule_start.on('change', function() {
-    //     schedule_end.prop('min', $(this).val());
-    //     let time = $(this).val().split(':');
-
-    //     let max_schedule_end = date
-    //         .set({
-    //             'hour': time[0],
-    //             'minute': time[1],
-    //         })
-    //         .add('minute', 30)
-    //         .format('HH:mm');
-
-    //     schedule_end.val(max_schedule_end);
-    // });
-
-    // schedule_end.on('change', function() {
-    //     schedule_start.prop('max', $(this).val());
-    // });
-
     $('.schedule-row').each((i, schedule_row) => {
         let schedule_picker = $(schedule_row).find('.schedule-picker')
         let index = schedule_picker.data('day')
@@ -46,7 +23,7 @@ $(function() {
         });
 
         schedule_end.off().on('change', function() {
-            schedule_start.prop('max', $(this).val());
+            //schedule_start.prop('max', $(this).val());
         });
     })
 

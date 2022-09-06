@@ -118,7 +118,10 @@ if (! function_exists('eventScheduleStatus')) {
                 if($event_schedule->schedule_start->diffInDays(Carbon::now()) == 0) { //less than 24hrs
 
                     $hours_to_start = $event_schedule->schedule_start->diffInMinutes(Carbon::now(), true) / 60;
-                    if($hours_to_start <= 3) {
+
+                    ///$status = $hours_to_start;
+
+                    if($hours_to_start <= 3) {// if event starts in less than or equal to 3 hours
                         $status = 'SOON';
                     }
 
