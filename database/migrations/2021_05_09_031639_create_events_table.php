@@ -19,7 +19,6 @@ class CreateEventsTable extends Migration
             $table->text('qrcode')->nullable()->comment('qrcode path');
 
             $table->foreignId('organizer_id')->constrained('users');
-            $table->foreignId('event_grpup_id')->nullable()->constrained()->comment('for events with multiple days');
             $table->foreignId('category_id')->constrained();
             $table->foreignId('type_id')->constrained();
             $table->foreignId('evaluation_id')->nullable()->constrained()->comment('Note: the entries are configurable, so there might not always be a 100% similarity. refer to the evaluation_questions field for the final questions used in the attendee evaluation');
@@ -30,8 +29,6 @@ class CreateEventsTable extends Migration
             $table->text('venue')->nullable()->comment('required if location field is venue');
             $table->text('online')->nullable()->comment('required if location field is online');
             $table->text('documents')->nullable();
-            $table->dateTime('schedule_start');
-            $table->dateTime('schedule_end');
 
             $table->text('evaluation_name')->nullable()->comment('the name of evaluation used, we save it here because there is a chance that the evaluation will be renamed in the future');
             $table->text('evaluation_description')->nullable()->comment('the description of evaluation used');

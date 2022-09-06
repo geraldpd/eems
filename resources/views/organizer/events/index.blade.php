@@ -40,7 +40,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <a href="#" class="btn btn-primary add-event-button">Add Event</a>
-                    <a href="#" class="btn btn-primary add-events-button">Add multi-day Events</a>
                 </div>
             </div>
         </div>
@@ -90,8 +89,9 @@
             events: @json($events)
         }
 
+        config.routes.fetchScheduleEvents = '{{ route('organizer.events.fetch-scheduled-events') }}'
         config.routes.invitations = '{{ route('organizer.invitations.index', ['resource_id']) }}'
-        config.routes.createMultiple = '{{ route('organizer.events.create-multiple') }}'
+        config.routes.create = '{{ route('organizer.events.create') }}'
     </script>
     <script src="{{ asset('scripts/organizer/events/index.js') }}"></script>
 @endpush

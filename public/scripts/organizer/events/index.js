@@ -6,7 +6,9 @@ $(function() {
 
     const moment_format = 'YYYY-MM-DD';
 
-    const events = Object.values(config.events).map(event => Object.values(event)).flat();
+    //const events = Object.values(config.events).map(event => Object.values(event)).flat();
+    const events = config.events;
+    console.log(events)
 
     const calendar = new window.Fullcalendar.Calendar($('#calendar').get(0), {
         plugins: window.Fullcalendar.Plugins,
@@ -15,14 +17,21 @@ $(function() {
         initialView: 'dayGridMonth',
         events: events,
         eventBorderColor: 'white',
+        displayEventTime: false,
         eventClick: info => {
-            let event = info.event.extendedProps.event;
+            let event = info.event.extendedProps
             window.location.href = config.routes.show.replace('resource_id', event.code)
         },
         dateClick: info => { //single date
-            //hide multi day events button
-            $('.add-events-button').hide();
 
+            //show the select multi-day event button
+            let start = info.dateStr;//moment(info.dateStr).startOf('day').format(moment_format); //full calendar adds 1 day to info.endStr so we need to add 1 day to start to compensate
+            let end = info.dateStr;//moment(info.dateStr).endOf('day').format(moment_format);
+
+            $('.add-event-button')
+            .attr('href', config.routes.create + `/?start=${start}&end=${end}`)
+
+            /*
             let eventsOfTheDay = Object.keys(config.events).map(function(key) {
                 let keyRange = key.split(',')
                 if (
@@ -34,114 +43,189 @@ $(function() {
             })
             .filter(Boolean)
             .flat();
+            */
 
-            if(!eventsOfTheDay.length && moment(info.dateStr).isBefore()) {
-                return;
-            }
+            fetchScheduleEvents({
+                start: start,
+                end: end
+            }, (eventsOfTheDay) => {
 
-            let events = eventsOfTheDay.length
-                ? constructEventList(eventsOfTheDay)
+                let events = Object.keys(eventsOfTheDay).length
+                ? constructEventList(eventsOfTheDay[info.dateStr], info.dateStr)
                 : '<h3>No event scheduled for this date!</h3>';
 
-            dateModal(info, events, moment(info.dateStr).isAfter()); //moment(info.dateStr).isAfter() compares the moment object if its after NOW date
+                dateModal(info, events, moment(info.dateStr).isAfter()); //moment(info.dateStr).isAfter() compares the moment object if its after NOW date
+
+            })
+
         },
         select: info => { //multi date
 
             //show the select multi-day event button
-            let start = moment(info.startStr).add(1, 'days').format(moment_format); //full calendar adds 1 day to info.endStr so we need to add 1 day to start to compensate
-            let end = moment(info.endStr).format(moment_format);
+            let start = moment(info.startStr).format(moment_format); //full calendar adds 1 day to info.endStr so we need to add 1 day to start to compensate
+            let end = moment(info.endStr).subtract(1, 'days').format(moment_format);
 
             if(start == end) {
                 return;
             }
 
-            //show multi day events button
-            $('.add-events-button')
-            .attr('href', config.routes.createMultiple + `/?start=${start}&end=${end}`)
+            $('.add-event-button')
+            .attr('href', config.routes.create + `/?start=${start}&end=${end}`)
             .show()
 
-            let selected_dates = constructListOfIntervals(info.startStr, info.endStr, 'days');
+            fetchScheduleEvents({
+                start: start,
+                end: end
+            }, eventsOfTheDay => {
 
-            let eventRows = '';
+                if (Object.keys(eventsOfTheDay).length) {
 
-            selected_dates.forEach(date => {
+                    let events = $.map(eventsOfTheDay, function(events, index) {
+                       return `<h3>${moment(index).format('MMMM D YYYY')}</h3> <div class="col-md-12"> ${constructEventList(events, index)}</div><hr>`
+                    })
 
-                let eventsOfTheDates = Object.keys(config.events).map(function(key) {
-                    let keyRange = key.split(',')
-                    if (
-                        date > keyRange[0] && date < keyRange[1] ||
-                        (date == keyRange[0])
-                    ) {
-                        return config.events[key]
-                    }
-                })
-                .filter(Boolean)
-                .flat();
+                    dateModal(info, events, moment(info.dateStr).isAfter()); //moment(info.dateStr).isAfter() compares the moment object if its after NOW date
 
-                if(!eventsOfTheDates.length) return;
+                } else {
 
-                eventRows += `<h3>${moment(date).format('MMMM D YYYY')}</h3> <div class="col-md-12"> ${constructEventList(eventsOfTheDates)}</div><hr>`
+                   let events =  '<h3>No event scheduled for this date!</h3>'
+                   dateModal(info, events, moment(info.dateStr).isAfter()); //moment(info.dateStr).isAfter() compares the moment object if its after NOW date
+                }
             })
-
-            if(!eventRows) {
-                //return;
-                eventRows = '<h3>No event scheduled for this date!</h3>'
-            }
-
-            dateModal(info, eventRows, false);
         }
     });
 
     function dateModal(info, events, add_buton_bool = true) {
+        let today = moment();
         let readableFormat = date => moment(date).format('MMMM Do YYYY');
-        let event_for = info.dateStr ? readableFormat(info.dateStr) : `${readableFormat(info.startStr)} - ${readableFormat(info.endStr)}`;
+        let event_for = info.dateStr
+                    ? readableFormat(info.dateStr)
+                    : `${readableFormat(info.startStr)} - ${readableFormat(moment(info.endStr).subtract(1, 'days'))}`;
 
         modals.date.modal('show');
         modals.date.find('.date-title').text(`Events for ${ event_for }`);
-        modals.date.find('.add-event-button').attr('href', `${config.routes.create}?date=${info.dateStr}`).toggle(add_buton_bool);
         modals.date.find('.date-events').html(events);
 
-        modals.date.find('.event-countdown').each((i, countdown_div) => {
-            let countdown = $(countdown_div).data();
 
-            if(moment(countdown.start).isBefore()) {
-                clearInterval(i);
-                let html = moment(countdown.end).isBefore() ? '<b class="text-secondary">Event has concluded</b>' : '<b class="text-success">Ongoing Event</b >'
-                return $(countdown_div).html(html).prev().addClass('text-secondary');
+        modals.date.find('.event-status').each((i, status_div) => {
+            let status = $(status_div).data();
+
+            let event_day = status.day
+            let schedule_start = moment(status.start)
+            let schedule_end = moment(status.end)
+
+            //console.log({schedule_start, schedule_end})
+            /*
+                if sched == day
+                    if time already startd = ongoing
+                    else = status
+                if day > sched
+                    concluded
+                if day < sched
+                    days/month/year left
+            */
+
+            let status_html = ''
+            switch (status.status) {
+                case 'CONCLUDED':
+                    status_html = '<b class="text-muted">CONCLUDED</b >'
+                    break;
+
+                case 'ONGOING':
+                    status_html = '<b class="text-success">ONGOING</b >'
+                    break;
+
+                case 'SOON':
+                    status_html = '<b class="text-warning">SOON</b >'
+                    break;
+
+                default: //*PENDING
+
+                    let duration = moment.duration(moment(schedule_start).diff(moment()));
+                console.log(duration)
+                    switch (true) {
+                        case duration.years() >= 1:
+                            let year = duration.format("Y") == 1 ? 'year' : 'years';
+                            display_duration = `<p title="Event Countdown"><b>${duration.format("Y")} ${year} left</b></p>`;
+                        break;
+
+                        case duration.months() >= 1:
+                            let month = duration.format("M") == 1 ? 'month' : 'months';
+                            display_duration = `<p title="Event Countdown"><b>${duration.format("M")} ${month} left</b></p>`;
+                        break;
+
+                        case duration.days() >= 1:
+                            let day = duration.format("D") == 1 ? 'day' : 'days';
+                            display_duration = `<p title="Event Countdown"><b>${duration.format("D")} ${day} left</b></p>`;
+                        break;
+
+                        //case duration.hours() <= 24:
+                        case moment(schedule_start).isSame(today):
+                            if(duration.hours() <= 24) {
+                                display_duration = `<h4 title="Event Countdown" ><b class="event-status-timer text-warning">${duration.format("hh : mm : ss")}</b></h4>`;
+                            }
+                        break;
+                    }
+
+                    status_html = `<b class="text-muted">${display_duration}</b >`
+                    break;
             }
 
-            intervals[i] = setInterval(_ => {
-                let duration = moment.duration(moment(countdown.start).diff(moment()));
-                let display_duration = '';
+            $(status_div).html(status_html);
+            return;
 
-                switch (true) {
-                    case duration.years() >= 1:
-                        let year = duration.format("Y") == 1 ? 'year' : 'years';
-                        display_duration = `<p title="Event Countdown"><b>${duration.format("Y")} ${year} left</b></p>`;
-                    break;
+            if(today.isSame(event_day, 'day')) {
+                //clearInterval(i);
 
-                    case duration.months() >= 1:
-                        let month = duration.format("M") == 1 ? 'month' : 'months';
-                        display_duration = `<p title="Event Countdown"><b>${duration.format("M")} ${month} left</b></p>`;
-                    break;
-
-                    case duration.days() >= 1:
-                        let day = duration.format("D") == 1 ? 'day' : 'days';
-                        display_duration = `<p title="Event Countdown"><b>${duration.format("D")} ${day} left</b></p>`;
-                    break;
-
-                    case duration.hours() <= 24:
-                        display_duration = `<h4 title="Event Countdown" ><b class="event-countdown-timer text-warning">${duration.format("hh : mm : ss")}</b></h4>`;
-                    break;
+                if(today.isBetween(schedule_start, schedule_end, 'hours')) { //event is ongoing
+                    duration = '<b class="text-success">Ongoing Event</b >'
+                } else {
+                    duration = 'status'
                 }
 
-                $(countdown_div).html(display_duration);
-            }, 1000);
+                //let status_div = ''//moment(schedule_end).isBefore() ? '<b class="text-secondary">Event has concluded</b>' : '<b class="text-success">Ongoing Event</b >'
+                return $(status_div).html(duration).prev().addClass('text-secondary');
+
+            } else {
+
+                //intervals[i] = setInterval(_ => {
+                    let duration = moment.duration(moment(schedule_start).diff(moment()));
+
+                    let display_duration = '';
+
+                    switch (true) {
+                        case duration.years() >= 1:
+                            let year = duration.format("Y") == 1 ? 'year' : 'years';
+                            display_duration = `<p title="Event Countdown"><b>${duration.format("Y")} ${year} left</b></p>`;
+                        break;
+
+                        case duration.months() >= 1:
+                            let month = duration.format("M") == 1 ? 'month' : 'months';
+                            display_duration = `<p title="Event Countdown"><b>${duration.format("M")} ${month} left</b></p>`;
+                        break;
+
+                        case duration.days() >= 1:
+                            let day = duration.format("D") == 1 ? 'day' : 'days';
+                            display_duration = `<p title="Event Countdown"><b>${duration.format("D")} ${day} left</b></p>`;
+                        break;
+
+                        //case duration.hours() <= 24:
+                        case moment(schedule_start).isSame(today):
+                            if(duration.hours() <= 24) {
+                                display_duration = `<h4 title="Event Countdown" ><b class="event-status-timer text-warning">${duration.format("hh : mm : ss")}</b></h4>`;
+                            }
+                        break;
+                    }
+
+                    $(status_div).html(display_duration);
+                //}, 1000);
+
+            }
         });
     }
 
-    function constructEventList(events) {
-        let event_row = event => {
+    function constructEventList(schedules, day) {
+        let event_row = schedule => {
             let date_formater = (date) => ({time: moment(date).format('hh:mm A'), day: moment(date).format('MMMM D YYYY')});
 
             /*
@@ -149,34 +233,41 @@ $(function() {
                 *TRUE - do not render the edit button
                 !FALSE - render the edit button redirecting to the edit page
             */
-            let edit_button = moment(event.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', event.code)}">Edit</a>`;
+            let edit_button = moment(schedule.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', schedule.event.code)}">Edit</a>`;
 
             return `
                 <div class="event row">
                     <div class="col-md-7 col-sm-12">
                         <br>
-                        <h2 class="lead">${event.name}</h2>
+                        <h2 class="lead">${schedule.event.name}</h2>
                         <p>
-                            Location: <b>${event.location}</b>
+                            Location: <b>${schedule.event.location}</b>
                             <br>
-                            Category: <b>${event.category.name}</b>
+                            Category: <b>${schedule.event.category.name}</b>
                             <br>
-                            Type: <b>${event.type}</b>
+                            Type: <b>${schedule.event.type.name}</b>
                         </p>
                     </div>
                     <div class="col-md-5 col-sm-12">
                         <br>
-                        <h4 class="scheduled_time"><strong>${date_formater(event.schedule_start).time}</strong> - <strong>${date_formater(event.schedule_end).time}</strong></h4>
-                        <div class="event-countdown" data-start="${event.schedule_start}" data-end="${event.schedule_end}"></div>
-                        <a class=" btn btn-link" href="${config.routes.show.replace('resource_id', event.code)}">Preview</a>
-                        <a class=" btn btn-link" href="${config.routes.invitations.replace('resource_id', event.code)}">Attendees</a>
+
+                        <h4 class="scheduled_time">
+                            <strong>${date_formater(schedule.schedule_start).time}</strong> - <strong>${date_formater(schedule.schedule_end).time}</strong>
+                        </h4>
+
+                        <div class="event-status" data-status="${schedule.status}" data-day="${day}" data-start="${ schedule.schedule_start }" data-end="${ schedule.schedule_end }"></div>
+
+                        <a class=" btn btn-link btn-light" href="${config.routes.show.replace('resource_id', schedule.event.code)}">Preview</a>
+
+                        <a class=" btn btn-link btn-light" href="${config.routes.invitations.replace('resource_id', schedule.event.code)}">Attendees</a>
+
                         ${edit_button}
                     </div>
                 </div>`;
 
         };
 
-        return events.map(data => event_row(data.event)).join('<br>');
+        return schedules.map(schedule => event_row(schedule)).join('<br>');
     }
 
     function constructListOfIntervals(start, end, interval) {
@@ -192,6 +283,16 @@ $(function() {
 
         //return intervals;
         return Object.keys(intervals);
+    }
+
+    function fetchScheduleEvents(date, callback) {
+        axios.get(config.routes.fetchScheduleEvents, { params: date })
+        .then(function (response) {
+            callback(response.data)
+        })
+        .catch(function (error) {
+          console.warn(error);
+        });
     }
 
     modals.date.on('hidden.bs.modal', function (e) {

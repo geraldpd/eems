@@ -27,8 +27,6 @@ class Event extends Model
         'venue', //depending on the location field
         'online', //depending on the location field
         'documents',
-        'schedule_start',
-        'schedule_end',
         'status',
 
         'evaluation_id',
@@ -40,8 +38,6 @@ class Event extends Model
     ];
 
     protected $casts = [
-        'schedule_start' => 'datetime:Y-m-d H:i:s',
-        'schedule_end' => 'datetime:Y-m-d H:i:s',
         'evaluation_questions' => 'json',
     ];
 
@@ -73,6 +69,11 @@ class Event extends Model
         return $this->belongsTo(Type::class);
     }
 
+    public function schedules()
+    {
+        return $this->hasMany(EventSchedule::class);
+    }
+
     public function invitations()
     {
         return $this->hasMany(Invitation::class);
@@ -97,7 +98,7 @@ class Event extends Model
 
     public function getGroupDateAttribute()
     {
-        return $this->schedule_start->format('d-m-y');
+        return '';//$this->schedule_start->format('d-m-y');
     }
 
     public function getNotifConfirmedAttendeeCountAttribute()

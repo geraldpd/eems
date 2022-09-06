@@ -53,11 +53,11 @@
         </div>
 
         <div class="col-md-6 form-group">
-          <label for="type">Type</label>
-          <select name="type" id="type" class="form-control">
+          <label for="type_id">Type</label>
+          <select name="type_id" id="type_id" class="form-control">
             <option value=""> Select Event Type </option>
-              @foreach (config('eems.event_types') as $type)
-              <option {{ $event->type == $type ? 'selected' : '' }} value="{{ $type }}"> {{ $type }} </option>
+              @foreach ($types as $type)
+              <option {{ $event->type_id == $type->id ? 'selected' : '' }} value="{{ $type->id }}"> {{ $type->name }} </option>
               @endforeach
           </select>
 

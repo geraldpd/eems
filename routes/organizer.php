@@ -26,7 +26,7 @@ Route::group([
         Route::delete('events/temp-docs', [TemporaryDocumentController::class, 'destroy'])->name('tempdocs.destroy');
 
         //EVENTS
-        Route::get('events/create-multiple', [Event::class, 'createMultiple'])->name('events.create-multiple');
+        Route::get('events/fetch-scheduled-events', [Event::class, 'fetchScheduleEvents'])->name('events.fetch-scheduled-events');
         Route::resource('events', EventController::class);
 
         //EVENT INVITATIONS

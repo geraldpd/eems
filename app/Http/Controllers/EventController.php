@@ -15,6 +15,7 @@ use App\Models\Event;
 use App\Models\User;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Throwable;
 
 class EventController extends Controller
@@ -22,15 +23,15 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $events = Event::orderByDesc('schedule_start')
-            ->with(['attendees'])
+            ->with(['attendees', 'type'])
             ->withCount('attendees')
             //->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray()); //except for those events that the current user already has attended to
             ->when($request->filled('keyword'), function($query) {
-                $query->where(function($qeury) {
-                    $qeury
-                    ->orWhere('name', 'like', '%'.request()->keyword.'%')
-                    ->orWhere('type', 'like', '%'.request()->keyword.'%');
-                });
+
+                $query
+                ->where(fn($subQuery) => $subQuery->orWhere('name', 'like', '%'.request()->keyword.'%'))
+                ->orWhereRelation('type','name', 'like', '%'.request()->keyword.'%');
+
             })
             ->when(! $request->filled('keyword'), function($query) {
                 if(Auth::check()) {

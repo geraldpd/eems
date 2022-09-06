@@ -20,19 +20,23 @@
             </div>
 
             <div class="col-md-4">
-                @if(!$event->schedule_start->isPast())
+                {{-- @if(!$event->schedule_start->isPast()) --}}
+                @if(!false)
                     <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
                 @endif
 
-                <a href="{{ route('organizer.invitations.index', [$event->code, $event->schedule_start->isPast() ? 'confirmed' : '']) }}" class="btn btn-link">
+                {{-- <a href="{{ route('organizer.invitations.index', [$event->code, $event->schedule_start->isPast() ? 'confirmed' : '']) }}" class="btn btn-link"> --}}
+                <a href="{{ route('organizer.invitations.index', [$event->code, false ? 'confirmed' : '']) }}" class="btn btn-link">
                     Invitations
                     @switch(true)
-                        @case(!$event->invitations->count() && !$event->schedule_start->isPast()) {{-- when there is no one invited yet and has not yet started--}}
+                        {{-- @case(!$event->invitations->count() && !$event->schedule_start->isPast()) when there is no one invited yet and has not yet started --}}
+                        @case(!$event->invitations->count() && !false) {{-- when there is no one invited yet and has not yet started--}}
                             <span class="badge badge-primary" title="Invite attendees to your event" >
                                 <i class="fas fa-user-plus"></i>
                             </span>
                             @break
-                        @case($event->notif_confirmed_attendee_count && !$event->schedule_end->isPast()) {{-- when there is no one invited yet and has not yet started --}}
+                        {{-- @case($event->notif_confirmed_attendee_count && !$event->schedule_end->isPast()) when there is no one invited yet and has not yet started --}}
+                        @case($event->notif_confirmed_attendee_count && !false) {{-- when there is no one invited yet and has not yet started --}}
                             <span class="badge badge-primary" title="{{ $event->notif_confirmed_attendee_count }} new confirmed attendees">
                                {{ $event->notif_confirmed_attendee_count }}
                             </span>
@@ -43,7 +47,8 @@
                 </a>
                 <a href="{{route('organizer.events.evaluations.index', [$event->code]) }}" class="btn btn-link">
                     Evaluations
-                    @if (!$event->evaluation_id && !$event->schedule_start->isPast())  {{-- when there is no set evaluation sheet, and has not yet started--}}
+                    {{-- @if (!$event->evaluation_id && !$event->schedule_start->isPast())  when there is no set evaluation sheet, and has not yet started --}}
+                    @if (!$event->evaluation_id && !false)  {{-- when there is no set evaluation sheet, and has not yet started--}}
                         <span class="badge badge-primary">
                             <i title="Provide and evaluation sheet to this event" class="fas fa-clipboard-list"></i>
                         </span>
@@ -51,7 +56,7 @@
                 </a>
             </div>
 
-            <div class="col-md-12"><br></div>
+            <div class="col-md-12"> <br> </div>
 
             <div class="col-md-3">
                 <img class="mx-auto d-block" src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 100%;">
@@ -77,8 +82,38 @@
                         <p>Uploaded documents will only be available for the events attendees.</p>
                     @endif
                 @empty
-
                 @endforelse
+
+                <div>
+                    <h3> Schedules</h3>
+                    <table class="table">
+                        <tbody>
+                        @foreach ($event->schedules as $schedule)
+                            @php
+                                $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
+                            @endphp
+                            <tr>
+                                <td>{{ $schedule_day }}</td>
+                                <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
+                                <td>
+                                    @switch(true)
+                                        @case($schedule->status == 'ongoing')
+                                            <i class="fas fa-circle"></i>
+                                            @break
+                                        @case($schedule->status == 'concluded')
+                                            <i class="fas fa-check"></i>
+                                            @break
+                                        @default
+                                            {{ $schedule->status }}
+                                            @break
+                                    @endswitch
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>

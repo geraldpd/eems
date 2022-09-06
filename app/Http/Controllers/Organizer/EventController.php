@@ -16,9 +16,12 @@ use App\Mail\EventInvitation;
 use App\Models\Category;
 use App\Models\Type;
 use App\Models\Event;
-use App\Http\Requests\Event\StoreRequest;
-use App\Http\Requests\Event\UpdateRequest;
-
+use App\Models\EventSchedule;
+use App\Http\Requests\Event\{
+    StoreRequest,
+    UpdateRequest
+};
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
@@ -36,22 +39,39 @@ class EventController extends Controller
             'CONCLUDED' => '#6c757d',
         ];
 
-        $events = Auth::user()->organizedEvents()->with('category')->get()->map(function($event) use ($background_color) {
+        $events = Auth::user()->organizedEvents()->with(['category', 'type'])->get()
+        ->map(function($event) use ($background_color) {
             return [
                 'id' => $event->id,
                 'title' => $event->name,
-                'start' => $event->schedule_start->format('Y-m-d'),
-                'end' => $event->schedule_end->format('Y-m-d'),
-                'event' => $event,
+                'start' => $event->schedules->first()->schedule_start->format('Y-m-d H:i'),
+                'end' => $event->schedules->last()->schedule_end->format('Y-m-d H:i'),
+                'code' => $event->code,
+                //'event' => $event,
                 //'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),
-                'backgroundColor' => $background_color[eventHelperGetDynamicStatus($event)],
+                //'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),// $background_color[eventHelperGetDynamicStatus($event)],
             ];
-        })
-        ->groupBy(function ($item, $key) {
-            $start = $item['event']->schedule_start->format('Y-m-d');
-            $end = $item['event']->schedule_end->format('Y-m-d');
-            return "$start,$end";
         });
+        // ->groupBy(function ($item, $key) {
+        //     $start = $item['start'];
+        //     $end = $item['end'];
+        //     return "$start,$end";
+        // });
+
+        //dd($events);
+        // $events = EventSchedule::with(['event.category', 'event.type'])
+        // ->get()
+        // ->map(function($eventchedule) {
+        //     return [
+        //         'id' => $eventchedule->id,
+        //         'title' => $eventchedule->event->name,
+        //         'start' => $eventchedule->schedule_start->format('Y-m-d H:i'),
+        //         'end' => $eventchedule->schedule_end->format('Y-m-d  H:i'),
+        //         'event' => $eventchedule->event,
+        //         'status' => $eventchedule->status,
+        //         'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF))//$background_color[eventHelperGetDynamicStatus($event)],
+        //     ];
+        // });
 
         return view('organizer.events.index', compact('events'));
     }
@@ -63,26 +83,34 @@ class EventController extends Controller
      */
     public function create(Request $request)
     {
-        $date_range = explode(' to ', $request->date);
-        $date = $request->date ? Carbon::parse($request->date) : Carbon::now();
+        $validator = Validator::make($request->all(), [
+            'start' => 'required',
+            'end' => 'required',
+        ]);
 
-        if(count($date_range) > 1) {
-            return redirect()->route('organizer.events.index')->with('message', 'Multi date event creation coming soon!');
+        if ($validator->fails()) {
+            return redirect()->route('organizer.events.index')->with('message', 'Something went wrong, please select proper dates!');
         }
 
-        if($date->copy()->startOfDay() < Carbon::now()->startOfDay()) {
+        try {
+            $start = @Carbon::parse($request->start);
+            $end = @Carbon::parse($request->end);
+        } catch (InvalidFormatException $_) {
+            return redirect()->route('organizer.events.index')->with('message', 'Something went wrong, please select proper dates!');
+        }
+
+        $today = Carbon::now()->format('Y-m-d');
+        $period = CarbonPeriod::create($request->start, $request->end)->toArray();
+
+        if($start->copy()->startOfDay() < Carbon::now()->startOfDay()) {
             return redirect()->route('organizer.events.index')->with('message', 'Cannot add events on past dates');
         }
 
-        $is_same_day = $date->copy()->startOfDay() == Carbon::now()->startOfDay(); //? check if the selected day is the same as the current date
         $default_event_min_time = config('eems.default_event_min_time');
 
-        $categories = Category::whereIsActive(true)->get();
-        $types = Type::whereIsActive(true)->get();
-
         $min_sched = [
-            'start' => $is_same_day ? Carbon::now()->addHour()->toTimeString() : $default_event_min_time['start'],
-            'end' => $is_same_day ? Carbon::now()->addHours(2)->toTimeString() : $default_event_min_time['end']
+            'start' => $default_event_min_time['start'],
+            'end' => $default_event_min_time['end']
         ];
 
         $user = Auth::user();
@@ -93,28 +121,10 @@ class EventController extends Controller
         }
 
         $documents = $this->getTemporayDocs();
-
-        //dd($documents);
-        return view('organizer.events.create', compact('types', 'categories', 'date', 'min_sched', 'documents'));
-    }
-
-    public function createMultiple(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'start' => 'required',
-            'end' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->route('organizer.events.index')->with('message', 'Something went wrong, please select proper dates!');
-        }
-
-        $period = CarbonPeriod::create($request->start, $request->end);
         $categories = Category::whereIsActive(true)->get();
         $types = Type::whereIsActive(true)->get();
-        $documents = [];
 
-        return view('organizer.events.create_multiple', compact('types', 'categories', 'documents', 'period'));
+        return view('organizer.events.create', compact('period', 'types', 'categories', 'min_sched', 'documents'));
     }
 
     /**
@@ -127,32 +137,46 @@ class EventController extends Controller
     {
         DB::beginTransaction();
 
+        //* all fields
         $data = collect($request->validated());
 
-        //TODO assuming that the date picked is single day
-        $schedule_start = Carbon::parse($request->schedule_start); //refers to the TIME only not the date
-        $schedule_end = Carbon::parse($request->schedule_end); //refers to the TIME only not the date
-        $date = Carbon::parse($request->date);
-
+        //*organier_id and status
         $event_data = $data->merge([
             'organizer_id' => Auth::user()->id,
-            'schedule_start' => $date->copy()->setHour($schedule_start->hour)->setMinute($schedule_start->minute),
-            'schedule_end' => $date->copy()->setHour($schedule_end->hour)->setMinute($schedule_end->minute),
             'status' => Event::Pending,
         ]);
 
-        //dd($event_data->all());
         $event = Event::create($event_data->all());
 
+        //*code
         $event->code = eventHelperSetCode($event->id);
+
+        //* qrcode
         $event_folder_path = "storage/events/$event->id/";
         $qrcode_invitation_link = route('events.show', $event->code).'?invite=true';
-
         File::makeDirectory($event_folder_path);
         QrCode::generate($qrcode_invitation_link, $event_folder_path.'qrcode.svg');
         $event->qrcode = $event_folder_path.'qrcode.svg';
 
         $event->save();
+
+        $event_schedule = [];
+        foreach($request->schedules as $date => $schedule) {
+
+            $schedule_start = Carbon::parse($schedule['start']);
+            $schedule_end = Carbon::parse($schedule['end']);
+
+            $event_schedule[] = [
+                'event_id' => $event->id,
+                'schedule_start' => Carbon::parse($date)->setHour($schedule_start->hour)->setMinute($schedule_start->minute)->format('y-m-d H:i:s'),
+                'schedule_end' => Carbon::parse($date)->setHour($schedule_end->hour)->setMinute($schedule_end->minute)->format('y-m-d H:i:s'),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ];
+        }
+
+        EventSchedule::insert($event_schedule);
+
 
         File::makeDirectory($event_folder_path.'documents/');
         $this->moveTemporayDocsToEvents($event_folder_path);
@@ -171,6 +195,7 @@ class EventController extends Controller
     public function show(Event $event)
     {
         $preview = new EventInvitation($event, Auth::user()->email, Auth::user()->email);
+        $event->load('schedules');
         return view('organizer.events.show', compact('event', 'preview'));
     }
 
@@ -207,13 +232,15 @@ class EventController extends Controller
 
         }
 
+        $types = Type::whereIsActive(true)->get();
         $categories = Category::all();
+
         $event->load('category');
 
         $event->documents = $event->uploaded_documents;
         $event->temporary_documents = $this->getTemporayDocs();
 
-        return view('organizer.events.edit', compact('event','categories'));
+        return view('organizer.events.edit', compact('event','categories', 'types'));
     }
 
     /**
@@ -223,7 +250,7 @@ class EventController extends Controller
      * @param  \App\Models\Event  $event´
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Event $event)
+    public function update(UpdateRequest $request, Event $event)
     {
 
         try {
@@ -238,7 +265,7 @@ class EventController extends Controller
                 return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
             }
 
-            $event->update($request->all());
+            $event->update($request->validated());
 
             $event_folder_path = "storage/events/$event->id/";
             $this->moveTemporayDocsToEvents($event_folder_path);
@@ -299,4 +326,18 @@ class EventController extends Controller
         }
     }
 
+    public function fetchScheduleEvents(Request $request)
+    {
+        $scheduled_events = EventSchedule::query()
+        ->with(['event.category', 'event.type'])
+        ->whereDate('schedule_start', '>=', Carbon::parse($request->start)->startOfDay())
+        ->whereDate('schedule_end', '<=', Carbon::parse($request->end)->endOfDay())
+        ->orderBy('schedule_start')
+        ->get()
+        ->mapToGroups(function ($item, $key) {
+            return [Carbon::parse($item['schedule_start'])->format('Y-m-d') => $item];
+        });
+
+        return response($scheduled_events);
+    }
 }

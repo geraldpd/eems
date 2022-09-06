@@ -8,14 +8,8 @@
       <li class="breadcrumb-item active" aria-current="page">Add</li>
     </ol>
 
-    @if ($date)
-      <h1>{{ $date->format('M d, Y') }}</h1>
-    @endif
-
     <form method="POST" action="{{ route('organizer.events.store') }}">
       @csrf
-
-      <input type="hidden" name="date" value="{{ $date }}">
 
       <div class="form-group">
         <label for="name">Name of this event</label>
@@ -28,28 +22,58 @@
         @endif
       </div>
 
-      <div class="row">
-        <div class="col-md-6 form-group">
-          <label for="name">Start of Event</label>
-          <input type="time" max="23:29" id="schedule_start" name="schedule_start" value="{{ old('schedule_start') ?? $min_sched['start'] }}" class="form-control" required>
+      <div class="form-group">
+        <label>Schedules</label>
 
-          @if ($errors->has('schedule_start'))
-            <small class="help-block text-danger">
-              <strong>{{ $errors->first('schedule_start') }}</strong>
-            </small>
-          @endif
-        </div>
+        <table class="table table-hover">
+          <tbody class="">
+            @php
+                $today = date('Y-m-d');
+            @endphp
+            @foreach ($period as $schedule)
+              <tr class="schedule-row">
+                <td>
+                  {{ $schedule->isoFormat('Y MMM D dddd') }}
+                </td>
+                <td>
+                  @php
+                    $date_index = $schedule->format('Y-m-d');
+                    $min = [
+                      'start' => $today == $date_index ? date('H:i') : '',
+                      'end' => $min_sched['start']
+                    ];
+                  @endphp
+                    <div class="row schedule-picker" data-day="{{ $date_index }}">
+                      <div class="col-md-6 form-group">
+                        <label>Start of Event</label>
+                        <input
+                          type="time"
+                          min="{{ $min['start'] }}"
+                          id="schedule-{{ $date_index }}-start"
+                          name="schedules[{{ $date_index }}][start]"
+                          value="{{ old("schedules.$date_index.start") }}"
+                          class="form-control schedule_input"
+                          required>
+                      </div>
 
-        <div class="col-md-6 form-group">
-          <label for="name">End of Event</label>
-          <input type="time" id="schedule_end" name="schedule_end" value="{{ old('schedule_end') ?? $min_sched['end'] }}" class="form-control" required>
+                      <div class="col-md-6 form-group">
+                        <label>End of Event</label>
+                        <input
+                          type="time"
+                          min="{{ $min['start'] }}"
+                          id="schedule-{{ $date_index }}-end"
+                          name="schedules[{{ $date_index }}][end]"
+                          value="{{ old("schedules.$date_index.end") }}"
+                          class="form-control schedule_input"
+                          required>
+                      </div>
+                    </div>
+                </td>
+              </tr>
+            @endforeach
+          </tbod>
+        </table>
 
-          @if ($errors->has('schedule_end'))
-            <small class="help-block text-danger">
-              <strong>{{ $errors->first('schedule_end') }}</strong>
-            </small>
-          @endif
-        </div>
       </div>
 
       <div class="row">
@@ -74,7 +98,7 @@
           <select name="type_id" id="type_id" class="form-control">
             <option value=""> Select Event Type </option>
               @foreach ($types as $type)
-                <option {{ old('type->id') == $type->id ? 'selected' : '' }} value="{{ $type->id }}"> {{ $type->name }} </option>
+                <option {{ old('type_id') == $type->id ? 'selected' : '' }} value="{{ $type->id }}"> {{ $type->name }} </option>
               @endforeach
           </select>
 
@@ -178,6 +202,10 @@
   <style>
     .ck-editor__editable_inline {
         min-height: 400px;
+    }
+
+    .schedule_input:invalid {
+      color:red;
     }
   </style>
 @endpush

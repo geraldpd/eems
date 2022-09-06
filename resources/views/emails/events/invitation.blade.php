@@ -2,8 +2,6 @@
 
 # You have been invited to attend {{ $event->name }}
 
-### {{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}
-
 <br>
 {{ $event->location }}
 

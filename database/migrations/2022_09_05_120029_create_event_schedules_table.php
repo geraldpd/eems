@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEventGroupsTable extends Migration
+class CreateEventSchedulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,13 @@ class CreateEventGroupsTable extends Migration
      */
     public function up()
     {
-        Schema::create('event_groups', function (Blueprint $table) {
+        Schema::create('event_schedules', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('event_id')->constrained();
+            $table->dateTime('schedule_start');
+            $table->dateTime('schedule_end');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -26,6 +30,6 @@ class CreateEventGroupsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('event_groups');
+        Schema::dropIfExists('event_schedules');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
@@ -94,5 +95,36 @@ if (! function_exists('eventHelperGetUploadedDocuments')) {
             ]];
         })
         ->all();
+    }
+}
+
+if (! function_exists('eventScheduleStatus')) {
+    function eventScheduleStatus($event_schedule)
+    {
+        $status = '';
+
+        switch (true) {
+            case $event_schedule->schedule_start->isPast():
+
+                if($event_schedule->schedule_end->isPast()) {
+                    $status = 'CONCLUDED';
+                } else {
+                    $status = 'ONGOING';
+                }
+            break;
+
+            default: //!
+                $status = 'PENDING';
+                if($event_schedule->schedule_start->diffInDays(Carbon::now()) == 0) { //less than 24hrs
+
+                    $hours_to_start = $event_schedule->schedule_start->diffInMinutes(Carbon::now(), true) / 60;
+                    if($hours_to_start <= 3) {
+                        $status = 'SOON';
+                    }
+
+                }
+            break;
+        }
+        return $status;
     }
 }
