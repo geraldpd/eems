@@ -42,11 +42,12 @@ class Event extends Model
     ];
 
     protected $appends = [
-        'group_date',
         'notif_confirmed_attendee_count',
         'has_evaluation',
         'evaluation_questions_array',
         'uploaded_documents',
+        'schedule_start',
+        'schedule_end',
     ];
 
     public function getRouteKeyName()
@@ -96,11 +97,6 @@ class Event extends Model
                 ->withTimestamps();
     }
 
-    public function getGroupDateAttribute()
-    {
-        return '';//$this->schedule_start->format('d-m-y');
-    }
-
     public function getNotifConfirmedAttendeeCountAttribute()
     {
         return $this->attendees()->whereIsConfirmed(1)->whereIsNotified(0)->count();
@@ -125,5 +121,15 @@ class Event extends Model
     function getUploadedDocumentsAttribute()
     {
         return eventHelperGetUploadedDocuments($this);
+    }
+
+    public function getScheduleStartAttribute()
+    {
+        return $this->schedules->first()->schedule_start->format('Y-m-d H:i');
+    }
+
+    public function getScheduleEndAttribute()
+    {
+        return $this->schedules->last()->schedule_end->format('Y-m-d H:i');
     }
 }

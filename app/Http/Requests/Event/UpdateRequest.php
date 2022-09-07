@@ -27,6 +27,7 @@ class UpdateRequest extends FormRequest
             'name' => ['required'],
             'category_id' => ['required', 'exists:categories,id'],
             'type_id' => ['required', 'exists:types,id'],
+            'schedules' => ['array', 'min:1'],
             'description' => ['required'],
             'location' => ['required'],
             'venue' => ['required_if:location,venue'],

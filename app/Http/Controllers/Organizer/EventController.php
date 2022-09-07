@@ -33,45 +33,18 @@ class EventController extends Controller
      */
     public function index()
     {
-        $background_color = [
-            'PENDING' => '#007bff',
-            'ONGOING' => '#28a745',
-            'CONCLUDED' => '#6c757d',
-        ];
-
-        $events = Auth::user()->organizedEvents()->with(['category', 'type'])->get()
-        ->map(function($event) use ($background_color) {
+        $events = Auth::user()->organizedEvents()
+        ->with(['category', 'type'])
+        ->get()
+        ->map(function($event) {
             return [
                 'id' => $event->id,
                 'title' => $event->name,
                 'start' => $event->schedules->first()->schedule_start->format('Y-m-d H:i'),
                 'end' => $event->schedules->last()->schedule_end->format('Y-m-d H:i'),
                 'code' => $event->code,
-                //'event' => $event,
-                //'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),
-                //'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),// $background_color[eventHelperGetDynamicStatus($event)],
             ];
         });
-        // ->groupBy(function ($item, $key) {
-        //     $start = $item['start'];
-        //     $end = $item['end'];
-        //     return "$start,$end";
-        // });
-
-        //dd($events);
-        // $events = EventSchedule::with(['event.category', 'event.type'])
-        // ->get()
-        // ->map(function($eventchedule) {
-        //     return [
-        //         'id' => $eventchedule->id,
-        //         'title' => $eventchedule->event->name,
-        //         'start' => $eventchedule->schedule_start->format('Y-m-d H:i'),
-        //         'end' => $eventchedule->schedule_end->format('Y-m-d  H:i'),
-        //         'event' => $eventchedule->event,
-        //         'status' => $eventchedule->status,
-        //         'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF))//$background_color[eventHelperGetDynamicStatus($event)],
-        //     ];
-        // });
 
         return view('organizer.events.index', compact('events'));
     }
@@ -160,6 +133,7 @@ class EventController extends Controller
 
         $event->save();
 
+        //*event schedules
         $event_schedule = [];
         foreach($request->schedules as $date => $schedule) {
 
@@ -174,9 +148,7 @@ class EventController extends Controller
                 'updated_at' => Carbon::now()
             ];
         }
-
         EventSchedule::insert($event_schedule);
-
 
         File::makeDirectory($event_folder_path.'documents/');
         $this->moveTemporayDocsToEvents($event_folder_path);
@@ -218,19 +190,11 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        //disable editing events that has passed its scheduled date
-        if($event->schedule_start->isPast()) {
-
-            return redirect()->route('organizer.events.index')->with('message', "Event $event->name has passed its scheduled date, editing is no longer allowed.");
-
-        }
-
-        //disable editing events that is almost about to start
-        if($event->schedule_start < Carbon::now()->addHour()) {
-
-            return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
-
-        }
+        $default_event_min_time = config('eems.default_event_min_time');
+        $min_sched = [
+            'start' => $default_event_min_time['start'],
+            'end' => $default_event_min_time['end']
+        ];
 
         $types = Type::whereIsActive(true)->get();
         $categories = Category::all();
@@ -240,7 +204,7 @@ class EventController extends Controller
         $event->documents = $event->uploaded_documents;
         $event->temporary_documents = $this->getTemporayDocs();
 
-        return view('organizer.events.edit', compact('event','categories', 'types'));
+        return view('organizer.events.edit', compact('event','categories', 'types', 'min_sched'));
     }
 
     /**
@@ -252,20 +216,30 @@ class EventController extends Controller
      */
     public function update(UpdateRequest $request, Event $event)
     {
-
         try {
             DB::beginTransaction();
 
             //disable editing events that is almost about to start
-            if($event->schedule_start < Carbon::now()->addHour()) {
-                return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
-            }
+            // if($event->schedule_start < Carbon::now()->addHour()) {
+            //     return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
+            // }
 
-            if($event->organizer_id != Auth::user()->id) {
-                return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
-            }
+            // if($event->organizer_id != Auth::user()->id) {
+            //     return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
+            // }
 
             $event->update($request->validated());
+
+            $event_schedule = [];
+            foreach($request->schedules as $schedule_id => $schedule) {
+                $schedule_start = Carbon::parse($schedule['schedule_start']);
+                $schedule_end = Carbon::parse($schedule['schedule_end']);
+
+                $event_schedule = EventSchedule::find($schedule_id);
+                $event_schedule->schedule_start = Carbon::parse($event_schedule->schedule_start)->setHour($schedule_start->hour)->setMinute($schedule_start->minute)->format('y-m-d H:i:s');
+                $event_schedule->schedule_end = Carbon::parse($event_schedule->schedule_end)->setHour($schedule_end->hour)->setMinute($schedule_end->minute)->format('y-m-d H:i:s');
+                $event_schedule->save();
+            }
 
             $event_folder_path = "storage/events/$event->id/";
             $this->moveTemporayDocsToEvents($event_folder_path);
