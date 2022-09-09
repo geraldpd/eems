@@ -128,6 +128,7 @@ if (! function_exists('eventScheduleStatus')) {
                 }
             break;
         }
+
         return $status;
     }
 }

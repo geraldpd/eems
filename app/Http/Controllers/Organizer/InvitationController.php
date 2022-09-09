@@ -91,7 +91,7 @@ class InvitationController extends Controller
     private function getParticipants(Event $event, $filter)
     {
         $attendees = $event->attendees;
-        $is_past = $event->schedule_start->isPast();
+        $is_past = false;//$event->schedule_start->isPast();
 
         switch ($filter) {
             case 'confirmed':

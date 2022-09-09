@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +15,12 @@ class Event extends Model
     const Active = 'Active';
     const Done = 'Done';
     const Cancelled = 'Cancelled';
+
+    //global event status
+    const PENDING = 'PENDING';
+    const ONGOING = 'ONGOING';
+    const CONCLUDED = 'CONCLUDED';
+    const CANCELLED = 'CANCELLED';
 
     protected $fillable = [
         'code',
@@ -42,12 +49,14 @@ class Event extends Model
     ];
 
     protected $appends = [
+        'dynamic_status',
         'notif_confirmed_attendee_count',
         'has_evaluation',
         'evaluation_questions_array',
         'uploaded_documents',
-        'schedule_start',
-        'schedule_end',
+        'schedule_start', //fetches the first event_schedules relationship, returns schedule_start column
+        'schedule_end', //fetches the last event_schedules relationship, returns schedule_end column
+        'todays_scheduled_event',
     ];
 
     public function getRouteKeyName()
@@ -131,5 +140,43 @@ class Event extends Model
     public function getScheduleEndAttribute()
     {
         return $this->schedules->last()->schedule_end->format('Y-m-d H:i');
+    }
+
+    public function getTodaysScheduledEventAttribute()
+    {
+        //fetches scheduled event for the current day
+        return $this->schedules()
+        ->whereDate('schedule_start', '>=', Carbon::now()->startOfDay())
+        ->whereDate('schedule_end', '<=', Carbon::now()->endOfDay())
+        ->first();
+    }
+
+    public function scopePendingEvents($query)
+    {
+        return $query->with(['schedules' => function($query) {
+            $query->whereDate('schedule_start', '>', Carbon::now());
+        }]);
+    }
+
+    public function getDynamicStatusAttribute()
+    {
+        $start = Carbon::parse($this->schedule_start);
+        $end = Carbon::parse($this->schedule_end);
+
+        switch (true) {
+            case $start->isFuture():
+                return self::PENDING;
+                break;
+
+            case $start->isPast() && $end->isFuture():
+                return self::ONGOING;
+                break;
+
+            case $start->isPast() && $end->isPast():
+                return self::CONCLUDED;
+                break;
+        }
+
+        return 'wtf';
     }
 }

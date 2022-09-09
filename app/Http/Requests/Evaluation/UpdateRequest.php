@@ -29,6 +29,7 @@ class UpdateRequest extends FormRequest
             'description' => ['required'],
             'html_form' => ['required'],
             'questions' => ['required'],
+            'update_type' => ['required'],
         ];
     }
 }

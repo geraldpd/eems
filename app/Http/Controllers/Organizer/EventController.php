@@ -168,6 +168,7 @@ class EventController extends Controller
     {
         $preview = new EventInvitation($event, Auth::user()->email, Auth::user()->email);
         $event->load('schedules');
+
         return view('organizer.events.show', compact('event', 'preview'));
     }
 
@@ -216,17 +217,18 @@ class EventController extends Controller
      */
     public function update(UpdateRequest $request, Event $event)
     {
+
         try {
             DB::beginTransaction();
 
             //disable editing events that is almost about to start
-            // if($event->schedule_start < Carbon::now()->addHour()) {
-            //     return redirect()->route('organizer.events.index')->with('message', "Event $event->name is about to start, editing the event is no longer allowed.");
-            // }
+            if(in_array($event->schedules->last()->status, ['ONGOING', 'CONCLUDED'])) {
+                return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event can no longer be updated.');
+            }
 
-            // if($event->organizer_id != Auth::user()->id) {
-            //     return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
-            // }
+            if($event->organizer_id != Auth::user()->id) {
+                return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
+            }
 
             $event->update($request->validated());
 

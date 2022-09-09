@@ -17,46 +17,45 @@ $(function() {
             return;
         }
 
-        //! when there is only one event set and has not yet concluded, this happens when a newly created event, gets its own evaluation
-        if(config.events_count == 1 && config.event != null) {
-            if(moment(config.event.scheduled_start).isBefore()) {
-                return updateEvaluationForm();
+        if(config.event) { //*update only the evaluation columns of the event
+            return updateEvaluationForm(0);
+        } else { //*update the this evaluation only OR update this evaluation and the rest of events using this evaluation
+            if(config.evaluation.pending_events.length > 1) {
+                let pending_event_rows = config.evaluation.pending_events.map((event) =>  `<tr> <td>${event.name}</td> <td>${moment(event.schedule_start).format('MMM DD, YYYY HH:mm a')}</td> </tr>`);
+
+                window.Swal.fire({
+                    title: `Modify Evaluation Sheet?`,
+                    html: `
+                        <table class="table table-bordered">
+                            <thead>
+                                <th>Event</th>
+                                <th>Schedule</th>
+                            </thead>
+                            <tbody>${pending_event_rows}</tbody>
+                        </table>
+                        <br>
+                       There are ${config.evaluation.pending_events.length} booked events that will use this evalution sheet, Proceed Modification?
+                    `,
+                    icon: 'question',
+                    confirmButtonText: 'Persist to all Events',
+                    confirmButtonColor: '#007bff',
+                    denyButtonText: 'Only this Evaluation',
+                    denyButtonColor: '#007bff',
+                    showCancelButton: true,
+                    showDenyButton: config.event ? false : true,
+                })
+                .then((result) => {
+                    if (result.isConfirmed) { //persist
+                        return updateEvaluationForm(1);
+                    } else if(result.isDenied) { //only one
+                        return updateEvaluationForm(2);
+                    }
+                    return;
+                });
             }
         }
 
-        //!when there is more than one event using this evaluation sheet, this happens when an evaluation sheet has multiple pending events assigned to it
-        if(config.evaluation.pending_events.length > 1) {
-            let pending_event_rows = config.evaluation.pending_events.map((event) =>  `<tr> <td>${event.name}</td> <td>${moment(event.schedule_start).format('MMM DD, YYYY HH:mm a')}</td> </tr>`);
-
-            window.Swal.fire({
-                title: `Modify Evaluation Sheet?`,
-                html: `
-                    <table class="table table-bordered">
-                        <thead>
-                            <th>Event</th>
-                            <th>Schedule</th>
-                        </thead>
-                        <tbody>${pending_event_rows}</tbody>
-                    </table>
-                    <br>
-                   There are ${config.evaluation.pending_events.length} booked events that will use this evalution sheet, Proceed Modification?
-                `,
-                icon: 'question',
-                confirmButtonText: 'Yes',
-                confirmButtonColor: '#007bff',
-                showCancelButton: true
-            })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    return updateEvaluationForm();
-                }
-                return;
-            });
-        } else {
-            return updateEvaluationForm();
-        }
-
-        function updateEvaluationForm() {
+        function updateEvaluationForm(type) {
 
             let questions = [];
             $.map(questions_div.find('.question_entry'), label => {
@@ -68,6 +67,7 @@ $(function() {
             });
 
             $('#name').val($('#preview-name').val());
+            $('#update_type').val(type);
             $('#description').val($('#preview-description').val());
             $('#questions').val(JSON.stringify(questions));
             $('#html_form').val(html_form);
@@ -270,7 +270,7 @@ $(function() {
         }
 
         //the query
-        form_builder_div.find('#form_evaluation_query').val(label);
+        form_builder_div.find('#form_evaluation_query').val(label).select().trigger('click');
 
         $('.form-creation-buttons').addClass('d-none'); //hide the add and clear buttons
 
@@ -300,6 +300,8 @@ $(function() {
             $('.form-modification-buttons').addClass('d-none'); //hide the update button
             form_entry.removeClass('alert-info').addClass('alert-light');
         }
+
+        form_builder_div[0].scrollIntoView({behavior: "smooth"});
     }
 
     function formAttributeConstructor() {

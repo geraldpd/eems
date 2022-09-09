@@ -20,8 +20,8 @@
             </div>
 
             <div class="col-md-4">
-                {{-- @if(!$event->schedule_start->isPast()) --}}
-                @if(!false)
+
+                @if(! in_array($event->schedules->last()->status, ['ONGOING', 'CONCLUDED']))
                     <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
                 @endif
 

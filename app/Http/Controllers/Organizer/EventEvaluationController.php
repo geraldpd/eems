@@ -21,6 +21,15 @@ class EventEvaluationController extends Controller
      */
     public function index(Request $request, Event $event)
     {
+
+        /*
+            Dev Notes:
+            Organizers are allowed to attach/modify their events evaluation sheet
+            before(PENDING) and during(ONGOING) the scheduled event. Once the event's
+            last scheduled day has passed(CONCLUDED) the organizer will then no longer be allowed
+            to attached or make modifications on their evaluation sheet
+        */
+
         $event->loadCount('attendees');
         $event->load('evaluations.attendee');
 

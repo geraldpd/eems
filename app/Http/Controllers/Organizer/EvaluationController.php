@@ -89,21 +89,27 @@ class EvaluationController extends Controller
     {
         $event = null;
 
+        $html_form = $evaluation->html_form;
+
         if($request->has('event')) {
             $event = $this->getEvent($request->event);
 
             $event->update([
                 'evaluation_id' => $evaluation->id
             ]);
+
+            if($event->evaluation_html_form) {
+                $html_form = $event->evaluation_html_form;
+            }
         }
 
         $evaluation->loadCount('events');
-        $evaluation->pending_events = $this->getPendingEvents($evaluation)->get();;
+        $evaluation->pending_events = Event::pendingEvents()->where('evaluation_id', $evaluation->id)->get();
 
-        return view('organizer.evaluations.edit', compact('evaluation', 'event'));
+        return view('organizer.evaluations.edit', compact('evaluation', 'event', 'html_form'));
     }
 
-    /**
+    /*
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -114,41 +120,66 @@ class EvaluationController extends Controller
     {
         DB::beginTransaction();
 
-        $params = [$evaluation->id];
+        if($request->has('event')) { // this events evaluation only
 
-        $evaluation->update($request->validated());
-
-        //means evaluation is being modified for an event
-        if($request->has('event')) {
             $event = $this->getEvent($request->event);
 
-            if($event->schedule_start->isPast()) {
-                return redirect()->back()->with('message', 'This event does not have an evaluation sheet');
+            if($event->dynamic_status == Event::CONCLUDED) {
+                DB::rollback();
+                return redirect()->back()->with('message', 'This event has already concluded, You can no longer moddify its evaluation sheet.');
             }
 
             $event->update([
-                'evaluation_name' => $evaluation->name,
-                'evaluation_description' => $evaluation->description,
-                'evaluation_questions' => $evaluation->questions,
-                'evaluation_html_form' => $evaluation->html_form
+                'evaluation_name' => $request->name,
+                'evaluation_description' => $request->description,
+                'evaluation_questions' => $request->questions,
+                'evaluation_html_form' => $request->html_form
             ]);
 
             $params = [$evaluation->id, 'event' => $event->code];
+
+        } else {
+
+            switch ($request->update_type) {
+                case 1: //update this one and the rest of the pending events using this evaluation
+
+                    $evaluation->update($request->validated());
+
+                    $this->getPendingEvents($evaluation)
+                        ->update([
+                            'evaluation_name' => $evaluation->name,
+                            'evaluation_description' => $evaluation->description,
+                            'evaluation_questions' => $evaluation->questions,
+                            'evaluation_html_form' => $evaluation->html_form
+                        ]);
+
+                    break;
+
+                default://update all
+                    $evaluation->update($request->validated());
+                    break;
+            }
+
+            $params = [$evaluation->id];
         }
 
-        if($this->getPendingEvents($evaluation)->count()){
 
-            $evaluation
-            ->events()
-            ->where('schedule_start', '>', Carbon::now()) //TODO add additional condition, i.e. events with staus = pending
-            ->update([
-                'evaluation_name' => $evaluation->name,
-                'evaluation_description' => $evaluation->description,
-                'evaluation_questions' => $evaluation->questions,
-                'evaluation_html_form' => $evaluation->html_form
-            ]);
 
-        }
+        //if($this->getPendingEvents($evaluation)->count()){
+        // if(false){
+
+        //     $evaluation
+        //     ->events()
+        //     ->whereNot('code', '!=', $request->code)
+        //     ->where('schedule_start', '>', Carbon::now()) //TODO add additional condition, i.e. events with staus = pending
+        //     ->update([
+        //         'evaluation_name' => $evaluation->name,
+        //         'evaluation_description' => $evaluation->description,
+        //         'evaluation_questions' => $evaluation->questions,
+        //         'evaluation_html_form' => $evaluation->html_form
+        //     ]);
+
+        // }
 
         $request->session()->flash('clear_storage');
 
@@ -202,6 +233,6 @@ class EvaluationController extends Controller
      */
     private function getPendingEvents($evaluation)
     {
-        return $evaluation->events()->where('schedule_start', '>', Carbon::now());
+        return Event::pendingEvents()->where('evaluation_id', $evaluation->id);
     }
 }

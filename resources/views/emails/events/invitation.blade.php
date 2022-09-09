@@ -3,11 +3,31 @@
 # You have been invited to attend {{ $event->name }}
 
 <br>
-{{ $event->location }}
+Category: <strong>{{ $event->category->name }}</strong>
+<br>
+Type: <strong>{{ $event->type->name }}</strong>
+<br>
+<br>
 
-Category: <strong>{{ $event->category->name }}</strong> | Type: <strong>{{ $event->type->name }}</strong>
+Schedules:
+<table class="table">
+    <tbody>
+    @foreach ($event->schedules as $schedule)
+        @php
+            $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
+        @endphp
+        <tr>
+            <td>{{ $schedule_day }}</td>
+            <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>
 
 {!! $event->description !!}
+
+<br>
+{{ $event->location }}
 
 @component('mail::button', ['url' => $invitation_link])
     confirm invitation

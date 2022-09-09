@@ -50,7 +50,7 @@
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
 
-                {!! $evaluation->html_form ? $evaluation->html_form : '<h2 class="empty-form_text text-muted">No Evaluation Entries </h2>' !!}
+                {!! $html_form ? $html_form : '<h2 class="empty-form_text text-muted">No Evaluation Entries </h2>' !!}
             </ol>
         </div>
 
@@ -80,6 +80,7 @@
                                 <input type="hidden" name="event" value="{{ $event->code }}">
                             @endif
                             <input type="hidden" name="name" id="name" value="{{ old('name') }}">
+                            <input type="hidden" name="update_type" id="update_type" value="">
                             <input type="hidden" name="description" id="description" value="{{ old('description') }}" required>
                             <input type="hidden" name="html_form" id="html_form" value="{{ old('html_form') }}" required>
                             <input type="hidden" name="questions" id="questions" value="{{ old('questions') }}" required>
