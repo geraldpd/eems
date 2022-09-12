@@ -19,9 +19,18 @@
                         {{-- has accepted invitation --}}
                         @if($event->attendees()->whereAttendeeId(Auth::user()->id)->exists())
 
-                            @if($event->schedule_start->ispast())
+                            @switch($event->dynamic_status)
+                                @case('PENDING')
+                                    <div class="float-right">
+                                        <button class="btn mr-2 btn-secondary" data-toggle="modal" data-target="#book_us-modal">Book for other attendees</button>
+                                        <button class="btn mr-2 btn-light" disabled>You will be attending this event</button>
+                                    </div>
+                                    @break
+                                @case('ONGOING')
+                                    <button class="btn btn-light float-right" disabled>This event is on going</button>
+                                    @break
+                                @default
 
-                                @if($event->schedule_end->ispast())
                                     <button class="btn btn-light float-right" disabled>You have attended this event</button>
 
                                     @if($event->has_evaluation && !in_array(Auth::user()->id, $event->evaluated_attendees) && in_array(Auth::user()->id, $event->attendees->pluck('id')->all()))
@@ -30,16 +39,7 @@
                                         </div>
                                     @endif
 
-                                @else
-                                    <button class="btn btn-light float-right" disabled>This event is on going</button>
-                                @endif
-
-                            @else
-                                <div class="float-right">
-                                    <button class="btn mr-2 btn-secondary" data-toggle="modal" data-target="#book_us-modal">Book for other attendees</button>
-                                    <button class="btn mr-2 btn-light" disabled>You will be attending this event</button>
-                                </div>
-                            @endif
+                            @endswitch
 
                         @else
                             <form action="{{ route('event.accept_booking_invitation', [$event->code]) }}" method="POST">
@@ -50,7 +50,7 @@
 
                     @else
 
-                        @if(! $event->schedule_start->ispast())
+                        @if($event->dynamic_status != 'CONCLUDED')
                             @if (Auth::user()->hasRole('attendee'))
                                 <button class="btn btn-primary text-white float-right" id="book-event" data-code="{{ $event->code }}" data-toggle="modal" data-target="#book_me-modal"> Book this event </button>
                             @endif
@@ -70,7 +70,37 @@
 
         <div class="row">
             <div class="col-md-7">
-                <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
+                {{-- <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4> --}}
+
+                <div>
+                    <h3> Schedules</h3>
+                    <table class="table">
+                        <tbody>
+                        @foreach ($event->schedules as $schedule)
+                            @php
+                                $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
+                            @endphp
+                            <tr>
+                                <td>{{ $schedule_day }}</td>
+                                <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
+                                <td>
+                                    @switch(true)
+                                        @case($schedule->status == 'ongoing')
+                                            <i class="fas fa-circle"></i>
+                                            @break
+                                        @case($schedule->status == 'concluded')
+                                            <i class="fas fa-check"></i>
+                                            @break
+                                        @default
+                                            {{ $schedule->status }}
+                                            @break
+                                    @endswitch
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
                 @if ($event->location == 'venue')
                     <p>Venue : <i> {{ $event->venue }} </i> </p>
@@ -83,7 +113,7 @@
                 @endif
             </div>
 
-            @if(! $event->schedule_start->isPast())
+            @if(! $event->dynamic_status == 'CONCLUDED')
                 <div class="col-md-5">
                     <p>Share the Qrcode or copy the link to share this event to other users</p>
                     <div class="float-left">
@@ -120,7 +150,35 @@
 
                         <div class="modal-body">
                             <h3>Book yourself to <span class="event-name">{{ $event->name }}?</span></h3>
-                            <p>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</p>
+                            <div>
+                                <h3> Schedules</h3>
+                                <table class="table">
+                                    <tbody>
+                                    @foreach ($event->schedules as $schedule)
+                                        @php
+                                            $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $schedule_day }}</td>
+                                            <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
+                                            <td>
+                                                @switch(true)
+                                                    @case($schedule->status == 'ongoing')
+                                                        <i class="fas fa-circle"></i>
+                                                        @break
+                                                    @case($schedule->status == 'concluded')
+                                                        <i class="fas fa-check"></i>
+                                                        @break
+                                                    @default
+                                                        {{ $schedule->status }}
+                                                        @break
+                                                @endswitch
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <div class="modal-footer">

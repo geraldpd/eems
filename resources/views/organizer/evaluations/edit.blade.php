@@ -76,15 +76,17 @@
                         <form id="evaluation-form" action="{{ route('organizer.evaluations.update', [$evaluation->id]) }}" onsubmit="save_evaluation_form.disabled=true; return true;" method="POST">
                             @csrf
                             @method('PUT')
-                            @if($event?->code)
-                                <input type="hidden" name="event" value="{{ $event->code }}">
-                            @endif
                             <input type="hidden" name="name" id="name" value="{{ old('name') }}">
                             <input type="hidden" name="update_type" id="update_type" value="">
                             <input type="hidden" name="description" id="description" value="{{ old('description') }}" required>
                             <input type="hidden" name="html_form" id="html_form" value="{{ old('html_form') }}" required>
                             <input type="hidden" name="questions" id="questions" value="{{ old('questions') }}" required>
                             <button type="button" id="save-evaluation_form" name="save_evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Sheet</button>
+                            @if($event?->code)
+                                <input type="hidden" name="event" value="{{ $event->code }}">
+                                <sub>Changes here will only reflect to this events evaluation data. to update the main evaluation sheet <a href="{{ route('organizer.evaluations.edit', [$event->evaluation->id]) }}">please refer to this page</a></sub>
+                            @endif
+
                         </form>
                     </div>
 

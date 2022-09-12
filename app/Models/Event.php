@@ -153,9 +153,9 @@ class Event extends Model
 
     public function scopePendingEvents($query)
     {
-        return $query->with(['schedules' => function($query) {
+        return $query->whereHas('schedules', function($query) {
             $query->whereDate('schedule_start', '>', Carbon::now());
-        }]);
+        });
     }
 
     public function getDynamicStatusAttribute()
@@ -177,6 +177,6 @@ class Event extends Model
                 break;
         }
 
-        return 'wtf';
+        //return 'wtf';
     }
 }

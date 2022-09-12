@@ -48,9 +48,38 @@
                             </div>
 
                             <div class="card-body">
-                                <h4>{{ $event->schedule_start->format('h:ia') }} - {{ $event->schedule_end->format('h:ia') }} of {{ $event->schedule_start->format('M d, Y') }}</h4>
 
-                                {{ $event->type }}
+                                <div>
+                                    <h3> Schedules</h3>
+                                    <table class="table">
+                                        <tbody>
+                                        @foreach ($event->schedules as $schedule)
+                                            @php
+                                                $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $schedule_day }}</td>
+                                                <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
+                                                <td>
+                                                    @switch(true)
+                                                        @case($schedule->status == 'ongoing')
+                                                            <i class="fas fa-circle"></i>
+                                                            @break
+                                                        @case($schedule->status == 'concluded')
+                                                            <i class="fas fa-check"></i>
+                                                            @break
+                                                        @default
+                                                            {{ $schedule->status }}
+                                                            @break
+                                                    @endswitch
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {{ $event->type_name }}
                                 {{ $event->category_name}}
 
                                 @forelse ($event->uploaded_documents as $name => $path)
@@ -66,7 +95,7 @@
                                     {{-- no attachments --}}
                                 @endforelse
 
-                                @if($event->has_evaluation && $event->schedule_start->isPast() && !in_array(Auth::user()->id, $event->evaluated_attendees))
+                                @if($event->has_evaluation && $event->dynamic_status == 'CONCLUDED' && !in_array(Auth::user()->id, $event->evaluated_attendees))
                                     <div class="float-right">
                                         <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evaluate</a>
                                     </div>

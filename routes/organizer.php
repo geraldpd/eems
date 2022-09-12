@@ -5,6 +5,7 @@ use App\Http\Controllers\organizer\TemporaryDocumentController as TemporaryDocum
 use App\Http\Controllers\organizer\EventEvaluationController as EventEvaluation;
 use App\Http\Controllers\organizer\InvitationController as Invitation;
 use App\Http\Controllers\organizer\EventController as Event;
+use App\Http\Controllers\organizer\EvaluationController as Evaluation;
 
 Route::group([
     'middleware' => ['organizer'],
@@ -19,6 +20,7 @@ Route::group([
         Route::get('/', HomeController::class);
 
         //EVALUATIONS
+        Route::get('evaluations/{evaluation}/pending-events', [Evaluation::class, 'pendingEvents'])->name('evaluations.pending-events');
         Route::resource('evaluations', EvaluationController::class);
 
         //TEMPORARY DOCUMENTS

@@ -23,7 +23,10 @@ class EvaluationController extends Controller
     public function index(Request $request)
     {
         //dd($request->all());
-        $evaluations = Auth::user()->evaluations;
+        $evaluations = Auth::user()->evaluations->map(function($evaluation) {
+            $evaluation->events_count = $this->getPendingEvents($evaluation)->count();
+            return $evaluation;
+        });
         $event = $request->has('event') ? $this->getEvent($request->event) : null;
 
         return view('organizer.evaluations.index', compact('evaluations', 'event'));
@@ -54,11 +57,30 @@ class EvaluationController extends Controller
         $evaluation = Auth::user()->evaluations()->create($request->validated());
         $params = [$evaluation->id];
 
+        $evaluation->update([
+            'questions' => "[{\"t6u88\":\"What do you think of this event?\"}]",
+            'html_form' => '<li draggable="" data-type="text" class="form-group evaluation_entry alert alert-light">
+                        <div class="row">
+                            <div class="col-md-10 col-xs-12">
+                                <label class="question_entry" data-question_key="t6u88" data-is_required="1">What do you think of this event? <strong class="text-danger" title="required">*</strong></label>
+                            </div>
+                            <div class="col-md-2 col-xs-12 d-flex justify-content-center">
+                                <span class="edit-evaluation_type btn btn-link float-right">edit</span>
+                                <span class="remove-evaluation_type btn btn-link text-secondary float-right">remove</span>
+                            </div>
+                            <div class="col-md-12"><textarea name="t6u88" class="form-control" placeholder="Your answer" minlength="0" maxlength="100" required="required"></textarea></div>
+                        </div>
+                    </li>'
+        ]);
+
         if($request->has('event')) {
             $event = $this->getEvent($request->event);
-
             $event->update([
-                'evaluation_id' => $evaluation->id
+                'evaluation_id' => $evaluation->id,
+                'evaluation_name' => $evaluation->name,
+                'evaluation_description' => $evaluation->description,
+                'evaluation_questions' => $evaluation->questions,
+                'evaluation_html_form' => $evaluation->html_form
             ]);
 
             $params = [$evaluation->id, 'event' => $event->code];
@@ -196,7 +218,7 @@ class EvaluationController extends Controller
     public function destroy(Evaluation $evaluation)
     {
         $evaluation->load('events');
-        $pending_event_count = $evaluation->events()->where('schedule_start', '>=', Carbon::now())->count();
+        $pending_event_count = $this->getPendingEvents($evaluation)->count();
 
         if($pending_event_count) {
             return redirect()->back()->with('message', "$pending_event_count pending event(s) are attached to this evaluation. Please remove or transfer them to another evaluation sheet first.");
@@ -234,5 +256,10 @@ class EvaluationController extends Controller
     private function getPendingEvents($evaluation)
     {
         return Event::pendingEvents()->where('evaluation_id', $evaluation->id);
+    }
+
+    public function pendingEvents(Evaluation $evaluation)
+    {
+        return response()->json($this->getPendingEvents($evaluation)->get());
     }
 }

@@ -45,7 +45,7 @@
                 @else
                     <a href="{{ route('organizer.evaluations.index') }}" class="float-righ btn btn-link">Cancel</a>
                 @endif
-                <button type="submit" name="submit" class="float-righ btn btn-primary">Submit</button>
+                <button type="submit" name="submit" class="float-righ btn btn-primary">Save</button>
               </div>
         </form>
     </div>

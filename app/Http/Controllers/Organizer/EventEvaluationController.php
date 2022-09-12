@@ -29,7 +29,7 @@ class EventEvaluationController extends Controller
             last scheduled day has passed(CONCLUDED) the organizer will then no longer be allowed
             to attached or make modifications on their evaluation sheet
         */
-
+        //dd($event->evaluation);
         $event->loadCount('attendees');
         $event->load('evaluations.attendee');
 

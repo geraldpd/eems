@@ -36,19 +36,22 @@ if (! function_exists('resetNotifConfirmedAttendeeCount')) {
 if (! function_exists('eventHelperGetDynamicStatus')) {
     function eventHelperGetDynamicStatus($event)
     {
-        switch(true) {
-            case !$event->schedule_start->isPast() && !$event->schedule_end->isPast():
-                 $dynamic_status = 'PENDING';
-            break;
-            case $event->schedule_start->isPast() && !$event->schedule_end->isPast():
-                 $dynamic_status = 'ONGOING';
-            break;
-            default: // AKA $event->schedule_start->isPast() && $event->schedule_end->isPast():
-                $dynamic_status = 'CONCLUDED';
-            break;
-        }
+        $start = Carbon::parse($event->schedule_start);
+        $end = Carbon::parse($event->schedule_end);
 
-        return $dynamic_status;
+        switch (true) {
+            case $start->isFuture():
+                return 'PENDING';
+                break;
+
+            case $start->isPast() && $end->isFuture():
+                return 'ONGOING';
+                break;
+
+            case $start->isPast() && $end->isPast():
+                return 'CONCLUDED';
+                break;
+        }
     }
 }
 

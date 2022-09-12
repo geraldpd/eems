@@ -21,7 +21,7 @@ $(function() {
             return updateEvaluationForm(0);
         } else { //*update the this evaluation only OR update this evaluation and the rest of events using this evaluation
             if(config.evaluation.pending_events.length > 1) {
-                let pending_event_rows = config.evaluation.pending_events.map((event) =>  `<tr> <td>${event.name}</td> <td>${moment(event.schedule_start).format('MMM DD, YYYY HH:mm a')}</td> </tr>`);
+                let pending_event_rows = config.evaluation.pending_events.map((event) =>  `<tr> <td>${event.name}</td> <td>${moment(event.schedule_start).format('MMM DD, YYYY HH:mm a')}</td> </tr>`).join('');
 
                 window.Swal.fire({
                     title: `Modify Evaluation Sheet?`,
@@ -52,6 +52,8 @@ $(function() {
                     }
                     return;
                 });
+            } else {
+                return updateEvaluationForm(2);
             }
         }
 
