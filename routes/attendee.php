@@ -19,5 +19,7 @@ Route::group([
         Route::get('events/{event}/evaluation', [Event::class, 'evaluation'])->name('events.evaluation');
         Route::post('events/{event}/evaluate', [Event::class, 'evaluate'])->name('events.evaluate');
         Route::resource('events', EventController::class)->only(['index']);
+
+        Route::resource('invitations', InvitationController::class)->only(['index']);
     });
 });

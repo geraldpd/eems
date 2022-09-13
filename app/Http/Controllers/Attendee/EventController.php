@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Attendee;
 
 use App\Http\Controllers\Controller;
+use App\Services\EventServices;
 use App\Models\Event;
 use App\Models\EventEvaluation;
 use App\Models\EventSchedule;
@@ -20,49 +21,14 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $attended_events = DB::table('users')
-            ->where('users.id', Auth::user()->id)
-            ->join('invitations', 'users.email', '=', 'invitations.email')
-            ->join('events', 'invitations.event_id', '=', 'events.id')
-            ->join('categories', 'events.category_id', 'categories.id')
-            ->join('types', 'events.type_id', 'types.id')
-            ->leftJoin('event_attendees', fn($join) => $join->on('users.id', '=', 'event_attendees.attendee_id')->on('events.id', '=', 'event_attendees.event_id'))
-            ->select(
-                'events.*',
-                'users.id as user_id',
-                'invitations.id as invitation_id',
-                'event_attendees.is_confirmed as is_confirmed',
-                'categories.name as category_name',
-                'types.name as type_name'
-            )
-            //->whereDate('schedule_end', '>', Carbon::now()) //to only show future events
-            ->when($request->filled('keyword'), function($query) {
-                $query->where(function($qeury) {
-                    $qeury
-                    ->orWhere('events.name', 'like', '%'.request()->keyword.'%')
-                    ->orWhere('events.type', 'like', '%'.request()->keyword.'%');
-                });
-            })
-            ->get()
-            ->map(function ($event) {
+        $attended_events = (new EventServices())
+        ->getFrontEndEvents([
+            'keyword'           => $request->filled('keyword') ? $request->keyword : false,
+            'exclude_concluded' => false,
+            'has_attended'      => true
+        ])
+        ->paginate(15);
 
-                $schedule_start = DB::table('event_schedules')->where('event_id', $event->id)->first()->schedule_start;//Carbon::parse($event->schedule_start);
-                $schedule_end = DB::table('event_schedules')->where('event_id', $event->id)->latest()->first()->schedule_end;//Carbon::parse($event->schedule_end);
-
-               $event->schedule_start = Carbon::parse($schedule_start);
-               $event->schedule_end = Carbon::parse($schedule_end);
-               $event->dynamic_status = eventHelperGetDynamicStatus($event);
-               $event->has_evaluation = eventHelperHasEvaluation($event);
-               $event->uploaded_documents = eventHelperGetUploadedDocuments($event);
-               $event->evaluated_attendees = DB::table('event_evaluations')->where('event_id', $event->id)->pluck('attendee_id')->all() ?? [];
-               $event->schedules = EventSchedule::where('event_id', $event->id)->get();
-
-               return $event;
-            })
-            ->sortByDesc('schedule_start');
-            //->paginate(15);
-
-       // dd($attended_events);
         return view('attendee.events.index', compact('attended_events'));
     }
 

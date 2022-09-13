@@ -6,31 +6,28 @@
 Category: <strong>{{ $event->category->name }}</strong>
 <br>
 Type: <strong>{{ $event->type->name }}</strong>
-<br>
-<br>
 
-Schedules:
-<table class="table">
-    <tbody>
+@component('mail::table')
+    | SCHEDULES    |               |
+    | ------------- |:-------------:|
     @foreach ($event->schedules as $schedule)
         @php
             $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
         @endphp
-        <tr>
-            <td>{{ $schedule_day }}</td>
-            <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
-        </tr>
+        | {{ $schedule_day }}    | {{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}    |
     @endforeach
-    </tbody>
-</table>
+@endcomponent
 
-{!! $event->description !!}
+
+<div class="p-3 mb-2 bg-light">
+    {!! $event->description !!}
+</div>
 
 <br>
 {{ $event->location }}
 
 @component('mail::button', ['url' => $invitation_link])
-    confirm invitation
+confirm invitation
 @endcomponent
 
 <br>

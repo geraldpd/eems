@@ -10,4 +10,6 @@ class EventAttendee extends Pivot
     protected $table = 'event_attendees';
 
     use HasFactory;
+
+
 }

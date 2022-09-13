@@ -84,6 +84,16 @@ class Event extends Model
         return $this->hasMany(EventSchedule::class);
     }
 
+    public function start()
+    {
+        return $this->hasOne(EventSchedule::class)->orderBy('schedule_start')->limit(1);
+    }
+
+    public function end()
+    {
+        return $this->hasOne(EventSchedule::class)->orderByDesc('schedule_end')->limit(1);
+    }
+
     public function invitations()
     {
         return $this->hasMany(Invitation::class);

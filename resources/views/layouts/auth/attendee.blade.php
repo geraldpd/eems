@@ -37,6 +37,16 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('attendee.events.index') }}"> My Events </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('attendee.invitations.index') }}">
+                                    Invitations
+
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                       {{ eventAttendeeInvitationCount() }}
+                                    </span>
+
+                                </a>
+                            </li>
                         </ul>
 
                         <!-- Right Side Of Navbar -->

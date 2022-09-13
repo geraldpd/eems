@@ -49,38 +49,10 @@
 
                             <div class="card-body">
 
-                                <div>
-                                    <h3> Schedules</h3>
-                                    <table class="table">
-                                        <tbody>
-                                        @foreach ($event->schedules as $schedule)
-                                            @php
-                                                $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
-                                            @endphp
-                                            <tr>
-                                                <td>{{ $schedule_day }}</td>
-                                                <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
-                                                <td>
-                                                    @switch(true)
-                                                        @case($schedule->status == 'ongoing')
-                                                            <i class="fas fa-circle"></i>
-                                                            @break
-                                                        @case($schedule->status == 'concluded')
-                                                            <i class="fas fa-check"></i>
-                                                            @break
-                                                        @default
-                                                            {{ $schedule->status }}
-                                                            @break
-                                                    @endswitch
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                @include('partials.event_schedules')
 
-                                {{ $event->type_name }}
-                                {{ $event->category_name}}
+                                <sub>type: {{ $event->type->name }}</sub>
+                                <sub>category: {{ $event->category->name}}</sub>
 
                                 @forelse ($event->uploaded_documents as $name => $path)
                                     @if ($loop->first)
@@ -109,9 +81,14 @@
                         {!! $attended_events->links() !!}
                     </div> --}}
                 @else
-                    <div class="card">
-                        <div class="card-header">You have not yet attended nor invited to any events</div>
-                    </div>
+                <br>
+                    <p class="text-center my-5">
+                        You haven't been to any events!
+
+                        <br>
+                        <a class="text-center my-5" href="{{ route('events.index') }}">Browse Events</a>
+                    </p>
+
                 @endif
             </div>
 

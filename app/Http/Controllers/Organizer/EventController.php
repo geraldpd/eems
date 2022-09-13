@@ -40,8 +40,8 @@ class EventController extends Controller
             return [
                 'id' => $event->id,
                 'title' => $event->name,
-                'start' => $event->schedules->first()->schedule_start->format('Y-m-d H:i'),
-                'end' => $event->schedules->last()->schedule_end->format('Y-m-d H:i'),
+                'start' => $event->start->schedule_start->format('Y-m-d H:i'),
+                'end' => $event->end->schedule_end->format('Y-m-d H:i'),
                 'code' => $event->code,
             ];
         });

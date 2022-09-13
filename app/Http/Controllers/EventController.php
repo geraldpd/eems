@@ -14,65 +14,21 @@ use App\Models\EventAttendee;
 use App\Models\EventSchedule;
 use App\Models\Event;
 use App\Models\User;
-
+use App\Services\EventServices;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Throwable;
 
 class EventController extends Controller
 {
     public function index(Request $request)
     {
-        $events = Event::query()
-            //->orderByDesc('schedules.schedule_start')
-            ->with(['attendees', 'type', 'schedules'])
-            ->withCount('attendees')
-            //->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray()); //except for those events that the current user already has attended to
-            ->when($request->filled('keyword'), function($query) {
-
-                $query
-                ->where(fn($subQuery) => $subQuery->orWhere('name', 'like', '%'.request()->keyword.'%'))
-                ->orWhereRelation('type','name', 'like', '%'.request()->keyword.'%');
-
-            })
-            ->when(! $request->filled('keyword'), function($query) {
-                if(Auth::check()) {
-                    $query->whereNotIn('events.id', Auth::user()->attendedEvents->pluck('id')->toArray());
-                }
-            })
-            //->join('event_schedules', 'events.id', '=', 'event_schedules.event_id')
-            //->orderBy('event_schedules.schedule_start')
-            //->groupBy('events.id')
-            //->orderByRaw('(SELECT schedule_start FROM event_schedules WHERE event_schedules.event_id = events.id)')
-            ->paginate(15);
-            ///->dd();
-
-            //dd($events);
-
-
-        // $events = EventSchedule::query()
-        //     ->orderByDesc('schedule_start')
-        //     ->with(['event' => function($query) {
-        //         $query
-        //         ->withCount('attendees')
-        //         ->when(request()->filled('keyword'), function($query) {
-
-        //             $query
-        //             ->where(fn($subQuery) => $subQuery->orWhere('name', 'like', '%'.request()->keyword.'%'))
-        //             ->orWhereRelation('type','name', 'like', '%'.request()->keyword.'%');
-
-        //         })
-        //         ->when(! request()->filled('keyword'), function($query) {
-        //             if(Auth::check()) {
-        //                 $query->whereNotIn('events.id', Auth::user()->attendedEvents->pluck('id')->toArray());
-        //             }
-        //         })
-        //         ->whereNotIn('id', Auth::user()->attendedEvents->pluck('id')->toArray()); //except for those events that the current user already has attended to
-        //     }])
-        //     ->get()
-        //     ->groupBy('event_id')
-        //     ->dd();
-
+        $events = (new EventServices())
+        ->getFrontEndEvents([
+            'keyword'           => $request->filled('keyword') ? $request->keyword : false,
+            'exclude_concluded' => true,
+            'has_attended'      => false
+        ])
+        ->paginate(15);
 
         return view('front.events.index', compact('events'));
     }

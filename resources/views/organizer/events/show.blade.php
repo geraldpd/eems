@@ -84,43 +84,21 @@
                 @empty
                 @endforelse
 
-                <div>
-                    <h3> Schedules</h3>
-                    <table class="table">
-                        <tbody>
-                        @foreach ($event->schedules as $schedule)
-                            @php
-                                $schedule_day = $schedule->schedule_start->isoFormat('MMM D Y, dddd')
-                            @endphp
-                            <tr>
-                                <td>{{ $schedule_day }}</td>
-                                <td>{{ $schedule->schedule_start->isoFormat('H:mm A') }} - {{ $schedule->schedule_end->isoFormat('H:mm A') }}</td>
-                                <td>
-                                    @switch(true)
-                                        @case($schedule->status == 'ongoing')
-                                            <i class="fas fa-circle"></i>
-                                            @break
-                                        @case($schedule->status == 'concluded')
-                                            <i class="fas fa-check"></i>
-                                            @break
-                                        @default
-                                            {{ $schedule->status }}
-                                            @break
-                                    @endswitch
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                @include('partials.event_schedules')
 
             </div>
         </div>
     </div>
 
-    <br><br><br>
+    <p class="text-center my-5">
+        <button class="btn btn-link btn-light" onClick="$('#email-preview').toggle()">
+            Email Preview
+        </button>
+    </p>
 
-    {!! $preview !!}
+    <div id="email-preview" style="display:none" class="my-5">
+        {!! $preview !!}
+    </div>
 @endsection
 
 @push('styles')

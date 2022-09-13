@@ -4,6 +4,7 @@ use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use App\Services\EventServices;
 
 if (! function_exists('eventHelperSetCode')) {
     function eventHelperSetCode($id)
@@ -133,5 +134,12 @@ if (! function_exists('eventScheduleStatus')) {
         }
 
         return $status;
+    }
+}
+
+if (! function_exists('eventAttendeeInvitationCount')) {
+    function eventAttendeeInvitationCount()
+    {
+        return (new EventServices)->getEventsInvited()->count();
     }
 }
