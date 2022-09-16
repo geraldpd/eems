@@ -136,10 +136,3 @@ if (! function_exists('eventScheduleStatus')) {
         return $status;
     }
 }
-
-if (! function_exists('eventAttendeeInvitationCount')) {
-    function eventAttendeeInvitationCount()
-    {
-        return (new EventServices)->getEventsInvited()->count();
-    }
-}

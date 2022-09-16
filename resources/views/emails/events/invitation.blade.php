@@ -19,11 +19,10 @@ Type: <strong>{{ $event->type->name }}</strong>
 @endcomponent
 
 
-<div class="p-3 mb-2 bg-light">
+{{-- <div class="p-3 mb-2 bg-light">
     {!! $event->description !!}
-</div>
+</div> --}}
 
-<br>
 {{ $event->location }}
 
 @component('mail::button', ['url' => $invitation_link])

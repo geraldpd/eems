@@ -48,27 +48,26 @@ class EventController extends Controller
             1. event must be concluded(schedule_start && schedule_end ->ispast())
             2. the event must have an evaluation sheet($sheet->has_evaluation)
             3. the user has not evaluated this event
-            3. the user must have a record of attendance, and is an actual attendee user role
+            4. the user must have a record of attendance, and is an actual attendee user role
         */
 
         //! 1
-        if(! $event->schedule_end->isPast()) {
-            return redirect()->back()->with('message', 'Submitting Evaliation is not yet allowed.');
+        if(Carbon::parse($event->schedule_end)->isFuture()) {
+            return redirect()->back()->with('message', 'Submitting Evaluation is not yet allowed.');
         }
 
         //! 2
         if(! eventHelperHasEvaluation($event)) {
-            return redirect()->back()->with('message', 'This event does not have an evaluation sheet attaced.');
+            return redirect()->back()->with('message', 'This event does not have an evaluation sheet attached.');
         }
 
         //! 3
-        $evaluated_attendees = DB::table('event_evaluations')->where('event_id', $event->id)->pluck('attendee_id')->all() ?? [];
-        if(in_array(Auth::user()->id, $evaluated_attendees)) {
+        if($event->evaluations->where('attendee_id', Auth::user()->id)->count()) {
             return redirect()->back()->with('message', 'You have already evaluated this event.');
         }
 
         //! 4
-        if(in_array(Auth::user()->id, $event->attendees->pluck('id')->all())) {
+        if(in_array(Auth::user()->id, $event->attendees->pluck('attendee_id')->all())) {
             return redirect()->back()->with('message', "You have no participation for $event->name, submitting evaluation is prohibited.");
         }
 

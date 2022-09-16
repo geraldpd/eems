@@ -36,10 +36,6 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('attendee.events.index') }}"> My Events </a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('attendee.invitations.index') }}"> Invitations </a>
-                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

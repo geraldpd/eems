@@ -15,8 +15,8 @@ class InvitationController extends Controller
      */
     public function index(Request $request)
     {
-        $events = (new EventServices)->getEventsInvited()->get();
+        $invited_events = (new EventServices)->getEventsInvited()->get();
 
-        return view('attendee.invitations.index', compact('events'));
+        return view('attendee.invitations.index', compact('invited_events'));
     }
 }

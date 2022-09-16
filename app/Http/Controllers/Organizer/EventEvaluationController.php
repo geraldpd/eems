@@ -103,10 +103,11 @@ class EventEvaluationController extends Controller
     public function download(Request $request, Event $event)
     {
         $event->load('evaluations.attendee');
-        $questions = collect($event->evaluation_questions)->flatMap(fn($values) => $values);
+        $questions = collect(json_decode($event->evaluation_questions, true))->flatMap(fn($values) => $values);
 
-        $data = collect($event->evaluations)->mapWithKeys(function($evalaution) use ($questions) {
-            $feedback = $evalaution->feedback;
+        $data = collect($event->evaluations)->mapWithKeys(function($evaluation) use ($questions) {
+            $feedback = $evaluation->feedback;
+
             $processed_feeback = $questions->mapWithKeys(function($question, $key) use ($feedback){
                 if(array_key_exists($key, $feedback)) {
                     return [$question => $feedback[$key]];
@@ -115,12 +116,12 @@ class EventEvaluationController extends Controller
                 }
             })->all();
 
-            return [$evalaution->attendee->email => $processed_feeback];
+            return [$evaluation->attendee->email => $processed_feeback];
         });
 
         $event->downloadable_filename = Carbon::now()->format('y-m-d').' - '.$event->name.' Evaluations';
 
-       $downlodable = $request->as == 'JSON'
+        $downlodable = $request->as == 'JSON'
         ? $this->asJSON($data, $event)
         : $this->asCSV($data, $event, $questions);
 
@@ -146,14 +147,14 @@ class EventEvaluationController extends Controller
         $handle = fopen($path, 'w');
 
         //adds the title
-        fputcsv($handle, [$event->name.' Evaluation']);
+        //fputcsv($handle, [$event->name.' Evaluation']);
 
         //adds a spacer
-        fputcsv($handle, []);
+        //fputcsv($handle, []);
 
         //headers
         $headers = array_values($questions->all());
-        array_unshift($headers, 'Attendee');
+        array_unshift($headers, $event->name.' Evaluation');
 
         fputcsv($handle, $headers);
 

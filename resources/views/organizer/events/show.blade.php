@@ -25,18 +25,17 @@
                     <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
                 @endif
 
-                {{-- <a href="{{ route('organizer.invitations.index', [$event->code, $event->schedule_start->isPast() ? 'confirmed' : '']) }}" class="btn btn-link"> --}}
-                <a href="{{ route('organizer.invitations.index', [$event->code, false ? 'confirmed' : '']) }}" class="btn btn-link">
+                <a href="{{ route('organizer.invitations.index', [$event->code, $event->start->schedule_start->isPast() ? 'confirmed' : '']) }}" class="btn btn-link">
                     Invitations
                     @switch(true)
-                        {{-- @case(!$event->invitations->count() && !$event->schedule_start->isPast()) when there is no one invited yet and has not yet started --}}
-                        @case(!$event->invitations->count() && !false) {{-- when there is no one invited yet and has not yet started--}}
+                        @case(!$event->invitations->count() && $event->dynamic_status != 'CONCLUDED')
+                            {{-- when there is no one invited yet and has not yet started --}}
                             <span class="badge badge-primary" title="Invite attendees to your event" >
                                 <i class="fas fa-user-plus"></i>
                             </span>
                             @break
-                        {{-- @case($event->notif_confirmed_attendee_count && !$event->schedule_end->isPast()) when there is no one invited yet and has not yet started --}}
-                        @case($event->notif_confirmed_attendee_count && !false) {{-- when there is no one invited yet and has not yet started --}}
+                        @case($event->notif_confirmed_attendee_count && $event->dynamic_status != 'CONCLUDED')
+                            {{-- when there is no one invited yet and has not yet started --}}
                             <span class="badge badge-primary" title="{{ $event->notif_confirmed_attendee_count }} new confirmed attendees">
                                {{ $event->notif_confirmed_attendee_count }}
                             </span>
@@ -47,8 +46,8 @@
                 </a>
                 <a href="{{route('organizer.events.evaluations.index', [$event->code]) }}" class="btn btn-link">
                     Evaluations
-                    {{-- @if (!$event->evaluation_id && !$event->schedule_start->isPast())  when there is no set evaluation sheet, and has not yet started --}}
-                    @if (!$event->evaluation_id && !false)  {{-- when there is no set evaluation sheet, and has not yet started--}}
+                    @if (!$event->evaluation_id && !$event->start->schedule_start->isPast())
+                    {{-- when there is no set evaluation sheet, and has not yet started--}}
                         <span class="badge badge-primary">
                             <i title="Provide and evaluation sheet to this event" class="fas fa-clipboard-list"></i>
                         </span>
@@ -63,9 +62,12 @@
             </div>
 
             <div class="col-md-9">
-                <br>
-                <h3>Share this QR code to directly invite them to this event</h3>
-                <p>Users will need to signup(for unregistered) and login to their {{ config('app.name') }} account <br> to be automatically booked to this event.</p>
+
+                @if($event->dynamic_status != 'CONCLUDED')
+                    <br>
+                    <h3>Share this QR code to directly invite them to this event</h3>
+                    <p>Users will need to signup(for unregistered) and login to their {{ config('app.name') }} account <br> to be automatically booked to this event.</p>
+                @endif
 
                 @forelse ($event->uploaded_documents as $name => $path)
                     @if ($loop->first)
@@ -83,6 +85,38 @@
                     @endif
                 @empty
                 @endforelse
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        Type: <strong>{{ $event->type->name }}</strong>
+                        <br>
+                        Category: <strong>{{ $event->category->name }}</strong>
+                    </div>
+
+                    <div class="col-md-6">
+                        Attended:
+                        <strong>
+                            @if($event->dynamic_status == 'CONCLUDED')
+                                {{ $event->attendees->count() }} users <span title="attendance percentage">({{ $event->attendance_percentage }}%)</span>
+                            @else
+                                TBD
+                            @endif
+                        </strong>
+                        <br>
+                        Evaluation:
+                        <strong>
+                            @if($event->has_evaluation)
+                                {{ $event->evaluations->count() }} <span title="feedback percentage">({{ $event->feedback_percentage }}%)</span>
+                            @else
+                                N/A
+                            @endif
+                        </strong>
+                    </div>
+
+                </div>
+
+                <br>
 
                 @include('partials.event_schedules')
 

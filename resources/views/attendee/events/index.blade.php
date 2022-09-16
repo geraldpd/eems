@@ -67,7 +67,13 @@
                                     {{-- no attachments --}}
                                 @endforelse
 
-                                @if($event->has_evaluation && $event->dynamic_status == 'CONCLUDED' && !in_array(Auth::user()->id, $event->evaluated_attendees))
+                                @php
+                                    $has_evaluation = $event->has_evaluation;
+                                    $has_concluded = $event->dynamic_status == 'CONCLUDED';
+                                    $has_not_evaluated = $event->evaluations->where('attendee_id', Auth::user()->id)->count() == 0;
+                                @endphp
+
+                                @if($has_evaluation && $has_concluded && $has_not_evaluated)
                                     <div class="float-right">
                                         <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evaluate</a>
                                     </div>
@@ -81,14 +87,13 @@
                         {!! $attended_events->links() !!}
                     </div> --}}
                 @else
-                <br>
+                    <br>
                     <p class="text-center my-5">
                         You haven't been to any events!
 
                         <br>
                         <a class="text-center my-5" href="{{ route('events.index') }}">Browse Events</a>
                     </p>
-
                 @endif
             </div>
 

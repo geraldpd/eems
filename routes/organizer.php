@@ -38,9 +38,9 @@ Route::group([
         //Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
 
         //EVENT EVALUATIONS
-        Route::resource('events/{event}/evaluations', EventEvaluationController::class, ['as' => 'events']);
         Route::get('events/{event}/evaluations/download', [EventEvaluation::class, 'download'])->name('events.evaluations.download');
         Route::post('events/{event}/evaluations/close-open', [EventEvaluation::class, 'close_open'])->name('events.evalautions.close-open');
+        Route::resource('events/{event}/evaluations', EventEvaluationController::class, ['as' => 'events']);
 
     });
 });

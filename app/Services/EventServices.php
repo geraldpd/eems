@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class EventServices
 {
@@ -16,7 +17,8 @@ class EventServices
                 'attendees',
                 'type',
                 'category',
-                'schedules'
+                'schedules',
+                'evaluations'
             ])
             ->when($params['keyword'], function($query) use ($params) {
                 $keyword = "%$params[keyword]%";
@@ -28,7 +30,7 @@ class EventServices
                 });
             })
             ->when($params['exclude_concluded'], function($query) {
-                $query->whereHas('end', fn($end) => $end->whereDate('schedule_end', '>', Carbon::now()));
+                $query->whereHas('end', fn($end) => $end->whereDate('schedule_end', '>=', Carbon::now()));
             })
             ->when(Auth::check(), function($query) use ($params) {
                 if($params['has_attended']) {
@@ -49,10 +51,10 @@ class EventServices
     public function getEventsInvited()
     {
         return Event::query()
-        ->whereHas('invitations')
-        ->whereRelation('invitations', 'email', '=', Auth::user()->email)
-        ->whereDoesntHave('attendees', function ($query) {
-            $query->where('users.id', '=', Auth::user()->id);
-        });
+            ->whereHas('invitations')
+            ->whereRelation('invitations', 'email', '=', Auth::user()->email)
+            ->whereDoesntHave('attendees', function ($query) {
+                $query->where('users.id', '=', Auth::user()->id);
+            });
     }
 }

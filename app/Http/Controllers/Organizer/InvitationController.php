@@ -11,6 +11,7 @@ use App\Models\Invitation;
 use App\Jobs\SendEventInvitation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class InvitationController extends Controller
 {
@@ -22,7 +23,7 @@ class InvitationController extends Controller
      */
     public function index(Event $event, $filter = false)
     {
-        $event->load(['invitations.guest', 'attendees']);
+        $event->load(['invitations.guest', 'attendees', 'start', 'end']);
 
         $participants = $this->getParticipants($event, $filter);
 
@@ -60,21 +61,23 @@ class InvitationController extends Controller
 
     public function download(Event $event, $filter = 'all')
     {
+        $filter = Str::title($filter);
         $path = "storage/events/$event->id/evaluation.csv";
+        $file_name = $filter.' '.$event->name.' Attendees';
 
         $handle = fopen($path, 'w');
 
         //adds the title
-        fputcsv($handle, [$filter.' '.$event->name.' Invitations']);
+        fputcsv($handle, [$file_name]);
 
         //adds a spacer
-        fputcsv($handle, []);
+        //fputcsv($handle, []);
 
         //headers
-        $headers = array_values(['name']);
+        //$headers = array_values(['name']);
         //array_unshift($headers, 'Attendee');
 
-        fputcsv($handle, $headers);
+        //fputcsv($handle, $headers);
 
         $participants = $this->getParticipants($event, $filter);
 
@@ -82,6 +85,7 @@ class InvitationController extends Controller
 
         fclose($handle);
 
+        return response()->download(public_path($path), $file_name.'.csv');
         return [
             'path' => public_path($path),
             'extension_name' => '.csv'
@@ -91,7 +95,7 @@ class InvitationController extends Controller
     private function getParticipants(Event $event, $filter)
     {
         $attendees = $event->attendees;
-        $is_past = false;//$event->schedule_start->isPast();
+        $is_past = $event->start->schedule_start->isPast();
 
         switch ($filter) {
             case 'confirmed':

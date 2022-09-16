@@ -27,8 +27,7 @@
                 <h1 class="float-left">{{ $event->name }}</h1>
             </div>
 
-            {{-- @if ($event->schedule_start->isPast()) --}}
-            @if(false)
+            @if ($event->end->schedule_end->isPast())
 
                     <div class="col-md-3" style="padding-right:0px;">
                         <div class="btn-group float-right" role="group" aria-label="Button group with nested dropdown">
@@ -56,8 +55,7 @@
         </div>
 
         <div class="row">
-            {{-- <div class="col-md-{{ $event->schedule_start->isPast() ? '12' : '4'}} col-sm-12"> --}}
-                <div class="col-md-4 col-sm-12">
+            <div class="col-md-{{ $event->end->schedule_end->isPast() ? '12' : '4'}} col-sm-12">
                 <table id="table" class="table table-bordered">
                     <thead class="none">
                         <th style="display:none">created_at</th> <!-- just for ordering -->
@@ -84,8 +82,8 @@
                 <br>
             </div>
 
-            {{-- @if(!$event->schedule_start->isPast()) --}}
-            @if(true)
+            @if(!$event->end->schedule_end->isPast())
+
                 <div class="col-md-8">
                     <form method="POST" action="{{ route('organizer.invitations.store', [$event->code]) }}">
                         @csrf

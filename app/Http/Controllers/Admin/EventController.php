@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Mail\EventInvitation;
 
 class EventController extends Controller
 {
@@ -15,18 +16,39 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $events = Event::with('category')->get()->map(function($event) {
+        return $this->indexTable();
+    }
+
+    private function indexCalendar()
+    {
+        $events = Event::query()
+        ->with(['category', 'type'])
+        ->get()
+        ->map(function($event) {
             return [
                 'id' => $event->id,
                 'title' => $event->name,
-                'start' => $event->schedule_start->format('Y-m-d'),
-                'end' => $event->schedule_end->format('Y-m-d'),
-                'event' => $event,
-                'backgroundColor' => sprintf('#%06X', mt_rand(0, 0xFFFFFF)),
+                'start' => $event->start->schedule_start->format('Y-m-d H:i'),
+                'end' => $event->end->schedule_end->format('Y-m-d H:i'),
+                'code' => $event->code,
             ];
-        })
-        ->groupBy(fn($item) => $item['event']->schedule_start->format('Y-m-d'));
+        });
 
-        return view('admin.events.index', compact('events'));
+        return view('admin.events.index.calendar', compact('events'));
+    }
+
+    private function indexTable()
+    {
+        $events = Event::query()
+        ->with(['organizer', 'category', 'type', 'schedules'])
+        ->get();
+
+        return view('admin.events.index.table', compact('events'));
+    }
+
+    public function show(Request $request, Event $event)
+    {
+        $preview = new EventInvitation($event, $event->organizer->email, $event->organizer->email);
+        return view('admin.events.show', compact('event', 'preview'));
     }
 }

@@ -46,6 +46,8 @@ class Event extends Model
 
     protected $casts = [
         'evaluation_questions' => 'json',
+        'schedule_start' => 'datetime:Y-m-d H:i:s',
+        'schedule_end' => 'datetime:Y-m-d H:i:s'
     ];
 
     protected $appends = [
@@ -57,6 +59,8 @@ class Event extends Model
         'schedule_start', //fetches the first event_schedules relationship, returns schedule_start column
         'schedule_end', //fetches the last event_schedules relationship, returns schedule_end column
         'todays_scheduled_event',
+        'attendance_percentage',
+        'feedback_percentage'
     ];
 
     public function getRouteKeyName()
@@ -186,7 +190,15 @@ class Event extends Model
                 return self::CONCLUDED;
                 break;
         }
+    }
 
-        //return 'wtf';
+    public function getAttendancePercentageAttribute()
+    {
+        return $this->attendees->count() / $this->invitations->count() * 100;
+    }
+
+    public function getFeedbackPercentageAttribute()
+    {
+        return $this->attendees->count() / $this->evaluations->count() * 100;
     }
 }

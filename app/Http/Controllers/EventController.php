@@ -154,7 +154,7 @@ class EventController extends Controller
         $invitee = User::whereEmail($email)->first();
 
         switch (true) {
-            case Carbon::parse($event->schedule_end)->isPast(): //event has concluded
+            case $event->end->schedule_end->isPast(): //event has concluded
                 $message = 'Event has already concluded';
                 break;
 

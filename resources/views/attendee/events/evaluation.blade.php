@@ -22,7 +22,7 @@
                         @csrf
 
                         <ol class="evaluation-form d-none">
-                            {!! $event->evaluation->html_form !!}
+                            {!! $event->evaluation_html_form !!}
                         </ol>
 
                         <div class="form-group float-right">
