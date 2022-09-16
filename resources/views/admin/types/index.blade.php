@@ -35,7 +35,7 @@
                         <td class="text-center">{{ $type->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>
                         <td>
                             <div class="float-right">
-                                <a class="btn btn-link" href="{{ route('admin.types.index') }}">Events</a>
+                                <a class="btn btn-link" href="{{ route('admin.events.index', ['type' => $type->id]) }}">Events</a>
                                 <a class="btn btn-primary" href="{{ route('admin.types.edit', [$type->id]) }}">edit</a>
                                 <span class="btn btn-secondary delete-row" data-id="{{ $type->id }}">delete</span>
                             </div>

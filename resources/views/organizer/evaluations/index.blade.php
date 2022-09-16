@@ -58,7 +58,7 @@
                             <form action="{{ route('organizer.events.evaluations.update', [$event->code, $evaluation->id]) }}" method="post">
                                 @csrf
                                 @method('PUT')
-                                <button {{ $evaluation->events_count ? '' : 'disabled title="No entries set"' }} type="submit" class="btn btn-primary float-right use-evaluation_sheet" href="">Use This Evaluation Sheet</button>
+                                <button {{ $evaluation->events_count ? '' : `disabled title="No entries set"` }} type="submit" class="btn btn-primary float-right use-evaluation_sheet">Use This Evaluation Template</button>
                             </form>
                         @endif
 
@@ -69,7 +69,7 @@
                         <form action="{{ route('organizer.evaluations.destroy', [$evaluation->id]) }}" method="post">
                             @csrf
                             @method('delete')
-                            <button type="button" class="btn btn-link text-secondary float-right remove-evaluation_sheet" href="">remove</button>
+                            <button type="button" class="btn btn-link text-secondary float-right remove-evaluation_sheet">remove</button>
                         </form>
 
                         @if ($evaluation->events_count)

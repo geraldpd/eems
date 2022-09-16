@@ -194,11 +194,17 @@ class Event extends Model
 
     public function getAttendancePercentageAttribute()
     {
-        return $this->attendees->count() / $this->invitations->count() * 100;
+        if($this->attendees->count() && $this->invitations->count()) {
+            return $this->attendees->count() / $this->invitations->count() * 100;
+        }
     }
 
     public function getFeedbackPercentageAttribute()
     {
-        return $this->attendees->count() / $this->evaluations->count() * 100;
+        if($this->dynamic_status == 'CONCLUDED' && $this->evaluations->count() != 0) {
+            return $this->attendees->count() / $this->evaluations->count() * 100;
+        }
+
+        return 0;
     }
 }

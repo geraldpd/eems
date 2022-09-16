@@ -49,7 +49,9 @@
                         <td>{{ $organizer->organization->department }}</td>
                         <td>{{ $organizer->fullname }}</td>
                         <td>{{ $organizer->email }}</td>
-                        <td>show</td>
+                        <td>
+                            <a class="btn btn-link" href="{{ route('admin.events.index', ['organizer' => $organizer->email]) }}">events</a>
+                        </td>
                     </tr>
                 @empty
 

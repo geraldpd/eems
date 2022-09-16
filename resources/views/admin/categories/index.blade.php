@@ -35,7 +35,7 @@
                         <td class="text-center">{{ $category->is_active ? 'ACTIVE' : 'INACTIVE' }}</td>
                         <td>
                             <div class="float-right">
-                                <a class="btn btn-link" href="{{ route('admin.categories.index') }}">Events</a>
+                                <a class="btn btn-link" href="{{ route('admin.events.index', ['category' => $category->id]) }}">Events</a>
                                 <a class="btn btn-primary" href="{{ route('admin.categories.edit', [$category->id]) }}">edit</a>
                                 <span class="btn btn-secondary delete-row" data-id="{{ $category->id }}">delete</span>
                             </div>

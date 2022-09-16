@@ -8,6 +8,27 @@
         </div>
     @endif
 
+    @switch(true)
+        @case(request()->has('category'))
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('admin.categories.index') }}">Category</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ $filter }}</li>
+            </ol>
+            @break
+        @case(request()->has('type'))
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('admin.types.index') }}">Type</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ $filter }}</li>
+            </ol>
+            @break
+        @case(request()->has('organizer'))
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('admin.users.organizers') }}">Organizer</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ request()->organizer }}</li>
+            </ol>
+            @break
+    @endswitch
+
     <h1>Events</h1>
 
     <table id="table" class="table table-bordered table-hover"  width="100%">
