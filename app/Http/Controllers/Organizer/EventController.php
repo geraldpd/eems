@@ -127,7 +127,7 @@ class EventController extends Controller
         //* qrcode
         $event_folder_path = "storage/events/$event->id/";
         $qrcode_invitation_link = route('events.show', $event->code).'?invite=true';
-        File::makeDirectory($event_folder_path);
+        File::makeDirectory($event_folder_path, 0777, true);
         QrCode::generate($qrcode_invitation_link, $event_folder_path.'qrcode.svg');
         $event->qrcode = $event_folder_path.'qrcode.svg';
 
@@ -150,7 +150,7 @@ class EventController extends Controller
         }
         EventSchedule::insert($event_schedule);
 
-        File::makeDirectory($event_folder_path.'documents/');
+        File::makeDirectory($event_folder_path.'documents/', 0777,true);
         $this->moveTemporayDocsToEvents($event_folder_path);
 
         DB::commit();
