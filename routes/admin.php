@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController as User;
+use Illuminate\Support\Facades\Artisan;
 
 Auth::routes(['register' => false]);
 
@@ -21,4 +22,8 @@ Route::group([
     Route::resource('types', TypeController::class);
 
     Route::resource('events', EventController::class);
+
+    Route::get('/linkstorage', function () {
+        Artisan::call('storage:link');
+    });
 });
