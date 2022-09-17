@@ -25,5 +25,6 @@ Route::group([
 
     Route::get('/linkstorage', function () {
         Artisan::call('storage:link');
+        echo 'storage linked';
     });
 });

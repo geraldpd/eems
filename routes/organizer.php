@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\organizer\TemporaryDocumentController as TemporaryDocumentController;
-use App\Http\Controllers\organizer\EventEvaluationController as EventEvaluation;
-use App\Http\Controllers\organizer\InvitationController as Invitation;
-use App\Http\Controllers\organizer\EventController as Event;
-use App\Http\Controllers\organizer\EvaluationController as Evaluation;
+use App\Http\Controllers\Organizer\TemporaryDocumentController as TemporaryDocumentController;
+use App\Http\Controllers\Organizer\EventEvaluationController as EventEvaluation;
+use App\Http\Controllers\Organizer\InvitationController as Invitation;
+use App\Http\Controllers\Organizer\EventController as Event;
+use App\Http\Controllers\Organizer\EvaluationController as Evaluation;
 
 Route::group([
     'middleware' => ['organizer'],
