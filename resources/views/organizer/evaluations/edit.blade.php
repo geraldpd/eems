@@ -83,8 +83,12 @@
                             <input type="hidden" name="questions" id="questions" value="{{ old('questions') }}" required>
                             <button type="button" id="save-evaluation_form" name="save_evaluation_form" class="btn btn-primary mb-2 btn-block">Save Evaluation Sheet</button>
                             @if($event?->code)
-                                <input type="hidden" name="event" value="{{ $event->code }}">
-                                <sub>Changes here will only reflect to this events evaluation data. to update the main evaluation sheet <a href="{{ route('organizer.evaluations.edit', [$event->evaluation->id]) }}">please refer to this page</a></sub>
+                            <input type="hidden" name="event" value="{{ $event->code }}">
+                                @if(request()->has('persist'))
+                                    <input type="hidden" name="persist" value="1">
+                                @else
+                                    <sub>Changes here will only reflect to this events evaluation sheet. to update the main evaluation template <a href="{{ route('organizer.evaluations.edit', [$event->evaluation->id]) }}">please refer to this page</a></sub>
+                                @endif
                             @endif
 
                         </form>

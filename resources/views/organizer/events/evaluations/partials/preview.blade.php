@@ -76,9 +76,9 @@
                                     @csrf
                                     @method('DELETE')
 
-                                    <a class="btn btn-link" href="{{ route('organizer.evaluations.edit', [$event->evaluation_id, 'event' => $event->code]) }}">Modify evaluation Entries</a>
+                                    <a class="btn btn-link" href="{{ route('organizer.evaluations.edit', [$event->evaluation_id, 'event' => $event->code]) }}">Modify evaluation entries</a>
 
-                                    <a class="btn btn-link" href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}">Reuse another sheet</a>
+                                    <a class="btn btn-link" href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}">Reuse another template</a>
 
                                     <button type="button" class="btn btn-link text-secondary remove-evaluation-sheet" href="">Remove</button>
                                 </form>
@@ -104,7 +104,7 @@
     </div>
 
 @else
-    <div class="col-md-6">
+    <div class="col-md-7">
 
         @switch($event->dynamic_status)
         @case('CONCLUDED')
@@ -120,11 +120,11 @@
         <br>
 
         <a href="{{ route('organizer.evaluations.create', ['event' => $event->code]) }}"  class="btn btn-light">
-            <i class="fas fa-plus-square"></i> Create a new evaluation sheet
+            <i class="fas fa-plus-square"></i> Create new evaluation template
         </a>
 
         <a href="{{ route('organizer.evaluations.index', ['event' => $event->code]) }}"  class="btn btn-light">
-            <i class="fas fa-recycle"></i> Reuse existing evaluation sheet
+            <i class="fas fa-recycle"></i> Reuse existing template
         </a>
         @break
         @endswitch

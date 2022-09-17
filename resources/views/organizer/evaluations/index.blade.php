@@ -22,7 +22,7 @@
         <div class="col-md-9">
             @if ($event)
             <h1 class="text-secondary"> Evaluation sheet for <a href="{{ route('organizer.events.evaluations.index', [$event->code]) }}">{{ $event->name }}</a> </h1>
-            <p>Select an evaluation sheet to reuse for your event</p>
+            <p>Select an evaluation sheet template to reuse for your event</p>
             @endif
         </div>
         <div class="col-md-3">

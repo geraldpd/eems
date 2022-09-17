@@ -22,7 +22,6 @@ class EvaluationController extends Controller
      */
     public function index(Request $request)
     {
-        //dd($request->all());
         $evaluations = Auth::user()->evaluations->map(function($evaluation) {
             $evaluation->events_count = $this->getPendingEvents($evaluation)->count();
             return $evaluation;
@@ -83,7 +82,7 @@ class EvaluationController extends Controller
                 'evaluation_html_form' => $evaluation->html_form
             ]);
 
-            $params = [$evaluation->id, 'event' => $event->code];
+            $params = [$evaluation->id, 'event' => $event->code, 'persist' => true];
         }
 
         DB::commit();
@@ -131,7 +130,7 @@ class EvaluationController extends Controller
         return view('organizer.evaluations.edit', compact('evaluation', 'event', 'html_form'));
     }
 
-    /*
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -158,12 +157,16 @@ class EvaluationController extends Controller
                 'evaluation_html_form' => $request->html_form
             ]);
 
+            if($request->has('persist')) { //! Only happens when an event has just been newly created
+                $evaluation->update($request->validated());
+            }
+
             $params = [$evaluation->id, 'event' => $event->code];
 
         } else {
 
             switch ($request->update_type) {
-                case 1: //update this one and the rest of the pending events using this evaluation
+                case 1: //!update this one and the rest of the pending events using this evaluation
 
                     $evaluation->update($request->validated());
 
@@ -177,31 +180,13 @@ class EvaluationController extends Controller
 
                     break;
 
-                default://update all
+                default://!update this template only
                     $evaluation->update($request->validated());
                     break;
             }
 
             $params = [$evaluation->id];
         }
-
-
-
-        //if($this->getPendingEvents($evaluation)->count()){
-        // if(false){
-
-        //     $evaluation
-        //     ->events()
-        //     ->whereNot('code', '!=', $request->code)
-        //     ->where('schedule_start', '>', Carbon::now()) //TODO add additional condition, i.e. events with staus = pending
-        //     ->update([
-        //         'evaluation_name' => $evaluation->name,
-        //         'evaluation_description' => $evaluation->description,
-        //         'evaluation_questions' => $evaluation->questions,
-        //         'evaluation_html_form' => $evaluation->html_form
-        //     ]);
-
-        // }
 
         $request->session()->flash('clear_storage');
 
