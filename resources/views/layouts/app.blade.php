@@ -16,7 +16,7 @@
         <!-- Styles -->
         <link rel="stylesheet" type="text/css" href="{{ asset('scripts/plugins/DataTables/datatables.min.css') }}"/>
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
+        <link rel="icon" href="{{ asset('assets/EDUVENT.png') }}">
         @stack('styles')
     </head>
 

@@ -18,6 +18,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="icon" href="{{ asset('assets/EDUVENT.png') }}">
 </head>
 <body>
     <div id="app">
