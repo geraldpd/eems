@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\EventServices;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -143,7 +144,8 @@ class Event extends Model
 
     function getUploadedDocumentsAttribute()
     {
-        return eventHelperGetUploadedDocuments($this);
+        return (new EventServices)->getEventDocs($this->id);
+        //return eventHelperGetUploadedDocuments($this);
     }
 
     public function getScheduleStartAttribute()

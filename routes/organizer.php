@@ -24,6 +24,7 @@ Route::group([
         Route::resource('evaluations', EvaluationController::class);
 
         //TEMPORARY DOCUMENTS
+        Route::get('events/temp-docs', [TemporaryDocumentController::class, 'retrieve'])->name('tempdocs.retrieve');
         Route::post('events/temp-docs', [TemporaryDocumentController::class, 'store'])->name('tempdocs.store');
         Route::delete('events/temp-docs', [TemporaryDocumentController::class, 'destroy'])->name('tempdocs.destroy');
 

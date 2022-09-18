@@ -18,7 +18,7 @@ $(function() {
 
     // And display uploaded files
     uppy.on('upload-success', (file, response) => {
-        const url = response.uploadURL
+        const url = config.tempdocs.download.replace('document_path', response.body.document_path)
         const file_name = file.name
         let document =`
             <tr title="This document is not yet attached to this event, press ${config.save_button} button to save it to this events document folder">

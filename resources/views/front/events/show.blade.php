@@ -68,9 +68,9 @@
 
         <h1 class="display-3">{{ $event->name }}</h1>
 
-        <div class="row">
-            <div class="col-md-7">
+        <div class="row container">
 
+            <div class="col-md-8">
                 @include('partials.event_schedules')
 
                 @if ($event->location == 'venue')
@@ -82,24 +82,42 @@
                         @endif
                     @endauth
                 @endif
+
+                @forelse ($event->uploaded_documents as $name => $path)
+                    @if ($loop->first)
+                        <h4>Uploaded Documents:</h4>
+                    @endif
+                    <a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                        {{ $name }}
+                    </a>
+                    @if ($loop->last)
+                    <br>
+                        <sub>Uploaded documents will only be available for the events attendees.</sub>
+                        <br>
+                    @endif
+                @empty
+                @endforelse
+                <hr>
+
             </div>
 
-            @if(! $event->dynamic_status == 'CONCLUDED')
-                <div class="col-md-5">
+            @if($event->dynamic_status != 'CONCLUDED')
+                <div class="col-md-4">
                     <p>Share the Qrcode or copy the link to share this event to other users</p>
-                    <div class="float-left">
-                        <img  src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 150%;">
-                    </div>
 
-                    <div class="float-right">
-                        <button class="btn btn-lg btn-light" id="invite_link_button">Copy link to clipboard</button>
+                        <img class="rounded mx-auto d-block" src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="height: 150px;">
+
+                    <div class="">
+                        <br>
+                        <button class="mx-auto d-block btn btn-sm btn-light" id="invite_link_button">Copy link to clipboard</button>
                     </div>
                 </div>
             @endif
+
         </div>
 
         <div class="p-3 mb-2 bg-light">
-        {!! $event->description !!}
+            {!! $event->description !!}
         </div>
 
     </div>

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -35,13 +36,14 @@ class ProfileController extends Controller
         }
 
         if($request->has('profile_picture')) {
-            $location = "users/organizers/$user->id/";
-
             $path = $request->file('profile_picture')->store(
-                $location, 'public'
+                "users/organizers/$user->id/", 's3'
             );
 
-            $user->profile_picture = $path;
+            $user->profile_picture = [
+                'filename' => basename($path),
+                'path' => Storage::disk('s3')->url($path)
+            ];
         }
 
         $user->save();

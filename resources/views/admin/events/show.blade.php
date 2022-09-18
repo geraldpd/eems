@@ -58,6 +58,23 @@
 
                 </div>
 
+                @forelse ($event->uploaded_documents as $name => $path)
+                    @if ($loop->first)
+                        <br>
+                        <hr>
+                        <h4>Uploaded Documents:</h4>
+                    @endif
+                    <a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                        {{ $name }}
+                    </a>
+                    @if ($loop->last)
+                    <br>
+                        <sub>Uploaded documents will only be available for the events attendees.</sub>
+                        <br>
+                    @endif
+                @empty
+                @endforelse
+
                 <br>
 
                 @include('partials.event_schedules')

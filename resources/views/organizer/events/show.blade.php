@@ -66,28 +66,13 @@
                 @if($event->dynamic_status != 'CONCLUDED')
                     <br>
                     <h3>Share this QR code to directly invite them to this event</h3>
-                    <p>Users will need to signup(for unregistered) and login to their {{ config('app.name') }} account <br> to be automatically booked to this event.</p>
+                    <sub>Users will need to signup(for unregistered) and login to their {{ config('app.name') }} account <br> to be automatically booked to this event.</sub>
+                    <br>
                 @endif
 
-                @forelse ($event->uploaded_documents as $name => $path)
-                    @if ($loop->first)
-                        <br>
-                        <hr>
-                        <p>Uploaded Documents:</p>
-                    @endif
-                    <a href="{{ $path['asset'] }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
-                        {{ $name }}
-                    </a>
-                    @if ($loop->last)
-                        <br>
-                        <br>
-                        <p>Uploaded documents will only be available for the events attendees.</p>
-                    @endif
-                @empty
-                @endforelse
+                <br>
 
                 <div class="row">
-
                     <div class="col-md-6">
                         Type: <strong>{{ $event->type->name }}</strong>
                         <br>
@@ -115,6 +100,23 @@
                     </div>
 
                 </div>
+
+                @forelse ($event->uploaded_documents as $name => $path)
+                    @if ($loop->first)
+                        <br>
+                        <hr>
+                        <h4>Uploaded Documents:</h4>
+                    @endif
+                    <a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                        {{ $name }}
+                    </a>
+                    @if ($loop->last)
+                    <br>
+                        <sub>Uploaded documents will only be available for the events attendees.</sub>
+                        <br>
+                    @endif
+                @empty
+                @endforelse
 
                 <br>
 

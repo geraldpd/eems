@@ -40,6 +40,7 @@ Route::group([
 ], function(){
 
     Route::get('/', [HelperController::class, 'index'])->name('index');
+    Route::get('/download-event-attachment', [HelperController::class, 'downloadEventAttachment'])->name('download-event-attachment');
     Route::post('/suggest_attendees', [HelperController::class, 'suggestAttendees'])->name('suggest_attendees');
 
 });

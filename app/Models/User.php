@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Str;
 
@@ -45,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'profile_picture' => 'json'
     ];
 
     /**
@@ -74,7 +76,26 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getProfilePicturePathAttribute()
     {
-        return $this->profile_picture ? asset('storage/'.$this->profile_picture) : asset('assets/default-profile_picture.png');
+        switch (true) {
+            case $this->hasRole('attendees'):
+                $default_path = "users/attendee/$this->id/";
+                break;
+
+            case $this->hasRole('organizer'):
+                $default_path = "users/organizers/$this->id/";
+                break;
+
+            default: //*admin
+                $default_path = "users/admin/$this->id/";
+                break;
+        }
+
+        if($this->profile_picture) {
+            $s3_file_path = $default_path.$this->profile_picture['filename'];
+            return Storage::disk('s3')->temporaryUrl($s3_file_path, now()->addMinutes(5));
+        } else {
+            return asset('assets/default-profile_picture.png');
+        }
     }
 
     //! ORGANIZER RELATIONSHIPS

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\User;
+use App\Services\EventServices;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class HelperController extends Controller
 {
@@ -23,7 +26,8 @@ class HelperController extends Controller
     public function index()
     {
         return [
-            'suggestAttendees'
+            'suggestAttendees',
+            'downloadEventAttachment'
         ];
     }
 
@@ -65,6 +69,11 @@ class HelperController extends Controller
             ->toArray();
 
         return $query;
+    }
+
+    public function downloadEventAttachment(Request $request)
+    {
+       return (new EventServices)->downloadEventAttachment($request->document);
     }
 
 }

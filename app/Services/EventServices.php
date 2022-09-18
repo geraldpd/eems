@@ -6,7 +6,7 @@ use App\Models\Event;
 use App\Models\EventSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class EventServices
 {
@@ -56,5 +56,40 @@ class EventServices
             ->whereDoesntHave('attendees', function ($query) {
                 $query->where('users.id', '=', Auth::user()->id);
             });
+    }
+
+    public function downloadEventAttachment($document)
+    {
+        if(! $document) {
+            abort(403, 'Document could not be found');
+        }
+
+        try {
+            $path = decrypt($document);
+        } catch (DecryptException $th) {
+            abort(404, 'Document is invalid');
+        }
+
+        return Storage::disk('s3')->download($path);
+    }
+
+    public function getTemporaryDocs()
+    {
+        $temporary_document_path = "users/organizers/".Auth::user()->id."/temp_docs";
+        $documents = Storage::disk('s3')->allFiles($temporary_document_path);
+
+        return collect($documents)
+        ->mapWithKeys(fn($file) => [basename($file) => encrypt($file)])
+        ->all();
+    }
+
+    public function getEventDocs($event_id)
+    {
+        $event_document_path = "events/$event_id/documents";
+        $documents = Storage::disk('s3')->allFiles($event_document_path);
+
+        return collect($documents)
+        ->mapWithKeys(fn($file) => [basename($file) => encrypt($file)])
+        ->all();
     }
 }

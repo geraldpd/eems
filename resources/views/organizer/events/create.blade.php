@@ -179,7 +179,7 @@
             <tbody>
               @foreach ($documents as $name => $path)
                 <tr title="This document is not yet attached to this event, press the submit button to save it to this events document folder">
-                    <td><a href="{{ $path['asset'] }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
+                    <td><a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
                     <td class="text-center"> <button type="button" data-name="{{ $name }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
                 </tr>
               @endforeach
@@ -217,6 +217,7 @@
       csrf: '{{ csrf_token() }}',
       tempdocs: {
         count: {{ count($documents) }},
+        download: "{{ route('helpers.download-event-attachment', ['document' => 'document_path']) }}",
         store: "{{ route('organizer.tempdocs.store') }}",
         destroy: "{{ route('organizer.tempdocs.destroy') }}"
       },

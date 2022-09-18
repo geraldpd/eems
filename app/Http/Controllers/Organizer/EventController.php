@@ -21,7 +21,9 @@ use App\Http\Requests\Event\{
     StoreRequest,
     UpdateRequest
 };
+use App\Services\EventServices;
 use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
@@ -89,11 +91,11 @@ class EventController extends Controller
         $user = Auth::user();
         $event_folder_path = "storage/users/organizers/$user->id/temp_docs"; // temp docs for uploading event files
 
-        if(!File::exists($event_folder_path)) {
-            File::makeDirectory($event_folder_path, 0777, true);
-        }
+        // if(!File::exists($event_folder_path)) {
+        //     File::makeDirectory($event_folder_path, 0777, true);
+        // }
 
-        $documents = $this->getTemporayDocs();
+        $documents = (new EventServices)->getTemporaryDocs();
         $categories = Category::whereIsActive(true)->get();
         $types = Type::whereIsActive(true)->get();
 
@@ -125,10 +127,15 @@ class EventController extends Controller
         $event->code = eventHelperSetCode($event->id);
 
         //* qrcode
-        $event_folder_path = "storage/events/$event->id/";
+        $event_folder_path = "events/$event->id/";
         $qrcode_invitation_link = route('events.show', $event->code).'?invite=true';
+
         File::makeDirectory($event_folder_path, 0777, true);
         QrCode::generate($qrcode_invitation_link, $event_folder_path.'qrcode.svg');
+
+        Storage::disk('s3')->put($event_folder_path.'qrcode.svg', file_get_contents($event_folder_path.'qrcode.svg'));
+        Storage::delete($event_folder_path);
+
         $event->qrcode = $event_folder_path.'qrcode.svg';
 
         $event->save();
@@ -150,8 +157,7 @@ class EventController extends Controller
         }
         EventSchedule::insert($event_schedule);
 
-        File::makeDirectory($event_folder_path.'documents/', 0777,true);
-        $this->moveTemporayDocsToEvents($event_folder_path);
+        $this->moveTemporayDocsToEvents($event->id);
 
         DB::commit();
 
@@ -203,7 +209,7 @@ class EventController extends Controller
         $event->load('category');
 
         $event->documents = $event->uploaded_documents;
-        $event->temporary_documents = $this->getTemporayDocs();
+        $event->temporary_documents = (new EventServices)->getTemporaryDocs();
 
         return view('organizer.events.edit', compact('event','categories', 'types', 'min_sched'));
     }
@@ -243,8 +249,7 @@ class EventController extends Controller
                 $event_schedule->save();
             }
 
-            $event_folder_path = "storage/events/$event->id/";
-            $this->moveTemporayDocsToEvents($event_folder_path);
+            $this->moveTemporayDocsToEvents($event->id);
 
             DB::commit();
             return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
@@ -274,31 +279,14 @@ class EventController extends Controller
         //
     }
 
-    private function getTemporayDocs()
-    {
-        $temporary_document_path = "storage/users/organizers/".Auth::user()->id."/temp_docs";
-        $documents = File::allFiles($temporary_document_path);
-
-        return collect($documents)
-        ->sortBy(function ($file) {
-            return $file->getCTime();
-        })
-        ->mapWithKeys(function ($file) {
-            return [$file->getBaseName() => [
-                'public' => $file->getRealPath(),
-                'asset' => asset($file->getPathName())
-            ]];
-        })
-        ->all();
-    }
-
-    private function moveTemporayDocsToEvents($event_folder_path)
+    private function moveTemporayDocsToEvents($event_id)
     {
         //get temp files
-        $documents = $this->getTemporayDocs();
+        $documents = (new EventServices)->getTemporaryDocs();
 
         foreach($documents as $name => $path) {
-            File::move($path['public'], public_path($event_folder_path.'documents/'.$name));
+            Storage::disk('s3')->move(decrypt($path), "events/$event_id/documents/$name");
+            //File::move($path['public'], public_path($event_folder_path.'documents/'.$name));
         }
     }
 

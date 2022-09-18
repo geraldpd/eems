@@ -32,13 +32,14 @@ class ProfileController extends Controller
         }
 
         if($request->has('profile_picture')) {
-            $location = "users/admin/$user->id/";
-
             $path = $request->file('profile_picture')->store(
-                $location, 'public'
+                "users/admin/$user->id/", 's3'
             );
 
-            $user->profile_picture = $path;
+            $user->profile_picture = [
+                'filename' => basename($path),
+                'path' => Storage::disk('s3')->url($path)
+            ];
         }
 
         $user->save();
