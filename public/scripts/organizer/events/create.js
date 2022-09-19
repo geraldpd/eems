@@ -1,6 +1,5 @@
 
 $(function() {
-
     $('.schedule-row').each((i, schedule_row) => {
         let schedule_picker = $(schedule_row).find('.schedule-picker')
         let index = schedule_picker.data('day')
@@ -43,6 +42,16 @@ $(function() {
         let additional_field = $('.location-additional-field');
         additional_field.find('.form-group').each((i, div) => $(div).addClass('d-none'));
         additional_field.find(`.location-${location}`).removeClass('d-none');
+
+        switch (location) {
+            case 'venue':
+                $('#location-online').val('')
+                break;
+
+            default: //online
+                $('#location-venue').val('')
+                break;
+        }
     });
 
     //run in the end of the script

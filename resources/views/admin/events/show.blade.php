@@ -22,7 +22,7 @@
             <div class="col-md-12"> <br> </div>
 
             <div class="col-md-3">
-                <img class="mx-auto d-block" src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 100%;">
+                <img class="mx-auto d-block" src="{{ asset($event->qrcode_path) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 100%;">
                 <br>
             </div>
 

@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -61,7 +62,8 @@ class Event extends Model
         'schedule_end', //fetches the last event_schedules relationship, returns schedule_end column
         'todays_scheduled_event',
         'attendance_percentage',
-        'feedback_percentage'
+        'feedback_percentage',
+        'qr_code_path'
     ];
 
     public function getRouteKeyName()
@@ -208,5 +210,11 @@ class Event extends Model
         }
 
         return 0;
+    }
+
+    public function getQrCodePathAttribute()
+    {
+        $s3_file_path = "events/$this->id/qrcode.svg";
+        return Storage::disk('s3')->temporaryUrl($s3_file_path, now()->addMinutes(5));
     }
 }

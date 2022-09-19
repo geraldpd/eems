@@ -31,7 +31,7 @@ confirm invitation
 
 <br>
 
-<img class="mx-auto d-block" src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 30%;">
+<img class="mx-auto d-block" src="{{ asset($event->qrcode_path) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="width: 30%;">
 <br>
 <small class="mx-auto d-block" style="width: 30%;"> Share this qrcode to your friends to invite them too.</small>
 

@@ -105,7 +105,7 @@
                 <div class="col-md-4">
                     <p>Share the Qrcode or copy the link to share this event to other users</p>
 
-                        <img class="rounded mx-auto d-block" src="{{ asset($event->qrcode) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="height: 150px;">
+                        <img class="rounded mx-auto d-block" src="{{ asset($event->qrcode_path) }}" alt="{{ route('events.show', $event->code).'?invite=true' }}" style="height: 150px;">
 
                     <div class="">
                         <br>
