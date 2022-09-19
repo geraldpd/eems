@@ -158,7 +158,7 @@ class EventController extends Controller
 
         $this->moveTemporayDocsToEvents($event->id);
 
-        File::deleteDirectory(public_path('events')); // deletes events folder inside the public folder, since qrcode is moved to S3 folder instead
+        File::deleteDirectory(public_path('events')); // deletes events folder inside the public folder, since qrcode is moved to S3 folder instead`
 
         DB::commit();
 
