@@ -297,6 +297,7 @@ class EventController extends Controller
         ->with(['event.category', 'event.type'])
         ->whereDate('schedule_start', '>=', Carbon::parse($request->start)->startOfDay())
         ->whereDate('schedule_end', '<=', Carbon::parse($request->end)->endOfDay())
+        ->whereRelation('event', 'organizer_id', Auth::user()->id)
         ->orderBy('schedule_start')
         ->get()
         ->mapToGroups(function ($item, $key) {
