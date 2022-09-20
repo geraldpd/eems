@@ -138,7 +138,7 @@ $(function() {
                     let secondsLeft = parseFloat(timeDiff.format("s").replace(/,/g, ''))
 
                     if(secondsLeft > 0) {
-                        status_html = `<small>starts in</small> <h4 title="Event Countdown" ><b class="event-status-timer-disabled text-warning">${countdown}</b></h4>`;
+                        status_html = `<sub>starts in</sub> <br> <strong title="Event Countdown" ><b class="event-status-timer-disabled text-warning">${countdown}</b></strong>`;
                     } else {
                         let timeDiffEnd = moment.duration(moment(schedule_end).diff(moment())); //! for ongoing to concluded
                         let secondsLeftEnd = parseFloat(timeDiffEnd.format("s").replace(/,/g, ''))
@@ -171,7 +171,7 @@ $(function() {
             *TRUE - do not render the edit button
             !FALSE - render the edit button redirecting to the edit page
             */
-            let edit_button = moment(schedule.schedule_start).isBefore() ? '' : `<a class=" btn btn-link" href="${config.routes.edit.replace('resource_id', schedule.event.code)}">Edit</a>`;
+            let edit_button = moment(schedule.schedule_start).isBefore() ? '' : `<a class=" btn btn-link btn-light" href="${config.routes.edit.replace('resource_id', schedule.event.code)}">Edit</a>`;
 
             return `
             <div class="event row" data-status="${schedule.status}">
@@ -189,9 +189,9 @@ $(function() {
             <div class="col-md-5 col-sm-12">
             <br>
 
-            <h4 class="scheduled_time">
-            <strong>${date_formater(schedule.schedule_start).time}</strong> - <strong>${date_formater(schedule.schedule_end).time}</strong>
-            </h4>
+            <div class="scheduled_time">
+                <strong>${date_formater(schedule.schedule_start).time}</strong> - <strong>${date_formater(schedule.schedule_end).time}</strong>
+            </div>
 
             <div class="event-status" data-status="${schedule.status}" data-day="${day}" data-start="${ schedule.schedule_start }" data-end="${ schedule.schedule_end }"></div>
 

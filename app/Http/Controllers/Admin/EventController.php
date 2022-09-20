@@ -9,6 +9,7 @@ use App\Mail\EventInvitation;
 use App\Models\category;
 use App\Models\Type;
 use App\Models\User;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -61,6 +62,22 @@ class EventController extends Controller
         })
         ->when($request->has('category'), function($query) {
             $query->whereRelation('category', 'id', request()->category);
+        })
+        ->when($request->has('from') && $request->has('to'), function($query) {
+            $start = Carbon::parse(request()->from);
+            $end = Carbon::parse(request()->to);
+
+            $query
+            ->whereHas('start', function($subQuery) use ($start, $end){
+                    $subQuery
+                    ->whereDate('schedule_start','>=',$start->startOfDay())
+                    ->whereDate('schedule_start','<=',$end->endOfDay());
+                })
+            ->whereHas('end', function($subQuery) use ($start, $end){
+                    $subQuery
+                    ->whereDate('schedule_end','>=',$start->startOfDay())
+                    ->whereDate('schedule_end','<=',$end->endOfDay());
+                });
         })
         ->get();
 

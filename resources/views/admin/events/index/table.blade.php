@@ -67,5 +67,12 @@
 @endsection
 
 @push('scripts')
+    <script>
+        const config = {
+            eventsIndex : "{{ route('admin.events.index') }}",
+            from: "{{ request()->from }}",
+            to: "{{ request()->to }}",
+        }
+    </script>
     <script src="{{ asset('scripts/admin/events/table.js') }}"></script>
 @endpush

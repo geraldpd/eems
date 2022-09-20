@@ -57,6 +57,11 @@
         border-radius: 12px;
     }
 
+    .event:hover {
+        background: #ffffff;
+        box-shadow:  -8px 8px 16px #e8e8e8,
+             8px -8px 16px #ffffff;
+    }
     .fc-daygrid-event:hover{
         transform: scale(1.1);
         cursor: pointer;

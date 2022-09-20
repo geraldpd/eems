@@ -22,9 +22,4 @@ Route::group([
     Route::resource('types', TypeController::class);
 
     Route::resource('events', EventController::class);
-
-    Route::get('/linkstorage', function () {
-        Artisan::call('storage:link');
-        echo 'storage linked';
-    });
 });
