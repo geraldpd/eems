@@ -78,7 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         switch (true) {
             case $this->hasRole('attendees'):
-                $default_path = "users/attendee/$this->id/";
+                $default_path = "users/attendees/$this->id/";
                 break;
 
             case $this->hasRole('organizer'):
