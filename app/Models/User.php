@@ -77,7 +77,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getProfilePicturePathAttribute()
     {
         switch (true) {
-            case $this->hasRole('attendees'):
+            case $this->hasRole('attendee'):
                 $default_path = "users/attendees/$this->id/";
                 break;
 
