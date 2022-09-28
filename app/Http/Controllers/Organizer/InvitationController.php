@@ -80,7 +80,9 @@ class InvitationController extends Controller
 
         fputcsv($handle, [$file_name]);
 
-        fputcsv($handle, array_column($participants, 'email'));
+        foreach(array_column($participants, 'email') as $email) {
+            fputcsv($handle, [$email]);
+        }
 
         fclose($handle);
 
