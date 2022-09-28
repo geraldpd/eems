@@ -64,29 +64,28 @@ class InvitationController extends Controller
     {
         $filter = Str::title($filter);
         $participants = $this->getParticipants($event, $filter);
-        $path = "storage/events/$event->id/attendance.csv";
+        $path = "events/$event->id/";
 
         if(! count($participants)) {
             return redirect()->back()->with('message', 'Nothing to download');
         }
 
+        $s3 = Storage::disk('s3');
+        $csvFile = tmpfile();
+        $csvPath = stream_get_meta_data($csvFile)['uri'];
+
         $file_name = $filter.' '.$event->name.' Attandence';
 
-        $handle = fopen($path, 'w');
+        $handle = fopen($csvPath, 'w');
 
-        //adds the title
         fputcsv($handle, [$file_name]);
 
         fputcsv($handle, array_column($participants, 'email'));
 
         fclose($handle);
 
-        // Storage::disk('s3')->put($path, file_get_contents($path));
-
-        unlink(public_path($path));
-        return Storage::disk('s3')->download($path);
-
-        //return response()->download(public_path($path), $file_name.'.csv');
+        $s3->putFileAs('', $csvPath, $path.'attendance.csv');
+        return Storage::disk('s3')->download($path.'attendance.csv');
     }
 
     private function getParticipants(Event $event, $filter)
