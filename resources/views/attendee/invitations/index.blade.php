@@ -47,10 +47,7 @@
                                         <br>
                                         <p>Uploaded Documents:</p>
                                     @endif
-                                    @php
-                                        dump($name, $path);
-                                    @endphp
-                                    <a title="click to download attached document" href="{{-- $path['asset'] --}}" download class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                                    <a title="click to download attached document" href="{{ $path }}" download class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
                                         <i class="fas fa-download"></i> {{ $name }}
                                     </a>
                                 @empty
