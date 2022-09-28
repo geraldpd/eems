@@ -19,7 +19,7 @@
 
         @include('organizer.events.evaluations.partials.preview')
 
-        @if(!$event->invitations->count())
+        @if(!$event->invitations->count() && $event->dynamic_status != 'CONCLUDED')
             <div class="col-md-12">
                 <p>Dont forget to <a href="{{ route('organizer.invitations.index', [$event->code]) }}"> invite attendees</a> </p>
             </div>

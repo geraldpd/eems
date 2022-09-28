@@ -50,6 +50,10 @@
                             @endif
                         </div>
                     </div>
+            @else
+                <div class="col-md-3">
+                    <a href="{{ route('organizer.invitations.download', [$event->code, 'all']) }}" class="btn btn-secondary btn-md float-right">Download List</a>
+                </div>
             @endif
 
         </div>

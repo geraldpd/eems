@@ -11,6 +11,7 @@ use App\Models\Invitation;
 use App\Jobs\SendEventInvitation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class InvitationController extends Controller
@@ -62,34 +63,30 @@ class InvitationController extends Controller
     public function download(Event $event, $filter = 'all')
     {
         $filter = Str::title($filter);
-        $path = "storage/events/$event->id/evaluation.csv";
-        $file_name = $filter.' '.$event->name.' Attendees';
+        $participants = $this->getParticipants($event, $filter);
+        $path = "storage/events/$event->id/attendance.csv";
+
+        if(! count($participants)) {
+            return redirect()->back()->with('message', 'Nothing to download');
+        }
+
+        $file_name = $filter.' '.$event->name.' Attandence';
 
         $handle = fopen($path, 'w');
 
         //adds the title
         fputcsv($handle, [$file_name]);
 
-        //adds a spacer
-        //fputcsv($handle, []);
-
-        //headers
-        //$headers = array_values(['name']);
-        //array_unshift($headers, 'Attendee');
-
-        //fputcsv($handle, $headers);
-
-        $participants = $this->getParticipants($event, $filter);
-
         fputcsv($handle, array_column($participants, 'email'));
 
         fclose($handle);
 
-        return response()->download(public_path($path), $file_name.'.csv');
-        return [
-            'path' => public_path($path),
-            'extension_name' => '.csv'
-        ];
+        // Storage::disk('s3')->put($path, file_get_contents($path));
+
+        unlink(public_path($path));
+        return Storage::disk('s3')->download($path);
+
+        //return response()->download(public_path($path), $file_name.'.csv');
     }
 
     private function getParticipants(Event $event, $filter)
