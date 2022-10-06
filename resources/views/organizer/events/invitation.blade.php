@@ -97,7 +97,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="text-center">No guest invited yet</td>
+                            <td colspan="4" class="text-center">No guest invited yet</td>
                         </tr>
                     @endforelse
                 </tbody>
