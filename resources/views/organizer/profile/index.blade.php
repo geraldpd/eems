@@ -68,6 +68,26 @@
             </div>
 
             <br>
+            <h2>Other Information</h2>
+            <hr>
+
+            <div class="form-group">
+                <label for="lastname">Organization:</label>
+                <input type="text" name="organization_name" id="organization_name" class="form-control" value="{{ old('organization_name') ?? $organizer->attendee_organization_name }}">
+                @error('attendee_organization_name')
+                <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="attendee_occupation">Occupation:</label>
+                <input type="text" name="occupation" id="occupation" class="form-control" value="{{ old('occupation') ?? $organizer->attendee_occupation }}">
+                @error('attendee_occupation')
+                <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <br>
             <h2>Security</h2>
             <hr>
 

@@ -30,6 +30,8 @@ class ProfileController extends Controller
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->mobile_number = $request->mobile_number;
+        $user->attendee_organization_name = $request->organization_name;
+        $user->attendee_occupation = $request->occupation;
 
         if($request->password && $request->password_confirmation) {
             $user->password =  Hash::make($request->password);
