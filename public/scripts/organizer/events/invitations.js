@@ -105,7 +105,7 @@ $(function() {
     }
 
     $('#table').DataTable({
-        order: [[2, 'desc'], [0, 'desc']],
+        order: [[0, 'desc']],
         columnDefs: [
             {
                 "targets": [ 0 ],

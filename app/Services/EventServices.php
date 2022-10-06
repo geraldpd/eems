@@ -53,6 +53,7 @@ class EventServices
         return Event::query()
             ->whereHas('invitations')
             ->whereRelation('invitations', 'email', '=', Auth::user()->email)
+            ->whereRelation('end', 'schedule_end', '>', Carbon::now())
             ->whereDoesntHave('attendees', function ($query) {
                 $query->where('users.id', '=', Auth::user()->id);
             });

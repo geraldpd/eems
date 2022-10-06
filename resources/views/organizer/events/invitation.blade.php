@@ -1,121 +1,150 @@
 @extends('layouts.organizer')
 
 @section('content')
-    <div class="container">
+<div class="container">
 
-        <div class="row">
-            @if(session()->has('message'))
-                <div class="alert alert-info">
-                    {{ session()->get('message') }}
-                </div>
-            @endif
-
-            <br>
-
-            <ol class="breadcrumb" style="width:100%">
-                <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
-                <li class="breadcrumb-item active" aria-current="page"> <a href="{{ route('organizer.events.show', [$event->code]) }}">{{ ucwords(strtolower($event->name)) }}</a></li>
-                <li class="breadcrumb-item">Invitations</li>
-            </ol>
+    <div class="row">
+        @if(session()->has('message'))
+        <div class="alert alert-info">
+            {{ session()->get('message') }}
         </div>
+        @endif
 
         <br>
 
-        <div class="row">
+        <ol class="breadcrumb" style="width:100%">
+            <li class="breadcrumb-item"><a href="{{ route('organizer.events.index') }}">Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page"> <a href="{{ route('organizer.events.show', [$event->code]) }}">{{ ucwords(strtolower($event->name)) }}</a></li>
+            <li class="breadcrumb-item">Invitations</li>
+        </ol>
+    </div>
 
-            <div class="col-md-9" style="padding-left:0px;">
-                <h1 class="float-left">{{ $event->name }}</h1>
-            </div>
+    <br>
 
-            @if ($event->end->schedule_end->isPast())
+    <div class="row">
 
-                    <div class="col-md-3" style="padding-right:0px;">
-                        <div class="btn-group float-right" role="group" aria-label="Button group with nested dropdown">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Filter By
-                                </button>
+        <div class="col-md-9" style="padding-left:0px;">
+            <h1 class="float-left">{{ $event->name }}</h1>
+        </div>
 
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item {{ $filter == 'confirmed' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/confirmed">Confirmed</a>
-                                    <a class="dropdown-item {{ $filter == 'declined' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/declined">Declined</a>
-                                    <a class="dropdown-item {{ !in_array($filter, ['confirmed', 'declined']) ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/all">All</a>
-                                </div>
-                            </div>
+        @if ($event->end->schedule_end->isPast())
+            <div class="col-md-3" style="padding-right:0px;">
+                <div class="btn-group float-right" role="group" aria-label="Button group with nested dropdown">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Filter By {{ ucfirst($filter) }}
+                        </button>
 
-                            @if(in_array($filter, ['confirmed', 'declined', 'all', '']))
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('organizer.invitations.download', [$event->code, $filter]) }}" class="btn btn-secondary">Download</a>
-                                </div>
-                            @endif
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item {{ $filter == 'confirmed' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/confirmed">Confirmed</a>
+                            <a class="dropdown-item {{ $filter == 'declined' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/declined">Declined</a>
+                            <a class="dropdown-item {{ !in_array($filter, ['confirmed', 'declined']) ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/all">All</a>
                         </div>
                     </div>
-            @else
-                <div class="col-md-3">
-                    <a href="{{ route('organizer.invitations.download', [$event->code, 'all']) }}" class="btn btn-secondary btn-md float-right">Download List</a>
+
+                    @if(in_array($filter, ['confirmed', 'declined', 'all', '']))
+                    <div class="btn-group" role="group">
+                        <a href="{{ route('organizer.invitations.download', [$event->code, $filter]) }}" class="btn btn-secondary">Download</a>
+                    </div>
+                    @endif
                 </div>
-            @endif
-
-        </div>
-
-        <div class="row">
-            <div class="col-md-{{ $event->end->schedule_end->isPast() ? '12' : '4'}} col-sm-12">
-                <table id="table" class="table table-bordered">
-                    <thead class="none">
-                        <th style="display:none">created_at</th> <!-- just for ordering -->
-                        <th>Invited</th>
-                        <th class="text-center">Response</th>
-                    </thead>
-                    <tbody>
-                        @forelse ($participants as $participant)
-                            <tr>
-                                <td style="display:none">{{ $participant['created_at'] }}</td> <!-- just for ordering -->
-                                <td>{{ $participant['email'] }}</td>
-                                <td class="text-center">{{ $participant['response'] }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td></td>
-                                <td colspan="2" class="text-center">No guest invited yet</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-
-                <br>
-                <br>
             </div>
+        @else
+            <div class="col-md-3" style="padding-right:0px;">
+                <div class="btn-group float-right" role="group" aria-label="Button group with nested dropdown">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Filter By {{ ucfirst($filter) }}
+                        </button>
 
-            @if(!$event->end->schedule_end->isPast())
-
-                <div class="col-md-8">
-                    <form method="POST" action="{{ route('organizer.invitations.store', [$event->code]) }}">
-                        @csrf
-
-                        <div class="input-group mb-3">
-                            <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="email" aria-label="email" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-secondary send-invitation" disabled type="submit"> <i class="fas fa-paper-plane"></i> send </button>
-                            </div>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item {{ $filter == 'confirmed' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/confirmed">Confirmed</a>
+                            <a class="dropdown-item {{ $filter == 'declined' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/declined">Declined</a>
+                            <a class="dropdown-item {{ $filter == 'pending' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/pending">Pending</a>
+                            <a class="dropdown-item {{ !in_array($filter, ['confirmed', 'declined', 'pending']) ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/all">All</a>
                         </div>
+                    </div>
 
-                        @if ($errors->has('invitees'))
-                            {{ $message }}
-                        @endif
-                    </form>
-
-                    <br>
-                    <br>
-
+                    @if(in_array($filter, ['confirmed', 'declined', 'all','pending', '']))
+                        <div class="btn-group" role="group">
+                            <a href="{{ route('organizer.invitations.download', [$event->code, $filter]) }}" class="btn btn-secondary">Download</a>
+                        </div>
+                    @endif
                 </div>
-            @endif
+            </div>
+        @endif
 
-        </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-{{ $event->end->schedule_end->isPast() ? '12' : '6'}} col-sm-12">
+            <table id="table" class="table table-bordered">
+                <thead class="none">
+                    <th style="display:none">created_at</th> <!-- just for ordering -->
+                    <th class="text-center">Response</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Organization</th>
+                </thead>
+                <tbody>
+                    @forelse ($participants as $participant)
+                        <tr>
+                            <td style="display:none">{{ $participant['created_at'] }}</td> <!-- just for ordering -->
+                            <td class="text-center">{{ $participant['response'] }}</td>
+                            <td>{{ $participant['email'] }}</td>
+                            <td>{{ $participant['name'] }}</td>
+                            <td>{{ $participant['organization'] }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-center">No guest invited yet</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <br>
+            <br>
+        </div>
+
+        @if(!$event->end->schedule_end->isPast())
+            <div class="col-md-6" style="padding-right:0px">
+                <form method="POST" action="{{ route('organizer.invitations.store', [$event->code]) }}">
+                    @csrf
+
+                    <div class="input-group mb-3">
+                        <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="email" aria-label="email" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary send-invitation" disabled type="submit"> <i class="fas fa-paper-plane"></i> send </button>
+                        </div>
+                    </div>
+
+                    @if ($errors->has('invitees'))
+                        {{ $message }}
+                    @endif
+                </form>
+
+                <br>
+                <br>
+
+            </div>
+        @endif
+
+    </div>
+</div>
 @endsection
 
 @push('styles')
     <style>
+
+        /* #table_filter > label > input {
+            height: 53px;
+        }
+
+        .tagify {
+            height: 53px;
+        } */
+
         .tagify--outside{
             border: 0;
             border: 1px solid #ced4da;
@@ -206,22 +235,21 @@
             border-radius: 0.3rem;
         }
     </style>
-
 @endpush
 
 @push('scripts')
-    <script src="{{ asset('scripts/organizer/events/invitations.js') }}" defer></script>
+<script src="{{ asset('scripts/organizer/events/invitations.js') }}" defer></script>
 
-    <script>
-        const config = {
-            event_is_past: '{{ false }}',
-            routes: {
-                suggest_attendees : '{{ route('helpers.suggest_attendees') }}'
-            },
-            event: {
-                id: {{ $event->id }},
-                blacklist: @json($event->invitations->pluck('email'))
-            }
+<script>
+    const config = {
+        event_is_past: '{{ false }}',
+        routes: {
+            suggest_attendees : '{{ route('helpers.suggest_attendees') }}'
+        },
+        event: {
+            id: {{ $event->id }},
+            blacklist: @json($event->invitations->pluck('email'))
         }
-    </script>
+    }
+</script>
 @endpush

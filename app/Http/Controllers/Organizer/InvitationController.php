@@ -62,31 +62,30 @@ class InvitationController extends Controller
 
     public function download(Event $event, $filter = 'all')
     {
-        $filter = Str::title($filter);
         $participants = $this->getParticipants($event, $filter);
+        $filter = Str::title($filter);
         $path = "events/$event->id/";
+        $file_name = $filter.' '.$event->name.' Attandence';
 
         if(! count($participants)) {
             return redirect()->back()->with('message', 'Nothing to download');
         }
 
-        $s3 = Storage::disk('s3');
         $csvFile = tmpfile();
         $csvPath = stream_get_meta_data($csvFile)['uri'];
-
-        $file_name = $filter.' '.$event->name.' Attandence';
-
         $handle = fopen($csvPath, 'w');
 
         fputcsv($handle, [$file_name]);
 
-        foreach(array_column($participants, 'email') as $email) {
-            fputcsv($handle, [$email]);
+        fputcsv($handle, ['Response', 'Email', 'Name', 'Organization']);
+
+        foreach($participants as $participant) {
+            fputcsv($handle, [$participant['response'], $participant['email'],$participant['name'], $participant['organization']]);
         }
 
         fclose($handle);
 
-        $s3->putFileAs('', $csvPath, $path.'attendance.csv');
+        Storage::disk('s3')->putFileAs('', $csvPath, $path.'attendance.csv');
         return Storage::disk('s3')->download($path.'attendance.csv');
     }
 
@@ -96,36 +95,72 @@ class InvitationController extends Controller
         $is_past = $event->start->schedule_start->isPast();
 
         switch ($filter) {
-            case 'confirmed':
-                $participants = $event->attendees->map(function($invitation) {
-                    $invitation->response = 'Yes';
-
-                    return [
-                        'created_at' => $invitation->created_at,
-                        'email' => $invitation->email,
-                        'response' => 'Confirmed'
-                    ];
-                });
-
-                break;
-            case 'declined':
-                //$participants = $event->invitations()->doesnthave('guest')->get();
-
+            case 'pending':
                 $participants = $event->invitations->map(function($invitation) use ($attendees, $is_past) {
 
-                    if(! $invitation->guest) { //the invitation has no relationship with the user(aka guest), it is understood that the guest did not confirmed the invitations
+                    //UNREGISTERED
+                    if(! $invitation->guest) {
                         return [
+                            'organization' => 'N/A',
+                            'name' => 'N/A',
+                            'created_at' => $invitation->created_at,
+                            'email' => $invitation->email,
+                            'response' => $is_past ? 'Declined' : 'Pending'
+                        ];
+                    }
+
+                    //REGISTERED
+                    if(! in_array($invitation->guest->email, $attendees->pluck('email')->all())) {
+                        return [
+                            'organization' => $invitation->guest->attendee_organization_name,
+                            'name' => $invitation->guest->fullname,
+                            'created_at' => $invitation->created_at,
+                            'email' => $invitation->email,
+                            'response' => 'Pending'
+                        ];
+                    }
+
+                });
+                break;
+
+            case 'confirmed':
+                $participants = $event->invitations->map(function($invitation) use ($attendees, $is_past) {
+
+                    if(!$invitation->guest) return;
+
+                    if( in_array($invitation->guest->email, $attendees->pluck('email')->all())) {
+                        return [
+                            'organization' => $invitation->guest->attendee_organization_name,
+                            'name' => $invitation->guest->fullname,
                             'created_at' => $invitation->created_at,
                             'email' => $invitation->email,
                             'response' => 'Confirmed'
                         ];
                     }
+                });
+                break;
 
-                    if(! in_array($invitation->guest->email, $attendees->pluck('email')->all())) {
+            case 'declined':
+                //$participants = $event->invitations()->doesnthave('guest')->get();
+
+                $participants = $event->invitations->map(function($invitation) use ($attendees, $is_past) {
+                    if(! $invitation->guest && $is_past) { //the invitation has no relationship with the user(aka guest), it is understood that the guest did not confirmed the invitations
                         return [
+                            'organization' => 'N/A',
+                            'name' => 'N/A',
                             'created_at' => $invitation->created_at,
                             'email' => $invitation->email,
-                            'response' => 'Confirmed'
+                            'response' => 'Declined'
+                        ];
+                    }
+
+                    if($is_past && ! in_array($invitation->guest->email, $attendees->pluck('email')->all())) {
+                        return [
+                            'organization' => $invitation->guest->attendee_organization_name,
+                            'name' => $invitation->guest->fullname,
+                            'created_at' => $invitation->created_at,
+                            'email' => $invitation->email,
+                            'response' => 'Declined'
                         ];
                     }
                 });
@@ -135,8 +170,11 @@ class InvitationController extends Controller
             default: //all invited people
                 //dd(1);
                 $participants = $event->invitations->map(function($invitation) use ($attendees, $is_past) {
+
                     if(! $invitation->guest) {
                         return [
+                            'organization' => 'N/A',
+                            'name' => 'N/A',
                             'created_at' => $invitation->created_at,
                             'email' => $invitation->email,
                             'response' => $is_past ? 'Declined' : 'Pending'
@@ -145,6 +183,8 @@ class InvitationController extends Controller
 
                     if( in_array($invitation->guest->email, $attendees->pluck('email')->all())) {
                         return [
+                            'organization' => $invitation->guest->attendee_organization_name,
+                            'name' => $invitation->guest->fullname,
                             'created_at' => $invitation->created_at,
                             'email' => $invitation->email,
                             'response' => 'Confirmed'
@@ -152,6 +192,8 @@ class InvitationController extends Controller
                     }
 
                     return [
+                        'organization' => $invitation->guest->attendee_organization_name,
+                        'name' => $invitation->guest->fullname,
                         'created_at' => $invitation->created_at,
                         'email' => $invitation->email,
                         'response' => $is_past ? 'Declined' : 'Pending'
@@ -162,6 +204,5 @@ class InvitationController extends Controller
         }
 
         return $participants->sortBy('created_at')->filter()->toArray();
-
     }
 }

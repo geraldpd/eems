@@ -27,7 +27,7 @@ class EventEvaluationController extends Controller
             Organizers are allowed to attach/modify their events evaluation sheet
             before(PENDING) and during(ONGOING) the scheduled event. Once the event's
             last scheduled day has passed(CONCLUDED) the organizer will then no longer be allowed
-            to attached or make modifications on their evaluation sheet
+            to attach or make modifications on their evaluation sheet
         */
         //dd($event->evaluation);
         $event->loadCount('attendees');
@@ -121,36 +121,37 @@ class EventEvaluationController extends Controller
 
         $event->downloadable_filename = Carbon::now()->format('y-m-d').' - '.$event->name.' Evaluations';
 
-        $downlodable = $request->as == 'JSON'
+        $downloadable = $request->as == 'JSON'
         ? $this->asJSON($data, $event)
         : $this->asCSV($data, $event, $questions);
 
-       return response()->download($downlodable['path'], $event->downloadable_filename.$downlodable['extension_name']);
+        return Storage::disk('s3')->download($downloadable);
     }
 
     private function asJSON($data, $event)
     {
-        $path = "storage/events/$event->id/evaluation.json";
+        $path = "events/$event->id/";
 
-        file_put_contents($path, $data->toJson(JSON_PRETTY_PRINT));
+        $jsonFile = tmpfile();
+        $jsonPath = stream_get_meta_data($jsonFile)['uri'];
 
-        return [
-            'path' => public_path($path),
-            'extension_name' => '.json'
-        ];
+        file_put_contents($jsonPath, $data->toJson(JSON_PRETTY_PRINT));
+
+        $complete_file_path = $path.$event->downloadable_filename.'.json';
+
+        Storage::disk('s3')->putFileAs('', $jsonPath, $complete_file_path);
+
+        return $complete_file_path;
     }
 
     private function asCSV($data, $event, $questions)
     {
-        $path = "storage/events/$event->id/evaluation.csv";
+        $path = "events/$event->id/";
 
-        $handle = fopen($path, 'w');
+        $csvFile = tmpfile();
+        $csvPath = stream_get_meta_data($csvFile)['uri'];
 
-        //adds the title
-        //fputcsv($handle, [$event->name.' Evaluation']);
-
-        //adds a spacer
-        //fputcsv($handle, []);
+        $handle = fopen($csvPath, 'w');
 
         //headers
         $headers = array_values($questions->all());
@@ -178,10 +179,11 @@ class EventEvaluationController extends Controller
 
         fclose($handle);
 
-        return [
-            'path' => public_path($path),
-            'extension_name' => '.csv'
-        ];
+        $complete_file_path = $path.$event->downloadable_filename.'.csv';
+
+        Storage::disk('s3')->putFileAs('', $csvPath, $complete_file_path);
+
+        return $complete_file_path;
     }
 
 }
