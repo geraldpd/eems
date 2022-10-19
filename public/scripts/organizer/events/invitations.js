@@ -32,30 +32,32 @@ $(function() {
         `
     }
 
-    var tagify = new window.tagify(invitees.get(0), {
-        pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        blacklist : config.event.blacklist,
-        enforceWhitelist : false,
-        tagTextProp: 'email', // very important since a custom template is used with this property as text
-        templates: {
-            tag: tagTemplate,
-            dropdownItem: suggestionItemTemplate
-        },
-        dropdown: {
-            closeOnSelect: false,
-            enabled: 0,
-            classname: 'users-list',
-            searchKeys: ['name', 'email']  // very important to set by which keys to search for suggesttions when typing
-        },
-        editTags: {
-            clicks: 1,              // single click to edit a tag
-            keepInvalid: false      // if after editing, tag is invalid, auto-revert
-        },
-        callbacks : {
-            add    : console.log,  // callback when adding a tag
-            remove : console.log   // callback when removing a tag
-        }
-    });
+    if(invitees.length) {
+        var tagify = new window.tagify(invitees.get(0), {
+            pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            blacklist : config.event.blacklist,
+            enforceWhitelist : false,
+            tagTextProp: 'email', // very important since a custom template is used with this property as text
+            templates: {
+                tag: tagTemplate,
+                dropdownItem: suggestionItemTemplate
+            },
+            dropdown: {
+                closeOnSelect: false,
+                enabled: 0,
+                classname: 'users-list',
+                searchKeys: ['name', 'email']  // very important to set by which keys to search for suggesttions when typing
+            },
+            editTags: {
+                clicks: 1,              // single click to edit a tag
+                keepInvalid: false      // if after editing, tag is invalid, auto-revert
+            },
+            callbacks : {
+                add    : console.log,  // callback when adding a tag
+                remove : console.log   // callback when removing a tag
+            }
+        });
+    }
 
     function onInputTag(e) {
         tagify.whitelist = null; // reset current whitelist
@@ -97,12 +99,19 @@ $(function() {
     }
 
     if(! config.event_is_past) {
-        tagify.on('input', onInputTag)
-        .on('add', onAddTag)
-        .on('add', onEditTag)
-        .on('remove', onRemoveTag)
-        .on('blur', onTagifyFocusBlur)
+
+        if(invitees.length) {
+            tagify.on('input', onInputTag)
+            .on('add', onAddTag)
+            .on('add', onEditTag)
+            .on('remove', onRemoveTag)
+            .on('blur', onTagifyFocusBlur)
+        }
     }
+
+    $('.print-button').on('click', _ => {
+        window.print()
+    });
 
     $('#table').DataTable({
         order: [[0, 'desc']],

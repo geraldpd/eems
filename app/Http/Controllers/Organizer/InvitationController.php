@@ -33,6 +33,15 @@ class InvitationController extends Controller
         return view('organizer.events.invitation', compact('event', 'participants', 'filter'));
     }
 
+    public function print(Event $event, $filter = false)
+    {
+        $event->load(['invitations.guest', 'attendees', 'start', 'end']);
+
+        $participants = $this->getParticipants($event, $filter);
+
+        return view('organizer.events.invitation-print', compact('event', 'participants', 'filter'));
+    }
+
     public function store(Request $request, Event $event)
     {
         $newly_invited = collect(json_decode($request->invitees))->pluck('email')->unique();

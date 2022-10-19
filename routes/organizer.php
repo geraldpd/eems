@@ -34,6 +34,7 @@ Route::group([
 
         //EVENT INVITATIONS
         Route::get('events/{event}/invitations/{filter?}', [Invitation::class, 'index'])->name('invitations.index');
+        Route::get('events/{event}/invitations/print/{filter?}', [Invitation::class, 'print'])->name('invitations.print');
         Route::get('events/{event}/invitations/{filter}/download', [Invitation::class, 'download'])->name('invitations.download');
         Route::post('events/{event}/invitations', [Invitation::class, 'store'])->name('invitations.store');
         //Route::resource('events/{event}/invitations', InvitationController::class)->only(['index', 'store']);
