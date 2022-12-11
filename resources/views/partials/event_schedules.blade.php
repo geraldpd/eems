@@ -1,5 +1,5 @@
 <div>
-    <h4> Schedules</h4>
+    <h6> Schedules</h6>
     <table class="table">
         <tbody>
         @foreach ($event->schedules as $schedule)

@@ -32,4 +32,14 @@ class FrontController extends Controller
     {
         return $this->index();
     }
+
+    public function about()
+    {
+        return view('front.about');
+    }
+
+    public function news()
+    {
+        return view('front.news');
+    }
 }

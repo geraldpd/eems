@@ -26,6 +26,8 @@ Route::get('/email/verify', function () {
 
 Route::get('/', [FrontController::class, 'index']);
 Route::get('/home', [FrontController::class, 'index']);
+Route::get('/about', [FrontController::class, 'about'])->name('about');
+Route::get('/news', [FrontController::class, 'news'])->name('news');
 
 
 Route::post('/events/{event}/book', [Event::class, 'book'])->name('event.book');

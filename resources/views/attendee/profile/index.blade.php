@@ -22,6 +22,17 @@
                 <h3  id="profile_picture_edit"> edit </h3>
                 <input type="file" name="profile_picture" id="profile_picture" accept="image/*">
             </label>
+
+            <br>
+
+            <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                {{ __('Logout') }}
+            </a>
+
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
         </div>
 
         <div class="col-md-8 col-lg-8 col-sm-12">
