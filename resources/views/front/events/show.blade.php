@@ -151,23 +151,23 @@
 
                                 @auth
                                     @forelse ($event->uploaded_documents as $name => $path)
-                                        @if ($loop->first)
-                                        <div class="post-title">
-                                            <h3>Uploaded Documents:</h3>
-                                        </div>
+                                            @if ($loop->first)
+                                            <div class="post-title">
+                                                <h3>Uploaded Documents:</h3>
+                                            </div>
 
-                                        @endif
-                                        <a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
-                                            {{ $name }}
-                                        </a>
-                                        @if ($loop->last)
-                                        <br>
-                                            <sub>Uploaded documents will only be available for the events attendees.</sub>
+                                            @endif
+                                            <a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                                                {{ $name }}
+                                            </a>
+                                            @if ($loop->last)
                                             <br>
-                                        @endif
-                                    @empty
+                                                <sub>Uploaded documents will only be available for the events attendees.</sub>
+                                                <br>
+                                            @endif
+                                        @empty
                                     @endforelse
-                                @enauth
+                                @endauth
 
                             </div>
                         </article>
