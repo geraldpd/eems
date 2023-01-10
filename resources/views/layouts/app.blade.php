@@ -34,6 +34,23 @@
         <!-- CUSTOM CSS -->
         <link href=" {{ asset('theme/source/css/style.css') }}" rel="stylesheet">
 
+        <style>
+            .page-item.active .page-link {
+                background-color: #ff6600;
+                border-color: #ff6600;
+                font-size: 16px;
+                padding: 0;
+                height: 50px;
+                width: 50px;
+                line-height: 50px;
+                text-align: center;
+                border-color: transparent;
+                color: white;
+                border: 1px solid #e5e5e5;
+                border-radius: 0 !important;
+            }
+        </style>
+
     </head>
 
     <body class="body-wrapper">
@@ -60,7 +77,19 @@
                     <ul class="navbar-nav mx-auto">
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('events.index') }}">Browse Events
+                            <a class="nav-link" href="{{ route('events.index') }}">Events
+                            <span>/</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('front.index') }}#news">News
+                            <span>/</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('front.index') }}#about">About
                             <span>/</span>
                             </a>
                         </li>
@@ -74,18 +103,6 @@
                                 @break
                             @endswitch
                         @endif
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('news') }}">News
-                            <span>/</span>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('about') }}">About
-                            <span>/</span>
-                            </a>
-                        </li>
 
                     </ul>
 

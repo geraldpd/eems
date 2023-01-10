@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class EventServices
@@ -44,6 +45,55 @@ class EventServices
                 ->orderBy('schedule_start')
                 ->limit(1)
             );
+
+        return $events;
+    }
+
+    public function getFrontEndEventsPerDay(Array $params)
+    {
+
+        $events = DB::table('event_schedules')
+                ->join('events', 'event_schedules.event_id', '=', 'events.id')
+                ->join('types', 'events.type_id', '=', 'types.id')
+                ->join('categories', 'events.category_id', '=', 'categories.id')
+                ->join('users AS organizer', 'events.organizer_id', '=', 'organizer.id')
+                ->when($params['keyword'], function($query) use ($params) {
+                    $keyword = "%$params[keyword]%";
+                    $query->where(function($subQuery) use ($keyword){
+                        $subQuery
+                        ->orWhere('events.name', 'like', $keyword)
+                        ->orWhere('types.name', 'like', $keyword)
+                        ->orWhere('categories.name', 'like', $keyword);
+                    });
+                })
+                ->when($params['exclude_concluded'], function($query) {
+                    $query->whereDate('schedule_end', '>=', Carbon::now());
+                })
+                ->when(Auth::check(), function($query) use ($params) {
+                    if($params['has_attended']) {
+                        $query
+                        ->whereIn('events.id', Auth::user()->attendedEvents->pluck('id')->toArray());
+                    }
+                })
+                ->select(
+                    'events.id as event_id',
+                    'events.code as event_code',
+                    'events.name as event_name',
+                    'events.location as event_location',
+                    'events.venue as event_venue',
+                    'events.description as event_description',
+
+                    'event_schedules.id as event_schedule_id',
+                    'event_schedules.schedule_start as schedule_start',
+                    'event_schedules.schedule_end as schedule_end',
+
+                    'organizer.firstname as organizer_firstname',
+                    'organizer.lastname as organizer_lastname',
+
+                    'types.name as type_name',
+                    'categories.name as category_name',
+                )
+                ->orderBy('event_schedules.schedule_start');
 
         return $events;
     }

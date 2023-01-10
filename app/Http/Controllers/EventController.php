@@ -22,13 +22,19 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
-        $events = (new EventServices())
-        ->getFrontEndEvents([
+        // $events = (new EventServices())
+        // ->getFrontEndEvents([
+        //     'keyword'           => $request->filled('keyword') ? $request->keyword : false,
+        //     'exclude_concluded' => true,
+        //     'has_attended'      => false
+        // ])
+        // ->paginate(15);
+
+        $events = (new EventServices())->getFrontEndEventsPerDay([
             'keyword'           => $request->filled('keyword') ? $request->keyword : false,
             'exclude_concluded' => true,
             'has_attended'      => false
-        ])
-        ->paginate(15);
+        ])->paginate(15);
 
         return view('front.events.index', compact('events'));
     }

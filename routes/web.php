@@ -24,10 +24,8 @@ Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
-Route::get('/', [FrontController::class, 'index']);
+Route::get('/', [FrontController::class, 'index'])->name('front.index');
 Route::get('/home', [FrontController::class, 'index']);
-Route::get('/about', [FrontController::class, 'about'])->name('about');
-Route::get('/news', [FrontController::class, 'news'])->name('news');
 
 
 Route::post('/events/{event}/book', [Event::class, 'book'])->name('event.book');

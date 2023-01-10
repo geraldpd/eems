@@ -136,3 +136,10 @@ if (! function_exists('eventScheduleStatus')) {
         return $status;
     }
 }
+
+if (! function_exists('eventScheduleDateFormatter')) {
+    function eventScheduleDateFormatter($schedule)
+    {
+        return Carbon::parse($schedule)->format('d M Y H:m');
+    }
+}

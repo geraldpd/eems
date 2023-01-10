@@ -18,6 +18,12 @@
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <link rel="icon" href="{{ asset('assets/EDUVENT.png') }}">
         @stack('styles')
+
+        <style>
+            .bg-primary {
+                background-color:#ff6600 !important
+            }
+        </style>
     </head>
 
     <body>

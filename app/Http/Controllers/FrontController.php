@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
-
+use App\Services\EventServices;
 class FrontController extends Controller
 {
     /**
@@ -25,7 +25,21 @@ class FrontController extends Controller
      */
     public function index()
     {
-        return view('front.welcome');
+        // $events = (new EventServices())->getFrontEndEventsPerDay([
+        //     'keyword'           => false,
+        //     'exclude_concluded' => true,
+        //     'has_attended'      => false
+        // ])->get()->all();
+
+        $events = (new EventServices())
+        ->getFrontEndEvents([
+            'keyword'           => false,
+            'exclude_concluded' => true,
+            'has_attended'      => false
+        ])
+        ->paginate(15);
+
+        return view('front.welcome', compact('events'));
     }
 
     public function home()

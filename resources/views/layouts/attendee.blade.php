@@ -14,9 +14,16 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="icon" href="{{ asset('assets/EDUVENT.png') }}">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     @stack('styles')
+
+    <style>
+        .bg-primary {
+            background-color:#ff6600 !important
+        }
+    </style>
+
 </head>
 
 <body>
@@ -36,6 +43,22 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('attendee.events.index') }}"> My Events </a>
                         </li>
+
+                        @auth
+                        <a class="nav-link" href="{{ route('attendee.invitations.index') }}">
+                            Invitations
+
+                            @php
+                                $invitations_count = 0;//$my_invitations;
+                            @endphp
+                            @if ($invitations_count)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ $invitations_count }}
+                                </span>
+                            @endif
+
+                        </a>
+                        @endauth
                     </ul>
 
                     <!-- Right Side Of Navbar -->
