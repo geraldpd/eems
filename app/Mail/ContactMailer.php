@@ -28,7 +28,7 @@ class ContactMailer extends Mailable
      */
     public function build()
     {
-        return $this->from('example@example.com', 'Example')
-        ->view('view.name');
+        return $this->from(env('MAIL_FROM_ADDRESS'), 'info')
+        ->view('emails.contact');
     }
 }

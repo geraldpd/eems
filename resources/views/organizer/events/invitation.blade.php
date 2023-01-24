@@ -77,13 +77,15 @@
             </div>
 
             <div class="col-md-{{ $event->end->schedule_end->isPast() ? '12' : '6'}} col-sm-12">
-                <table id="table" class="table table-bordered">
+                <table id="table" class="table table-condensed table-sm table-bordered">
                     <thead class="none">
+                        <small>
                         <th style="display:none">created_at</th> <!-- just for ordering -->
                         <th class="text-center">Response</th>
                         <th>Email</th>
                         <th>Name</th>
                         <th>Organization</th>
+                        </small>
                     </thead>
                     <tbody>
                         @forelse ($participants as $participant)
