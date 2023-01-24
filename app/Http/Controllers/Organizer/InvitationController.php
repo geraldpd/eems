@@ -64,7 +64,7 @@ class InvitationController extends Controller
 
         Invitation::insert($recipients);
 
-        //SendEventInvitation::dispatch($event, Auth::user()->email, collect($recipients)->pluck('email'));
+        SendEventInvitation::dispatch($event, Auth::user()->email, collect($recipients)->pluck('email'));
 
         return  redirect()->back()->with('message', 'Invitations are on their way!');
     }
