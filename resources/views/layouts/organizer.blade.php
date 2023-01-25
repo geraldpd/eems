@@ -41,6 +41,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('organizer.evaluations.index') }}">Evaluation Management</span></a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('organizer.mails.index') }}">Emails</span></a>
+                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

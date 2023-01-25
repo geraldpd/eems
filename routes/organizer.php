@@ -6,6 +6,7 @@ use App\Http\Controllers\Organizer\EventEvaluationController as EventEvaluation;
 use App\Http\Controllers\Organizer\InvitationController as Invitation;
 use App\Http\Controllers\Organizer\EventController as Event;
 use App\Http\Controllers\Organizer\EvaluationController as Evaluation;
+use App\Http\Controllers\Organizer\MailController as Mail;
 
 Route::group([
     'middleware' => ['organizer'],
@@ -43,6 +44,10 @@ Route::group([
         Route::get('events/{event}/evaluations/download', [EventEvaluation::class, 'download'])->name('events.evaluations.download');
         Route::post('events/{event}/evaluations/close-open', [EventEvaluation::class, 'close_open'])->name('events.evalautions.close-open');
         Route::resource('events/{event}/evaluations', EventEvaluationController::class, ['as' => 'events']);
+
+        Route::resource('mails', MailController::class)->only(['index']);
+        Route::post('mails/send', [Mail::class, 'send'])->name('mails.send');
+
 
     });
 });
