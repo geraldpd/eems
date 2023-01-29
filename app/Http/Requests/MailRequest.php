@@ -26,9 +26,9 @@ class MailRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email'],
-            // 'cc' => ['nullable', 'array'],
-            // 'cc.*' => ['email'],
-            // 'bcc' => ['nullable', 'array'],
+            'cc' => ['nullable'],
+            //'cc.*' => ['email'],
+             'bcc' => ['nullable'],
             // 'bcc.*' => ['email'],
             'message' => ['required'],
         ];

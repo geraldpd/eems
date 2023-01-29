@@ -9,6 +9,7 @@ use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class MailController extends Controller
 {
@@ -26,7 +27,6 @@ class MailController extends Controller
 
     public function send(MailRequest $request)
     {
-        dd($request->all());
-        Mail::to($recipient)->send(new ContactMailer());
+        Mail::to($request->email)->send(new ContactMailer($request->validated()));
     }
 }

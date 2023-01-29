@@ -11,25 +11,26 @@
 
     <h1>Emails</h1>
     <hr>
-    <form method="POST" action="{{ route('organizer.mails.send') }}" enctype="multipart/form-data">
+    <form method="POST" id="sendMail" action="{{ route('organizer.mails.send') }}">
       @csrf
 
       <div class="row">
         <div class="form-group col-md-12 col-lg-12 col-sm-12">
-            <label for="to" class="mx-auto d-block">
+            <label for="email" class="mx-auto d-block">
               To
             </label>
-            <input type="email" id="email" class="form-control" value="" required>
-            {!! hasError($errors, 'name') !!}
+            <input type="email" id="email" name="email" class="form-control" value="" required>
+            {!! hasError($errors, 'email') !!}
         </div>
       </div>
 
       <div class="row">
         <div class="form-group col-md-6 col-lg-6 col-sm-12">
-            <label for="cc" class="mx-auto d-block">
-              CC
-            </label>
-            <input type="text" id="cc" class="form-control" value="">
+          <label for="cc" class="mx-auto d-block">
+            CC
+          </label>
+            <div id="cc-tag" class="tagify--outside"></div>
+            <input type="hidden" name="cc" id="cc">
             {!! hasError($errors, 'cc') !!}
         </div>
 
@@ -37,7 +38,8 @@
             <label for="bcc" class="mx-auto d-block">
               BCC
             </label>
-            <input type="text" id="bcc" class="form-control" value="">
+            <div id="bcc-tag" class="tagify--outside"></div>
+            <input type="hidden" name="bcc" id="bcc">
             {!! hasError($errors, 'bcc') !!}
         </div>
       </div>
@@ -62,8 +64,9 @@
 @endsection
 
 @push('styles')
-
 @endpush
 
 @push('scripts')
+<script src="{{ asset('scripts/organizer/emails/index.js') }}" defer></script>
+
 @endpush
