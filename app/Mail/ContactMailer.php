@@ -23,9 +23,10 @@ class ContactMailer extends Mailable
      */
     public function __construct($data)
     {
-        $this->email = $data['email'];
-        $this->cc = $data['cc'];
-        $this->bcc = $data['bcc'];
+        $this->subject = $data['subject'];
+        $this->to = $data['email'];
+        $this->cc = $data['cc'] ?? [];
+        $this->bcc = $data['bcc'] ?? [];
         $this->message = $data['message'];
     }
 
@@ -36,7 +37,9 @@ class ContactMailer extends Mailable
      */
     public function build()
     {
-        return $this->from(env('MAIL_FROM_ADDRESS'), 'info')
-        ->view('emails.contact');
+        dd($this->subject);
+        return $this->from(request()->user()->email, request()->user()->fullname)
+        ->subject($this->subject)
+        ->markdown('emails.contact');
     }
 }

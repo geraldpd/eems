@@ -11,6 +11,7 @@
 
     <h1>Emails</h1>
     <hr>
+
     <form method="POST" id="sendMail" action="{{ route('organizer.mails.send') }}">
       @csrf
 
@@ -19,8 +20,18 @@
             <label for="email" class="mx-auto d-block">
               To
             </label>
-            <input type="email" id="email" name="email" class="form-control" value="" required>
+            <input type="email" id="email" name="email" class="form-control" value="{{ old('email') }}" required>
             {!! hasError($errors, 'email') !!}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-md-12 col-lg-12 col-sm-12">
+            <label for="email" class="mx-auto d-block">
+              Subject
+            </label>
+            <input type="text" id="subject" name="subject" class="form-control" value="{{ old('subject') }}" required>
+            {!! hasError($errors, 'subject') !!}
         </div>
       </div>
 
@@ -49,7 +60,7 @@
             <label for="message" class="mx-auto d-block">
               Message
             </label>
-            <textarea class="form-control" name="message" id="" cols="30" rows="10"></textarea>
+            <textarea class="form-control" name="message" id="" cols="30" rows="10">{{ old('message') }}</textarea>
             {!! hasError($errors, 'message') !!}
         </div>
       </div>

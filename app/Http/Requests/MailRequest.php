@@ -25,10 +25,11 @@ class MailRequest extends FormRequest
     public function rules()
     {
         return [
+            'subject' => ['required', 'string'],
             'email' => ['required', 'email'],
             'cc' => ['nullable'],
+            'bcc' => ['nullable'],
             //'cc.*' => ['email'],
-             'bcc' => ['nullable'],
             // 'bcc.*' => ['email'],
             'message' => ['required'],
         ];
