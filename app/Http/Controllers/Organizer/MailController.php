@@ -28,5 +28,7 @@ class MailController extends Controller
     public function send(MailRequest $request)
     {
         Mail::to($request->email)->send(new ContactMailer($request->validated()));
+
+        return  redirect()->back()->with('message', 'Email sent!');
     }
 }

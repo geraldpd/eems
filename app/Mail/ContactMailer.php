@@ -12,8 +12,8 @@ class ContactMailer extends Mailable
     use Queueable, SerializesModels;
 
     public $email;
-    public $cc;
-    public $bcc;
+    public $myCc;
+    public $myBcc;
     public $message;
 
     /**
@@ -24,9 +24,8 @@ class ContactMailer extends Mailable
     public function __construct($data)
     {
         $this->subject = $data['subject'];
-        $this->to = $data['email'];
-        $this->cc = $data['cc'] ?? [];
-        $this->bcc = $data['bcc'] ?? [];
+        $this->myCc = $data['cc'] ?? [];
+        $this->myBcc = $data['bcc'] ?? [];
         $this->message = $data['message'];
     }
 
@@ -37,7 +36,7 @@ class ContactMailer extends Mailable
      */
     public function build()
     {
-        dd($this->subject);
+
         return $this->from(request()->user()->email, request()->user()->fullname)
         ->subject($this->subject)
         ->markdown('emails.contact');

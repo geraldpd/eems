@@ -63,4 +63,15 @@ $(function() {
         $('#bcc').val(bccTagInstance.value.map(tag => tag.email).join(','));
     })
 
+    window.ClassicEditor
+    .create($('#message').get(0), {
+        removePlugins: ['CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'Image', 'ImageCaption', 'ImageStyle', 'ImageToolbar', 'ImageUpload', 'MediaEmbed'],
+    })
+    .then( editor => {
+        //console.log( editor );
+    } )
+    .catch( error => {
+        //console.error( error );
+    } );
+
 })

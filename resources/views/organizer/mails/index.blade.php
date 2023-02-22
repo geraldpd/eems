@@ -60,10 +60,12 @@
             <label for="message" class="mx-auto d-block">
               Message
             </label>
-            <textarea class="form-control" name="message" id="" cols="30" rows="10">{{ old('message') }}</textarea>
+            <textarea class="form-control" name="message" id="message" cols="30" rows="10">{{ old('message') }}</textarea>
             {!! hasError($errors, 'message') !!}
         </div>
       </div>
+
+      <div class="editor"></div>
 
       <div class="float-right">
         <button type="submit" class="float-righ btn btn-primary">Send</button>
@@ -75,9 +77,13 @@
 @endsection
 
 @push('styles')
+<style>
+  .ck-editor__editable_inline {
+    min-height: 400px;
+  }
+</style>
 @endpush
 
 @push('scripts')
 <script src="{{ asset('scripts/organizer/emails/index.js') }}" defer></script>
-
 @endpush
