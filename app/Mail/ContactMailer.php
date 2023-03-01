@@ -15,6 +15,7 @@ class ContactMailer extends Mailable
     public $myCc;
     public $myBcc;
     public $message;
+    public $uploads;
 
     /**
      * Create a new message instance.
@@ -27,6 +28,7 @@ class ContactMailer extends Mailable
         $this->myCc = $data['cc'] ?? [];
         $this->myBcc = $data['bcc'] ?? [];
         $this->message = $data['message'];
+        $this->uploads = $data['uploads'];
     }
 
     /**
@@ -36,9 +38,19 @@ class ContactMailer extends Mailable
      */
     public function build()
     {
+        //$from = 'info.eduvent.ph@gmail.com';
+        $from = request()->user()->email;
 
-        return $this->from(request()->user()->email, request()->user()->fullname)
+        $mailable = $this->from($from, request()->user()->fullname)
         ->subject($this->subject)
         ->markdown('emails.contact');
+
+        if($this->uploads) {
+            foreach($this->uploads as $path) {
+                $mailable->attach($path);
+            }
+        }
+
+        return $mailable;
     }
 }

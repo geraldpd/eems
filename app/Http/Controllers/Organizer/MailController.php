@@ -9,6 +9,7 @@ use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 
 class MailController extends Controller
@@ -27,7 +28,29 @@ class MailController extends Controller
 
     public function send(MailRequest $request)
     {
-        Mail::to($request->email)->send(new ContactMailer($request->validated()));
+        $data = $request->validated();
+        $path = public_path('email_uploads/'. $request->user()->id);
+        $filepaths = [];
+
+
+        if($request->hasFile('attachments')) {
+
+            foreach($request->attachments as $attachment) {
+                $name = time().'.'.$attachment->getClientOriginalExtension();;
+
+                if(!File::exists($path)) {
+                    File::makeDirectory($path, 0777, true, true);
+                }
+
+                $attachment->move($path, $name);
+
+                $filepaths[] = $path.'/'.$name;
+            }
+
+            $data['uploads'] = $filepaths;
+        }
+
+        Mail::to($request->email)->send(new ContactMailer($data));
 
         return  redirect()->back()->with('message', 'Email sent!');
     }
