@@ -29,7 +29,7 @@ class MailController extends Controller
     public function send(MailRequest $request)
     {
         $data = $request->validated();
-        $path = public_path('email_uploads/'. $request->user()->id);
+        $path = public_path('email_uploads');
         $filepaths = [];
 
 
