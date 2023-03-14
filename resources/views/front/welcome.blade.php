@@ -14,11 +14,11 @@
 				<div class="block">
 					<!-- Coundown Timer -->
 					<div class="timer"></div>
-					<h1>Business</h1>
-					<h2>Conference 2017</h2>
-					<h6>02-05 July 2017 California</h6>
+					<h1>Eduvent</h1>
+					{{-- <h2>Educational Event</h2>
+					<h6>02-05 July 2017 California</h6> --}}
 					<!-- Action Button -->
-					<a href="contact.html" class="btn btn-white-md">get ticket now</a>
+					{{-- <a href="contact.html" class="btn btn-white-md">get ticket now</a> --}}
 				</div>
 			</div>
 		</div>
@@ -64,6 +64,7 @@
 	</div>
 </section>
 
+{{--
 <!--====  End of About  ====-->
 
 <!--==============================================
@@ -115,5 +116,5 @@
 	</div>
 </section>
 <!--====  End of Google Map  ====-->
-
+ --}}
 @endsection

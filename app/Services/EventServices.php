@@ -39,7 +39,7 @@ class EventServices
                     ->whereIn('events.id', Auth::user()->attendedEvents->pluck('id')->toArray());
                 }
             })
-            ->orderBy(
+            ->orderByDesc(
                 EventSchedule::select('schedule_start')
                 ->whereColumn('event_id', 'events.id')
                 ->orderBy('schedule_start')

@@ -30,13 +30,13 @@
                     @switch(true)
                         @case(!$event->invitations->count() && $event->dynamic_status != 'CONCLUDED')
                             {{-- when there is no one invited yet and has not yet started --}}
-                            <span class="badge badge-primary" title="Invite attendees to your event" >
+                            <span class="badge" title="Invite attendees to your event" >
                                 <i class="fas fa-user-plus"></i>
                             </span>
                             @break
                         @case($event->notif_confirmed_attendee_count && $event->dynamic_status != 'CONCLUDED')
                             {{-- when there is no one invited yet and has not yet started --}}
-                            <span class="badge badge-primary" title="{{ $event->notif_confirmed_attendee_count }} new confirmed attendees">
+                            <span class="badge" title="{{ $event->notif_confirmed_attendee_count }} new confirmed attendees">
                                {{ $event->notif_confirmed_attendee_count }}
                             </span>
                             @break
@@ -48,7 +48,7 @@
                     Evaluations
                     @if (!$event->evaluation_id && !$event->start->schedule_start->isPast())
                     {{-- when there is no set evaluation sheet, and has not yet started--}}
-                        <span class="badge badge-primary">
+                        <span class="badge badge-light">
                             <i title="Provide and evaluation sheet to this event" class="fas fa-clipboard-list"></i>
                         </span>
                     @endif

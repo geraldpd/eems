@@ -9,7 +9,7 @@
 			<div class="col-12">
 				<div class="section-title">
 					<h3>Register as <span class="alternate">{{ request()->as ? ucfirst(request()->as) : 'Attendee' }}</span></h3>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores, velit.</p>
+					{{-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores, velit.</p> --}}
 				</div>
 			</div>
 		</div>

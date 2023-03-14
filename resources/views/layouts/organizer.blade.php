@@ -18,13 +18,39 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('scripts/plugins/DataTables/datatables.min.css') }}"/>
     <link rel="icon" href="{{ asset('assets/EDUVENT.png') }}">
     @stack('styles')
+
+    <style>
+        .nav-orange {
+            background-color: #ff6600 !important;
+            color: white !important;
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .nav-brand {
+            color: white !important;
+        }
+
+        .btn-primary {
+            background-color: #ff6600 !important;
+        }
+        .btn-link:not(.text-secondary) {
+            color: #ff6600 !important;
+        }
+        i {
+            color: #ff6600 !important;
+        }
+        .breadcrumb-item > a{
+            color: #ff6600 !important;
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
+        <nav class="navbar navbar-expand-md shadow-sm nav-orange">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/organizer') }}">
+                <a class="navbar-brand" href="{{ url('/organizer') }}" style="color:white">
                     {{ config('app.name', 'Laravel') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">

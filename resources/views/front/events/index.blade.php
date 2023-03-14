@@ -14,7 +14,7 @@
                 <div class="col-12">
                     <div class="section-title">
                         <h3>Event <span class="alternate">Schedule</span></h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
+                        {{-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p> --}}
 
                     </div>
                 </div>
@@ -68,8 +68,8 @@
                                 <ul class="m-0 p-0">
                                     <li class="headings">
                                         <div class="time">Schedule</div>
-                                        <div class="speaker">Speaker</div>
-                                        <div class="subject">Event</div>
+                                        <div class="speaker">Organizer</div>
+                                        <div class="subject">Title</div>
                                         <div class="venue">Venue</div>
                                     </li>
 

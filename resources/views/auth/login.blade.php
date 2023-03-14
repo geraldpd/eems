@@ -7,8 +7,8 @@
 		<div class="row justify-content-center">
 			<div class="col-6">
 				<div class="section-title">
-					<h3>Sign<span class="alternate">Up</span></h3>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores, velit.</p>
+					<h3>Log<span class="alternate">in</span></h3>
+					{{-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores, velit.</p> --}}
 				</div>
 			</div>
 		</div>

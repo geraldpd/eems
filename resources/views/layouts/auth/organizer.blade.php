@@ -19,10 +19,29 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="icon" href="{{ asset('assets/EDUVENT.png') }}">
+
+    <style>
+        .nav-brand {
+            color: white !important;
+        }
+
+        .btn-primary {
+            background-color: #ff6600 !important;
+        }
+        .btn-link:not(.text-secondary) {
+            color: #ff6600 !important;
+        }
+        i {
+            color: #ff6600 !important;
+        }
+        .breadcrumb-item > a{
+            color: #ff6600 !important;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
+        <nav class="navbar navbar-expand-md shadow-sm nav-orange">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
