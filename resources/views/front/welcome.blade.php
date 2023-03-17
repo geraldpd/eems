@@ -41,23 +41,23 @@
 			</div>
 			<div class="col-lg-8 col-md-6 align-self-center">
 				<div class="content-block">
-					<h2>About The <span class="alternate">Eventre</span></h2>
+					<h2>About The <span class="alternate">Eduvent</span></h2>
 					<div class="description-one">
 						<p>
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusm tempor incididunt ut labore dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco.
+							Eduvent is an event management platform for organizing and promoting events conducted by organizations and Higher Educational Institutions.
 						</p>
 					</div>
 					<div class="description-two">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmtempor incididunt ut labore et dolore magna aliq enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.</p>
+						<p>It provides students and professionals access to in-house and virtual events and an avenue for professional development.</p>
 					</div>
-					<ul class="list-inline">
+					{{-- <ul class="list-inline">
 						<li class="list-inline-item">
 							<a href="#" class="btn btn-main-md">Buy ticket</a>
 						</li>
 						<li class="list-inline-item">
 							<a href="#" class="btn btn-transparent-md">Read more</a>
 						</li>
-					</ul>
+					</ul> --}}
 				</div>
 			</div>
 		</div>

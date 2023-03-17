@@ -4,6 +4,7 @@ namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UpdateRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'unique:categories,'.$this->category->id],
+            'name' => ['required', Rule::unique('categories')->ignore($this->category->id)],
             'is_active' => ['boolean'],
         ];
     }
