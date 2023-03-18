@@ -55,7 +55,7 @@
 
                     @if(in_array($filter, $filterable))
                         <div class="btn-group" role="group">
-                            <a href="{{ route('organizer.invitations.download', [$event->code, $filter]) }}" class="btn btn-secondary">Download</a>
+                            <a href="{{ route('organizer.invitations.download', [$event->code, $filter ? $filter : 'all' ]) }}" class="btn btn-secondary">Download</a>
                             @if (count($participants))
                                 <a href="{{ route('organizer.invitations.print', [$event->code, $filter]) }}" target="_blank" class="btn btn-primary">Print</a>
                             @endif
@@ -116,7 +116,7 @@
                         <div class="input-group mb-3">
                             <input type="text" name="invitees" id="invitees" class="form-control form-control-lg tagify--outside" placeholder="email" aria-label="email" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-secondary send-invitation" disabled type="submit"> <i class="fas fa-paper-plane"></i> send </button>
+                                <button class="btn btn-secondary send-invitation" disabled type="submit"> <i style="color:white !important" class="fas fa-paper-plane"></i> send </button>
                             </div>
                         </div>
 
