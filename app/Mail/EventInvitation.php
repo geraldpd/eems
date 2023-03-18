@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Jobs\SendEventInvitation;
 use App\Models\Event;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -21,6 +22,8 @@ class EventInvitation extends Mailable
     public $event;
 
     public $sender;
+
+    public $senderName;
 
     public $recipient;
 
@@ -40,6 +43,8 @@ class EventInvitation extends Mailable
 
         //$this->sender = $sender;
         $this->sender = env('MAIL_USERNAME', 'info.eduvent.ph@gmail.com');
+        $this->senderName = User::whereEmail($sender)->first()->full_name;
+
         $this->recipient = $recipient; // email of the recipient
 
         $this->invitation_link = eventHelperSetInvitationLink($event, $recipient);
