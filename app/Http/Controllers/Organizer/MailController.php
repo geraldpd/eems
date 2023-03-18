@@ -31,7 +31,7 @@ class MailController extends Controller
         $data = $request->validated();
         $path = public_path('email_uploads');
         $filepaths = [];
-
+        $data['uploads'] = [];
 
         if($request->hasFile('attachments')) {
 

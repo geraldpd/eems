@@ -38,7 +38,8 @@ class EventInvitation extends Mailable
             'category'
         ]);
 
-        $this->sender = $sender;
+        //$this->sender = $sender;
+        $this->sender = env('MAIL_USERNAME', 'info.eduvent.ph@gmail.com');
         $this->recipient = $recipient; // email of the recipient
 
         $this->invitation_link = eventHelperSetInvitationLink($event, $recipient);
