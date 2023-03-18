@@ -53,7 +53,7 @@ class EventInvitation extends Mailable
     public function build()
     {
         return $this
-            ->from($this->sender)
+            ->from($this->sender, env('APP_NAME', 'Eduvent'))
             ->markdown('emails.events.invitation');
     }
 }
