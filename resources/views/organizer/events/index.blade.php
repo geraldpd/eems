@@ -40,7 +40,9 @@
             <div class="modal-footer modal-footer--sticky">
                 <button type="button" class="btn btn-link pull-left toggle-concluded-events" >Toggle concluded events</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <a href="#" class="btn btn-primary add-event-button">Add Event</a>
+                @if(canCreateEvent())
+                    <a href="#" class="btn btn-primary add-event-button">Add Event</a>
+                @endif
             </div>
         </div>
     </div>

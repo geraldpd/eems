@@ -43,7 +43,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <a href="#" class="btn btn-primary add-event-button">Add Event</a>
+                    {{-- <a href="#" class="btn btn-primary add-event-button">Add Event</a> --}}
                 </div>
             </div>
         </div>
