@@ -72,7 +72,7 @@
                                     $has_not_evaluated = $event->evaluations->where('attendee_id', Auth::user()->id)->count() == 0;
                                 @endphp
 
-                                @if($has_not_evaluated && $has_evaluation)
+                                @if($has_concluded && $has_not_evaluated && $has_evaluation)
                                     <div class="float-right">
                                         <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evaluate</a>
                                     </div>
