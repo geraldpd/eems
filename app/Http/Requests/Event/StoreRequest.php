@@ -31,10 +31,12 @@ class StoreRequest extends FormRequest
             'location' => ['required'],
             'venue' => ['required_if:location,venue'],
             'online' => ['required_if:location,online'],
-            'documents' => ['nulllable'],
+            'documents' => ['nullable'],
+            'banner' => ['nullable'],
             //'schedule_start' => ['required'], //?range and single day
             //'schedule_end' => ['required'], //?range and single day
             'schedules' => ['required'],
+            'max_participants' => ['required', 'integer', 'min:1', 'max:999999'],
             //'date' => ['required'], //! Not in the fillable and table, but is added in the form
         ];
     }

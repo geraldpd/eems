@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class EventAttendee extends Pivot
+class EventRating extends Model
 {
-    protected $table = 'event_attendees';
-
     use HasFactory;
+
+    protected $fillable = [
+        'attendee_id',
+        'event_id',
+        'rating',
+    ];
 
     public function event()
     {
@@ -19,6 +22,6 @@ class EventAttendee extends Pivot
 
     public function attendee()
     {
-        return $this->belongsTo(User::class, 'attendee_id');
+        return $this->belongsTo(User::class);
     }
 }

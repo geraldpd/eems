@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Organization;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +16,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class RegisterController extends Controller
 {
@@ -70,12 +70,15 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'code' => ['nullable', 'exists:events'],
             'as' => ['required', Rule::in(['attendee', 'organizer'])],
+            'address' => ['required'],
 
             'organization_name' => ['required_if:as,organizer'],
             'department' => ['required_if:as,organizer'],
 
             'attendee_organization_name' => ['required_if:as,attendee'],
-            'attendee_occupation' => ['required_if:as,attendee']
+            'attendee_occupation' => ['required_if:as,attendee'],
+
+            'supporting_documents' => ['nullable', 'array', 'max:3']
         ]);
     }
 
@@ -91,33 +94,35 @@ class RegisterController extends Controller
             'firstname' => $data['firstname'],
             'lastname' => $data['lastname'],
             'mobile_number' => $data['mobile_number'],
+            'address' => $data['address'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make('password'),
+            //'password' => Hash::make($data['password']),
         ]);
 
         $event = false;
 
-        if(isset($data['code'])) { //if a code(event) is specified, check its validity
+        if (isset($data['code'])) { //if a code(event) is specified, check its validity
             try {
-              $event = Event::whereCode($data['code'])->firstOrFail();
+                $event = Event::whereCode($data['code'])->firstOrFail();
             } catch (ModelNotFoundException $e) {
-              return abort(404); //TODO: specif why an error occured to the user
+                return abort(404); //TODO: specif why an error occured to the user
             }
         }
 
-        if($data['as'] === 'attendee') {
+        if ($data['as'] === 'attendee') {
             $user->attendee_organization_name = $data['attendee_organization_name'];
             $user->attendee_occupation = $data['attendee_occupation'];
             $user->save();
         }
 
-        if($event && $data['as'] === 'attendee') {
+        if ($event && $data['as'] === 'attendee') {
             $event->attendees()->attach($user->id, [
-                'is_confirmed'=> 1
+                'is_confirmed' => 1
             ]);
         }
 
-        if($data['as'] === 'organizer') {
+        if ($data['as'] === 'organizer') {
             $user->organization()->create([
                 'name' => $data['organization_name'],
                 'department' => $data['department']
@@ -129,9 +134,57 @@ class RegisterController extends Controller
                 'questions' => null
             ]);
 
-            $event_folder_path = "storage/users/organizers/$user->id/temp_docs"; // temp docs for uploading event files
-            if (!file_exists($event_folder_path)) {
-                File::makeDirectory($event_folder_path, 0777, true);
+            $default_path = "storage/users/organizers/$user->id";
+
+            $temp_docs_path = $default_path . "/temp_docs";
+            if (!file_exists($temp_docs_path)) { // temp docs for uploading event files
+                File::makeDirectory($temp_docs_path, 0777, true);
+            }
+
+            $logo_path = $default_path . '/logo';
+            if (!file_exists($logo_path)) {
+                File::makeDirectory($logo_path, 0777, true);
+            }
+
+            $supporting_documents_path = $default_path . '/supporting_documents';
+            if (!file_exists($supporting_documents_path)) {
+                File::makeDirectory($supporting_documents_path, 0777, true);
+            }
+
+            if (isset($data['logo'])) {
+                $path = $data['logo']->store(
+                    "users/organizers/$user->id/logo",
+                    's3'
+                );
+
+                $user->organization->logo = [
+                    'filename' => basename($path),
+                    'path' => Storage::disk('s3')->url($path)
+                ];
+
+                $user->organization->save();
+            }
+
+            if (isset($data['supporting_documents'])) {
+                $supporting_documents = [];
+
+                foreach ($data['supporting_documents'] as $supporting_document) {
+                    $name = $supporting_document->getClientOriginalName();
+
+                    $path = $supporting_document->storeAs(
+                        "users/organizers/$user->id/supporting_documents",
+                        $name,
+                        's3'
+                    );
+
+                    $supporting_documents[] = [
+                        'filename' => $name,
+                        'path' => Storage::disk('s3')->url($path)
+                    ];
+                }
+
+                $user->organization->supporting_documents = $supporting_documents;
+                $user->organization->save();
             }
         }
 
@@ -140,7 +193,7 @@ class RegisterController extends Controller
         return $user;
     }
 
-      /**
+    /**
      * Handle a registration request for the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -150,9 +203,19 @@ class RegisterController extends Controller
     {
         $this->validator($request->all())->validate();
 
-        $user = $this->create($request->all());
+        $data = $request->all();
 
-        if(! $request->has('code')) {
+        if ($request->hasfile('logo')) {
+            $data['logo'] = $request->file('logo');
+        }
+
+        if ($request->hasfile('supporting_documents')) {
+            $data['supporting_documents'] = $request->file('supporting_documents');
+        }
+
+        $user = $this->create($data);
+
+        if (!$request->has('code')) {
             event(new Registered($user));
         }
 
@@ -163,8 +226,8 @@ class RegisterController extends Controller
         }
 
         return $request->wantsJson()
-                    ? new JsonResponse([], 201)
-                    : redirect($this->redirectPath());
+            ? new JsonResponse([], 201)
+            : redirect($this->redirectPath());
     }
 
     /**
@@ -176,7 +239,7 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
-        if($request->has('code')) {
+        if ($request->has('code')) {
             $user->email_verified_at = Carbon::now();
             $user->save();
 

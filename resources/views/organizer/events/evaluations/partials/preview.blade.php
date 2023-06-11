@@ -95,7 +95,7 @@
             @csrf
             <button type="submit" class="btn {{ $event->evaluation_is_released ? 'btn-primary' : 'btn-secondary' }} evaluation_is_released">
                 @if($event->evaluation_is_released)
-                <i class="fas fa-lock-open"></i> Open for Evaluation
+                <i class="fas fa-lock-open text-white"></i> Open for Evaluation
                 @else
                 <i class="fas fa-lock"></i> Closed for Evaluation
                 @endif

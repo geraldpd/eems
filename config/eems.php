@@ -2,6 +2,11 @@
 
 return [
 
+    'monthly_max_event' => [
+        0 => 5,     //unapproved organizer
+        1 => 50     //approved organizer
+    ],
+
     'roles' => [
         'admin',
         'organizer',

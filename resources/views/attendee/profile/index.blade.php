@@ -19,7 +19,7 @@
         <div class="col-md-4 col-lg-4 col-sm-12">
             <label for="profile_picture" id="profile_picture_label" class="mx-auto d-block">
                 <img src="{{ asset($attendee->profile_picture_path) }}" alt="profile picture" id="profile_picture_preview" class="img-circle img-responsive">
-                <h3  id="profile_picture_edit"> edit </h3>
+                <h3  id="profile_picture_edit"> update </h3>
                 <input type="file" name="profile_picture" id="profile_picture" accept="image/*">
             </label>
 

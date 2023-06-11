@@ -7,16 +7,20 @@ use App\Http\Controllers\Organizer\InvitationController as Invitation;
 use App\Http\Controllers\Organizer\EventController as Event;
 use App\Http\Controllers\Organizer\EvaluationController as Evaluation;
 use App\Http\Controllers\Organizer\MailController as Mail;
+use App\Http\Controllers\Organizer\OrganizationController as Organization;
 
 Route::group([
     'middleware' => ['organizer'],
-], function(){
+], function () {
 
+    Route::post('profile/supporting_documents', [Organization::class, 'storeDocuments'])->name('profile.supporting_documents.create');
+    Route::get('profile/supporting_documents/{supporting_document}', [Organization::class, 'getDocuments'])->name('profile.supporting_documents.download');
+    Route::delete('profile/supporting_documents/{supporting_document}', [Organization::class, 'deleteDocuments'])->name('profile.supporting_documents.delete');
     Route::resource('profile', ProfileController::class)->only(['index', 'update']);
 
     Route::group([
         'middleware' => ['verified'],
-    ], function(){
+    ], function () {
 
         Route::get('/', HomeController::class);
 
@@ -34,6 +38,7 @@ Route::group([
         Route::resource('events', EventController::class);
 
         //EVENT INVITATIONS
+        Route::post('events/{event}/invitations/book', [Invitation::class, 'book'])->name('invitations.book');
         Route::get('events/{event}/invitations/{filter?}', [Invitation::class, 'index'])->name('invitations.index');
         Route::get('events/{event}/invitations/print/{filter?}', [Invitation::class, 'print'])->name('invitations.print');
         Route::get('events/{event}/invitations/{filter}/download', [Invitation::class, 'download'])->name('invitations.download');
@@ -47,7 +52,5 @@ Route::group([
 
         Route::resource('mails', MailController::class)->only(['index']);
         Route::post('mails/send', [Mail::class, 'send'])->name('mails.send');
-
-
     });
 });

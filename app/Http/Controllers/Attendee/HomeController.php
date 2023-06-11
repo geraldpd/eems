@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Attendee;
 
 use App\Http\Controllers\Controller;
+use App\Services\EventServices;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -14,6 +15,15 @@ class HomeController extends Controller
      */
     public function __invoke()
     {
-        return view('attendee.index');
+        $upcommingEvents = (new EventServices())
+            ->getFrontEndEvents([
+                'keyword'           => request()->filled('keyword') ? request()->keyword : false,
+                'exclude_concluded' => true,
+                'has_attended'      => false,
+                'order'             => 'asc'
+            ])
+            ->paginate(12);
+
+        return view('attendee.index', compact('upcommingEvents'));
     }
 }

@@ -9,7 +9,7 @@
     <li class="breadcrumb-item active" aria-current="page">Edit</li>
   </ol>
 
-  <form method="POST" action="{{ route('organizer.events.update', [$event->code]) }}">
+  <form method="POST" action="{{ route('organizer.events.update', [$event->code]) }}" enctype="multipart/form-data">
     @method('PUT')
     @csrf
 
@@ -18,9 +18,9 @@
       <input type="text" name="name" value="{{ $event->name }}" class="form-control" placeholder="Give this event a name!" autofocus required>
 
       @if ($errors->has('name'))
-      <small class="help-block text-danger">
-        <strong>{{ $errors->first('name') }}</strong>
-      </small>
+        <small class="help-block text-danger">
+          <strong>{{ $errors->first('name') }}</strong>
+        </small>
       @endif
     </div>
 
@@ -154,20 +154,33 @@
       @endif
     </div>
 
-    <div class="form-group">
-      <label for="location">Location</label>
-      <select name="location" id="location" class="form-control">
-        <option value=""> Select Location </option>
-        <option {{ $event->location == 'venue' ? 'selected' : '' }} value="venue"> Venue </option>
-        <option {{ $event->location == 'online' ? 'selected' : '' }} value="online"> Online </option>
-      </select>
+    <div class="row">
+      <div class="col-md-10 form-group">
+        <label for="location">Location</label>
+        <select name="location" id="location" class="form-control">
+          <option value=""> Select Location </option>
+          <option {{ $event->location == 'venue' ? 'selected' : '' }} value="venue"> Venue </option>
+          <option {{ $event->location == 'online' ? 'selected' : '' }} value="online"> Online </option>
+        </select>
 
-      @if ($errors->has('location'))
-      <small class="help-block text-danger">
-        <strong>{{ $errors->first('location') }}</strong>
-      </small>
-      @endif
-    </div>
+        @if ($errors->has('location'))
+        <small class="help-block text-danger">
+          <strong>{{ $errors->first('location') }}</strong>
+        </small>
+        @endif
+      </div>
+
+      <div class="col-md-2 form-group">
+          <label for="location">Maximum Particpants</label>
+          <input type="number" name="max_participants" id="max_participants" class="form-control" value="{{ $event->max_participants }}" min="1" max="999999">
+
+          @if ($errors->has('max_participants'))
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('max_participants') }}</strong>
+            </small>
+          @endif
+        </div>
+      </div>
 
     <div class="form-group location-additional-field">
 
@@ -212,19 +225,28 @@
           <tbody>
             @foreach ($event->documents as $name => $path)
             <tr>
-              <td><a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank"> {{ $name }} </a></td>
+              <td><a href="{{ route('helpers.download-file', ['document' => $path]) }}" target="_blank"> {{ $name }} </a></td>
               <td class="text-center"> <button type="button" data-name="{{ $name }}" data-_method="DELETE" data-code="{{ $event->code }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
             </tr>
             @endforeach
             @foreach ($event->temporary_documents as $name => $path)
             <tr title="This document is not yet attached to this event, press the update button to save it to this events document folder">
-              <td><a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
+              <td><a href="{{ route('helpers.download-file', ['document' => $path]) }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
               <td class="text-center"> <button type="button" data-name="{{ $name }}" data-_method="DELETE" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
             </tr>
             @endforeach
           </tbody>
         </thead>
       </table>
+    </div>
+
+    <div class="form-group alert alert-secondary">
+      <label for="banner" id="banner_label" class="mx-auto d-block">
+        <img src="{{ $event->banner ? asset($event->banner_path) : 'https://placehold.co/770x250?text=Your+Event+Banner+Here' }}" alt="Event Banner" id="banner_preview" class="img-responsive">
+        <h3  id="banner_edit"> Upload Banner </h3>
+        <input type="file" name="banner" id="banner" accept="image/*">
+      </label>
+      <i class="fas fa-info-circle text-secondary" title="for best result, upload images minimum of 770 x 250"></i>
     </div>
 
     <div class="float-right">
@@ -244,6 +266,38 @@
   .schedule_input:invalid {
     color:red;
   }
+
+  #banner {
+    display: none;
+  }
+
+  #banner_preview {
+    /* height: 200px; */
+    width: 100%;
+  }
+
+  #banner_label {
+    position: relative;
+    text-align: center;
+    position: relative;
+  }
+
+  #banner_edit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display:none;
+  }
+
+  #banner_label:hover #banner_preview{
+    opacity: 0.5;
+    cursor: pointer;
+  }
+
+  #banner_label:hover #banner_edit{
+    display:block;
+  }
 </style>
 @endpush
 
@@ -254,7 +308,7 @@
     event: @json($event),
     csrf: '{{ csrf_token() }}',
     tempdocs: {
-      download: "{{ route('helpers.download-event-attachment', ['document' => 'document_path']) }}",
+      download: "{{ route('helpers.download-file', ['document' => 'document_path']) }}",
       store: "{{ route('organizer.tempdocs.store') }}",
       destroy: "{{ route('organizer.tempdocs.destroy') }}"
     },

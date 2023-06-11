@@ -23,7 +23,6 @@
             <div class="col-md-12">
                 <form action="" method="GET">
                     <div class="input-group mb-3">
-                        @csrf
                         <input type="text" class="form-control form-control-lg" name="keyword" placeholder="Search for events" aria-label="Search for events" value="{{ old('keyword') ? old('keyword') : request()->keyword}}">
                         <div class="input-group-append">
                             <button class="input-group-text" type="submit">Search</button>
@@ -60,7 +59,7 @@
                                         <br>
                                         <p>Uploaded Documents:</p>
                                     @endif
-                                    <a title="click to download attached document" href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                                    <a title="click to download attached document" href="{{ route('helpers.download-file', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
                                         <i class="fas fa-download"></i> {{ $name }}
                                     </a>
                                 @empty
@@ -68,12 +67,12 @@
                                 @endforelse
 
                                 @php
-                                    $has_evaluation = $event->has_evaluation;
                                     $has_concluded = $event->dynamic_status == 'CONCLUDED';
+                                    $has_evaluation = $event->has_evaluation;
                                     $has_not_evaluated = $event->evaluations->where('attendee_id', Auth::user()->id)->count() == 0;
                                 @endphp
 
-                                @if($has_evaluation && $has_concluded && $has_not_evaluated)
+                                @if($has_not_evaluated && $has_evaluation)
                                     <div class="float-right">
                                         <a class="btn btn-primary" href="{{ route('attendee.events.evaluation', [$event->code]) }}">Evaluate</a>
                                     </div>

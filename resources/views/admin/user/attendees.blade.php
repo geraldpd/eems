@@ -34,7 +34,7 @@
                     <th scope="col">First</th>
                     <th scope="col">Last</th>
                     <th scope="col">Email</th>
-                    <th scope="col">Verification</th>
+                    <th scope="col">Status</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>
@@ -48,11 +48,16 @@
                         <td>{{ $attendee->email }}</td>
                         <td class="text-center">
                             @php
-                                $verification = $attendee->email_verified_at ? ['badge' => 'success', 'status' => 'verified'] : ['badge' => 'secondary', 'status' => 'unverified'];
+                                $verification = $attendee->email_verified_at ? ['badge' => 'success', 'status' => 'Email Verified'] : ['badge' => 'secondary', 'status' => 'Email Unverified'];
+                                $approval = $attendee->is_approved ? ['badge' => 'primary', 'status' => 'Account Approved'] : ['badge' => 'secondary', 'status' => 'Pending Approval'];
                             @endphp
                             <span class="badge badge-{{ $verification['badge']}}">{{ $verification['status'] }}</span>
+                            <br>
+                            <span class="badge badge-{{ $approval['badge']}}">{{ $approval['status'] }}</span>
                         </td>
-                        <td>actions</td>
+                        <td>
+                            <a class="btn btn-link btn-sm" href="{{ route('admin.users.show', ['user' => $attendee->id]) }}">View Profile</a>
+                        </td>
                     </tr>
                 @empty
 
@@ -61,12 +66,38 @@
 
         </table>
     </div>
+
+    <form action="{{ route("admin.users.approve", ['user_id']) }}" method="POST" id="approve-form">
+        @csrf
+    </form>
 @endsection
 
 @push('scripts')
     <script>
         $(function() {
             $('#table').DataTable();
+
+            $('.approve-user').on('click', function() {
+                let user_id = $(this).data('user_id');
+                let user_type = $(this).data('user_type');
+
+                window.Swal.fire({
+                    title: `Approve ${user_type}?`,
+                    text: 'TAre you sure you want to approve this attendee?',
+                    icon: 'question',
+                    confirmButtonText: 'Approve',
+                    confirmButtonColor: '#007bff',
+                    showCancelButton: true
+                })
+                .then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    let approveForm = $('#approve-form')
+                    let approveActionRoute = approveForm.prop('action').replace('user_id', user_id)
+
+                    approveForm.prop('action', approveActionRoute).trigger('submit')
+                });
+            })
         })
     </script>
 @endpush

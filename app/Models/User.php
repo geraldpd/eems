@@ -26,7 +26,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'mobile_number',
         'password',
         'attendee_organization_name', //! exclusively for attendees
-        'attendee_occupation' //! exclusively for attendees
+        'attendee_occupation', //! exclusively for attendees
+        'address',
     ];
 
     /**
@@ -71,7 +72,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getFullnameAttribute()
     {
-        return Str::title($this->firstname.' '.$this->lastname);
+        return Str::title($this->firstname . ' ' . $this->lastname);
     }
 
     public function getProfilePicturePathAttribute()
@@ -90,8 +91,8 @@ class User extends Authenticatable implements MustVerifyEmail
                 break;
         }
 
-        if($this->profile_picture) {
-            $s3_file_path = $default_path.$this->profile_picture['filename'];
+        if ($this->profile_picture) {
+            $s3_file_path = $default_path . $this->profile_picture['filename'];
             return Storage::disk('s3')->temporaryUrl($s3_file_path, now()->addMinutes(5));
         } else {
             return asset('assets/default-profile_picture.png');
@@ -129,4 +130,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Evaluation::class, 'attendee_id');
     }
+
+    public function eventRating() //for attendees
+    {
+        return $this->hasMany(EventRating::class, 'attendee_id');
+    }
+
+    // public function attendedEvent() //for attendees
+    // {
+    //     return $this->hasMany(EventAttendee::class);
+    // }
 }

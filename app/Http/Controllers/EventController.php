@@ -22,14 +22,6 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
-        // $events = (new EventServices())
-        // ->getFrontEndEvents([
-        //     'keyword'           => $request->filled('keyword') ? $request->keyword : false,
-        //     'exclude_concluded' => true,
-        //     'has_attended'      => false
-        // ])
-        // ->paginate(15);
-
         $events = (new EventServices())->getFrontEndEventsPerDay([
             'keyword'           => $request->filled('keyword') ? $request->keyword : false,
             'exclude_concluded' => true,
@@ -41,24 +33,22 @@ class EventController extends Controller
 
     public function show(Request $request, Event $event)
     {
-        if($request->has('invite')) { //scanned from qrcode
+        if ($request->has('invite')) { //scanned from qrcode
 
-            if(Auth::check()) {//check if someone is logged in
+            if (Auth::check()) { //check if someone is logged in
 
-                if(Auth::user()->roles()->first()->name == 'attendee') { //if logged in user is attendee, run attend()
+                if (Auth::user()->roles()->first()->name == 'attendee') { //if logged in user is attendee, run attend()
                     return $this->attend($event, Auth::user()->email, true);
                 }
-
             } else { //redirect to login
 
                 return redirect()->route('login');
-
             }
         }
 
         $event->evaluated_attendees = $event->evaluations->pluck('attendee_id')->all() ?? []; //ids of attendees that has evalauted this event
 
-        $event->load(['invitations', 'attendees', 'schedules']);
+        $event->load(['invitations', 'attendees', 'schedules', 'ratings']);
 
         //show the event
         return view('front.events.show', compact('event'));
@@ -73,8 +63,8 @@ class EventController extends Controller
             return abort(404); //TODO: in the future updates, put more information why we returned 404a
         }
 
-        if(Auth::check()) {
-            if(Auth::user()->email != $email) { //user tried clicked an invitaion that is not for him/her
+        if (Auth::check()) {
+            if (Auth::user()->email != $email) { //user tried clicked an invitaion that is not for him/her
                 return redirect()->route('events.show', [$event->code]);
             }
         }
@@ -84,8 +74,12 @@ class EventController extends Controller
 
     public function book(Event $event, Request $request)
     {
-        if($event->invitations()->whereIn('email', $request->email)->exists()) {
+        if ($event->invitations()->whereIn('email', $request->email)->exists()) {
             return redirect()->back()->with('message', 'Error! You tried to book an attendee that has already been invited.');
+        }
+
+        if ($event->booked_participants >= $event->max_participants) {
+            return redirect()->back()->with('message', 'Error! This event has reached its maximum participants.');
         }
 
         DB::beginTransaction();
@@ -94,15 +88,15 @@ class EventController extends Controller
 
             //create the data for the invitees
             $invitees = collect($request->email)
-            ->map(function($email) use ($event){
-                return [
-                    'event_id' => $event->id,
-                    'email' => $email,
-                    'updated_at' => Carbon::now(),
-                    'created_at' => Carbon::now(),
-                ];
-            })
-            ->toArray();
+                ->map(function ($email) use ($event) {
+                    return [
+                        'event_id' => $event->id,
+                        'email' => $email,
+                        'updated_at' => Carbon::now(),
+                        'created_at' => Carbon::now(),
+                    ];
+                })
+                ->toArray();
 
             //insert to database
             $event->invitations()->insert($invitees);
@@ -122,32 +116,29 @@ class EventController extends Controller
                 ]);
 
                 //remove the current user from the invitation, so they dont get sent an email since they are auto conmfirmed
-                $invitations = $invitations->filter(fn($email) => $email !== Auth::user()->email);
+                $invitations = $invitations->filter(fn ($email) => $email !== Auth::user()->email);
             }
 
             DB::commit();
 
             //if there is still invitations, send them
-            if(count($invitations)) {
+            if (count($invitations)) {
 
                 SendEventInvitation::dispatch($event, Auth::user()->email, $invitations);
-
             }
 
             return redirect()->back()->with('message', 'You have successfully booked for this event');
-
         } catch (Throwable $th) {
 
             DB::rollBack();
             return redirect()->back()->with('message', $th->getMessage());
         }
-
     }
 
     public function acceptBookingInvitation(Event $event)
     {
         $event->attendees()->attach(Auth::user()->id, [
-            'is_confirmed'=> 1,
+            'is_confirmed' => 1,
         ]);
 
         $event->save();
@@ -166,17 +157,16 @@ class EventController extends Controller
 
             case !$event->invitations()->whereEmail($email)->exists(): //email is not invited in this event
 
-                if($is_qrcode_scanned) {
+                if ($is_qrcode_scanned) {
 
                     $event->invitations()->create(['email' => $email]);
                     $event->attendees()->attach($invitee->id, [
-                        'is_confirmed'=> 1
+                        'is_confirmed' => 1
                     ]);
                     $event->save();
 
                     $message = 'You have been invited to this event.';
-
-                } else {//email is not invited, and not qrcode scanned
+                } else { //email is not invited, and not qrcode scanned
 
                     //TODO: allow public invitation
                     $message = 'You are not invited to this event.';
@@ -184,7 +174,7 @@ class EventController extends Controller
                 break;
 
             default:
-                if(! $invitee) { //invited user is not yet registerd
+                if (!$invitee) { //invited user is not yet registerd
 
                     Auth::logout();
                     request()->session()->invalidate();
@@ -193,16 +183,15 @@ class EventController extends Controller
                     return redirect()->route('register', ['event' => $event->code, 'email' => encrypt($email)]);
                 }
 
-                if($event->attendees()->whereAttendeeId($invitee->id)->exists()) { //user has already accepted the invitation
+                if ($event->attendees()->whereAttendeeId($invitee->id)->exists()) { //user has already accepted the invitation
 
                     $message = 'You will be attending this event';
-
                 } else { //login the user and confirm the attendance
 
                     Auth::login($invitee);
 
                     $event->attendees()->attach($invitee->id, [
-                        'is_confirmed'=> 1
+                        'is_confirmed' => 1
                     ]);
                     $event->save();
 

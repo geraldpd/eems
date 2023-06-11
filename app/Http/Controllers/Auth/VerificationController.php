@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Access\AuthorizationException;
+
 class VerificationController extends Controller
 {
     /*
@@ -29,7 +30,28 @@ class VerificationController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/attendee';//RouteServiceProvider::HOME;
+    //protected $redirectTo = '/attendee';//RouteServiceProvider::HOME;
+    protected function redirectTo()
+    {
+        $role = request()->user()->roles()->first()->name;
+
+        switch ($role) {
+            case 'attendee':
+                $path = '/attendee';
+                break;
+
+            case 'organizer':
+                $path = '/organizer/events';
+                break;
+
+            default: //admin
+                $path = '/admin';
+                break;
+        }
+
+        //return '/attendee';
+        return $path;
+    }
 
     /**
      * Create a new controller instance.
@@ -54,15 +76,15 @@ class VerificationController extends Controller
     {
         if ($request->user()->hasVerifiedEmail()) {
             return $request->wantsJson()
-                        ? new JsonResponse([], 204)
-                        : redirect($this->redirectPath());
+                ? new JsonResponse([], 204)
+                : redirect($this->redirectPath());
         }
 
         $request->user()->sendEmailVerificationNotification();
 
         return $request->wantsJson()
-                    ? new JsonResponse([], 202)
-                    : back()->with('message', 'Verification link sent!');
+            ? new JsonResponse([], 202)
+            : back()->with('message', 'Verification link sent!');
     }
 
     /**
@@ -75,18 +97,18 @@ class VerificationController extends Controller
      */
     public function verify(Request $request)
     {
-        if (! hash_equals((string) $request->route('id'), (string) $request->user()->getKey())) {
+        if (!hash_equals((string) $request->route('id'), (string) $request->user()->getKey())) {
             throw new AuthorizationException;
         }
 
-        if (! hash_equals((string) $request->route('hash'), sha1($request->user()->getEmailForVerification()))) {
+        if (!hash_equals((string) $request->route('hash'), sha1($request->user()->getEmailForVerification()))) {
             throw new AuthorizationException;
         }
 
         if ($request->user()->hasVerifiedEmail()) {
             return $request->wantsJson()
-                        ? new JsonResponse([], 204)
-                        : redirect($this->redirectPath());
+                ? new JsonResponse([], 204)
+                : redirect($this->redirectPath());
         }
 
         if ($request->user()->markEmailAsVerified()) {
@@ -97,10 +119,9 @@ class VerificationController extends Controller
             return $response;
         }
 
-        $redirect_path = '/'.$request->user()->roles()->first()->name;
+        $redirect_path = '/' . $request->user()->roles()->first()->name;
         return $request->wantsJson()
-                    ? new JsonResponse([], 204)
-                    : redirect($redirect_path)->with('message', 'Email successfully verified');
+            ? new JsonResponse([], 204)
+            : redirect($redirect_path)->with('message', 'Email successfully verified');
     }
-
 }

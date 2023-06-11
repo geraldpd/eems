@@ -9,13 +9,12 @@
 			<div class="col-12">
 				<div class="section-title">
 					<h3>Register as <span class="alternate">{{ request()->as ? ucfirst(request()->as) : 'Attendee' }}</span></h3>
-					{{-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores, velit.</p> --}}
 				</div>
 			</div>
 		</div>
 
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
             @csrf
             @if(request()->event && request()->email)
                 <input type="hidden" name="code" value="{{ request()->event }}">
@@ -105,6 +104,8 @@
             </div>
 
             @if (request()->has('as') && request()->as == 'organizer')
+                <input type="hidden" name="as" value="organizer">
+
                 <div class="step-2">
                     <br>
                     <h4>Organization Information</h4>
@@ -137,8 +138,46 @@
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <label for="address" class="col-md-4 col-form-label text-md-right">{{ __('Address') }}</label>
+
+                        <div class="col-md-6">
+                            <textarea id="address" class="form-control @error('address') is-invalid @enderror" name="address" required>{{ old('address') }}</textarea>
+
+                            @error('address')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="logo" class="col-md-4 col-form-label text-md-right">{{ __('Logo') }}</label>
+
+                        <div class="col-md-6">
+                            <input class="" name="logo" type="file" id="logo" accept="image/png, image/jpeg">
+                            @error('logo')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="supporting_documents" class="col-md-4 col-form-label text-md-right">{{ __('Supporting Documents') }}</label>
+
+                        <div class="col-md-6">
+                            <input class="" name="supporting_documents[]" type="file" id="supporting_documents" multiple>
+                            <br>
+                            {!! hasError($errors, 'supporting_documents') !!}
+                        </div>
+                    </div>
+
                 </div>
             @else
+                <input type="hidden" name="as" value="attendee">
                 <div class="step-2">
                     <br>
                     <h4>Other Information</h4>
@@ -171,6 +210,20 @@
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <label for="address" class="col-md-4 col-form-label text-md-right">{{ __('Address') }}</label>
+
+                        <div class="col-md-6">
+                            <textarea id="address" class="form-control @error('address') is-invalid @enderror" name="address" required>{{ old('address') }}</textarea>
+
+                            @error('address')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+
                 </div>
             @endif
 
@@ -181,22 +234,9 @@
                         {{ __('Register') }}
                     </button>
 
-                    @switch(request()->as)
-                        @case('organizer')
-                            <input type="hidden" name="as" value="organizer">
-                            <a class="float-right" href="{{ route('register') }}?as=attendee">register as attendee</a>
-                            @break
-                        @default
-                            <input type="hidden" name="as" value="attendee">
-                            @if (!request()->event)
-                                <a class="float-right" href="{{ route('register') }}?as=organizer">register as organizer</a>
-                            @endif
-                    @endswitch
-
                 </div>
             </div>
         </form>
-
 
 	</div>
 </section>

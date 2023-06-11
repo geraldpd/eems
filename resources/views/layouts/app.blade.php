@@ -76,11 +76,11 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav mx-auto">
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('events.index') }}">Events
                             <span>/</span>
                             </a>
-                        </li>
+                        </li> --}}
 
                         {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('front.index') }}#news">News
@@ -88,13 +88,13 @@
                             </a>
                         </li> --}}
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('front.index') }}#about">About
                             <span>/</span>
                             </a>
-                        </li>
+                        </li> --}}
 
-                        @if(Auth::check())
+                        {{-- @if(Auth::check())
                             @switch(Auth::user()->roles()->first()->name)
                                 @case('attendee')
                                     <li class="nav-item">
@@ -102,7 +102,7 @@
                                     </li>
                                 @break
                             @endswitch
-                        @endif
+                        @endif --}}
 
                     </ul>
 
@@ -118,12 +118,24 @@
                         @endif
 
                         @if (Route::has('register'))
-                            <li class="ticket">
+                            {{-- <li class="ticket">
                                 <a href="{{ route('register') }}">
                                     <span>{{ __('Register') }}</span>
                                 </a>
-                            </li>
+                            </li> --}}
+
+                            <li class="ticket dropdown">
+                                <a data-toggle="dropdown"><span>{{ __('Register') }}</span></i>
+                                </a>
+                                <!-- Dropdown list -->
+                                <ul class="dropdown-menu">
+                                  <li><a class="dropdown-item" href="{{ route('register') }}?as=attendee">As Attendee</a></li>
+                                  <li><a class="dropdown-item" href="{{ route('register') }}?as=organizer">As Organizer</a></li>
+                                </ul>
+                              </li>
+
                         @endif
+
                     @else
                         <a href="{{ route(Auth::user()->roles()->first()->name.'.profile.index') }}" class="ticket">
                             <span style="border-left: none">{{ Auth::user()->fullname }}</span>
@@ -135,6 +147,7 @@
             </nav>
 
             @yield('content')
+            @stack('modals')
         </div>
 
         <!-- Scripts -->

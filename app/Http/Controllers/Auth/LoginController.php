@@ -29,7 +29,24 @@ class LoginController extends Controller
     //!protected $redirectTo = RouteServiceProvider::HOME;
     protected function redirectTo()
     {
-        return '/attendee';
+        $role = request()->user()->roles()->first()->name;
+
+        switch ($role) {
+            case 'attendee':
+                $path = '/attendee';
+                break;
+
+            case 'organizer':
+                $path = '/organizer/events';
+                break;
+
+            default: //admin
+                $path = '/admin';
+                break;
+        }
+
+        //return '/attendee';
+        return $path;
     }
 
     /**

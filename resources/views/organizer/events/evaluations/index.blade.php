@@ -40,7 +40,7 @@
     $(function() {
 
         const evaluation_is_released = {!! $event->evaluation_is_released !!};
-        const open_evaluation = _ => _.addClass('btn-primary').removeClass('btn-secondary').html('<i class="fas fa-lock-open"></i> Open for Evaluation');
+        const open_evaluation = _ => _.addClass('btn-primary').removeClass('btn-secondary').html('<i class="fas fa-lock-open text-white" style="color:white"></i> Open for Evaluation');
         const close_evaluation = _ => _.addClass('btn-secondary').removeClass('btn-primary').html('<i class="fas fa-lock"></i> Close for Evaluation');
 
         $('.evaluation_is_released')

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Services\EventServices;
+
 class FrontController extends Controller
 {
     /**
@@ -32,12 +33,14 @@ class FrontController extends Controller
         // ])->get()->all();
 
         $events = (new EventServices())
-        ->getFrontEndEvents([
-            'keyword'           => false,
-            'exclude_concluded' => true,
-            'has_attended'      => false
-        ])
-        ->paginate(15);
+            ->getFrontEndEvents([
+                'keyword'           => false,
+                'exclude_concluded' => true,
+                'has_attended'      => false,
+                'order'             => 'desc',
+            ])
+            ->limit(9)
+            ->get();
 
         return view('front.welcome', compact('events'));
     }

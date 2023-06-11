@@ -88,7 +88,12 @@
                                                             <span class="name">{{ $event->organizer_firstname.' '.$event->organizer_lastname }}</span>
                                                         </div>
                                                         <!-- Subject -->
-                                                        <div class="subject">{{ $event->event_name }}</div>
+                                                        <div class="subject">
+                                                            @if ($event->is_organizer_verified)
+                                                                <i class="fas fa-check-circle text-success"></i>
+                                                            @endif
+                                                            {{ $event->event_name }}
+                                                        </div>
                                                         <!-- Venue -->
                                                         <div class="venue">{{ $event->event_location }}</div>
                                                     </div>
@@ -98,7 +103,15 @@
 
                                          {!! $events->links() !!}
                                     @else
-                                        No event yet!
+
+                                        <a href="#">
+                                            <li class="schedule-details">
+                                                <div class="block">
+                                                   <h5 class="text-center"> No events yet! </h5>
+                                                </div>
+                                            </li>
+                                        </a>
+
                                     @endif
 
                                 </ul>

@@ -40,9 +40,10 @@
                         Attended:
                         <strong>
                             @if($event->dynamic_status == 'CONCLUDED')
-                                {{ $event->attendees->count() }} users <span title="attendance percentage">({{ $event->attendance_percentage }}%)</span>
+                                {{-- {{ $event->attendees->count() }} users <span title="attendance percentage">({{ $event->attendance_percentage }}%)</span> --}}
+                                <span title="{{ $event->booked_participants }} Bookings over {{ $event->max_participants }} max pariticpating slots" class="badge" style="background-color: #ff6600; color: white">{{ $event->booked_participants }} / {{ $event->max_participants }}</span> ({{ $event->attendance_percentage }}%)</span>
                             @else
-                                TBD
+                                <span title="To Be Determined">TBD</span>
                             @endif
                         </strong>
                         <br>
@@ -64,7 +65,7 @@
                         <hr>
                         <h4>Uploaded Documents:</h4>
                     @endif
-                    <a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                    <a href="{{ route('helpers.download-file', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
                         {{ $name }}
                     </a>
                     @if ($loop->last)

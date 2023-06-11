@@ -37,6 +37,7 @@ class Event extends Model
         'online', //depending on the location field
         'documents',
         'status',
+        'max_participants',
 
         'evaluation_id',
         'evaluation_name', // the final name of the evaluation used at the time setup
@@ -47,6 +48,7 @@ class Event extends Model
     ];
 
     protected $casts = [
+        'banner' => 'json',
         'evaluation_questions' => 'json',
         'schedule_start' => 'datetime:Y-m-d H:i:s',
         'schedule_end' => 'datetime:Y-m-d H:i:s'
@@ -63,7 +65,10 @@ class Event extends Model
         'todays_scheduled_event',
         'attendance_percentage',
         'feedback_percentage',
-        'qr_code_path'
+        'qr_code_path',
+        'banner_path',
+        'booked_participants'
+        //'has_attendee_event_rating'
     ];
 
     public function getRouteKeyName()
@@ -111,16 +116,21 @@ class Event extends Model
         return $this->belongsTo(Evaluation::class);
     }
 
-    public function evaluations()// the survey that the attendees provided
+    public function evaluations() // the survey that the attendees provided
     {
         return $this->hasMany(EventEvaluation::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(EventRating::class);
     }
 
     public function attendees()
     {
         return $this->belongsToMany(User::class, 'event_attendees', 'event_id', 'attendee_id')
-                ->withPivot('is_confirmed', 'id')
-                ->withTimestamps();
+            ->withPivot('is_booked', 'is_confirmed', 'id')
+            ->withTimestamps();
     }
 
     public function getNotifConfirmedAttendeeCountAttribute()
@@ -146,7 +156,7 @@ class Event extends Model
 
     function getUploadedDocumentsAttribute()
     {
-        return (new EventServices)->getEventDocs($this->id);
+        return (new EventServices)->getEventDocs($this);
         //return eventHelperGetUploadedDocuments($this);
     }
 
@@ -164,14 +174,19 @@ class Event extends Model
     {
         //fetches scheduled event for the current day
         return $this->schedules()
-        ->whereDate('schedule_start', '>=', Carbon::now()->startOfDay())
-        ->whereDate('schedule_end', '<=', Carbon::now()->endOfDay())
-        ->first();
+            ->whereDate('schedule_start', '>=', Carbon::now()->startOfDay())
+            ->whereDate('schedule_end', '<=', Carbon::now()->endOfDay())
+            ->first();
+    }
+
+    public function getBookedParticipantsAttribute()
+    {
+        return $this->attendees()->whereIsBooked(1)->count();
     }
 
     public function scopePendingEvents($query)
     {
-        return $query->whereHas('schedules', function($query) {
+        return $query->whereHas('schedules', function ($query) {
             $query->whereDate('schedule_start', '>', Carbon::now());
         });
     }
@@ -198,15 +213,24 @@ class Event extends Model
 
     public function getAttendancePercentageAttribute()
     {
-        if($this->attendees->count() && $this->invitations->count()) {
-            return $this->attendees->count() / $this->invitations->count() * 100;
+        if ($this->attendees->count() && $this->invitations->count()) {
+            $booked = $this->attendees->filter(function ($invitation) {
+                return $invitation->getOriginal('pivot_is_booked') === 1;
+            });
+
+            $percentage = $booked->count() / $this->max_participants * 100;
+
+            return number_format($percentage, 2, '.', '');
         }
     }
 
     public function getFeedbackPercentageAttribute()
     {
-        if($this->dynamic_status == 'CONCLUDED' && $this->evaluations->count() != 0) {
-            return $this->attendees->count() / $this->evaluations->count() * 100;
+        if ($this->dynamic_status == 'CONCLUDED' && $this->evaluations->count() != 0) {
+
+            $percentage = $this->attendees->count() / $this->evaluations->count() * 100;
+
+            return number_format($percentage, 2, '.', '');
         }
 
         return 0;
@@ -215,6 +239,17 @@ class Event extends Model
     public function getQrCodePathAttribute()
     {
         $s3_file_path = "events/$this->id/qrcode.svg";
+        return Storage::disk('s3')->temporaryUrl($s3_file_path, now()->addMinutes(5));
+    }
+
+    public function getBannerPathAttribute()
+    {
+        if (!$this->banner) {
+            return '';
+        }
+
+        $filename = $this->banner['filename'];
+        $s3_file_path = "events/$this->id/$filename";
         return Storage::disk('s3')->temporaryUrl($s3_file_path, now()->addMinutes(5));
     }
 }

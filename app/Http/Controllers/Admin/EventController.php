@@ -7,6 +7,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Mail\EventInvitation;
 use App\Models\category;
+use App\Models\EventSchedule;
 use App\Models\Type;
 use App\Models\User;
 use Carbon\Carbon;
@@ -26,17 +27,17 @@ class EventController extends Controller
     private function indexCalendar()
     {
         $events = Event::query()
-        ->with(['category', 'type'])
-        ->get()
-        ->map(function($event) {
-            return [
-                'id' => $event->id,
-                'title' => $event->name,
-                'start' => $event->start->schedule_start->format('Y-m-d H:i'),
-                'end' => $event->end->schedule_end->format('Y-m-d H:i'),
-                'code' => $event->code,
-            ];
-        });
+            ->with(['category', 'type'])
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'id' => $event->id,
+                    'title' => $event->name,
+                    'start' => $event->start->schedule_start->format('Y-m-d H:i'),
+                    'end' => $event->end->schedule_end->format('Y-m-d H:i'),
+                    'code' => $event->code,
+                ];
+            });
 
         return view('admin.events.index.calendar', compact('events'));
     }
@@ -44,42 +45,49 @@ class EventController extends Controller
     private function indexTable(Request $request)
     {
 
-        if($request->has('organizer')) {
+        if ($request->has('organizer')) {
             $organizer = User::where('email', request()->organizer)->firstOrFail();
 
-            if(! $organizer->hasRole('organizer')) {
+            if (!$organizer->hasRole('organizer')) {
                 return redirect()->back()->with('message', 'Organizer could not be found');
             }
         }
 
         $events = Event::query()
-        ->with(['organizer', 'category', 'type', 'schedules'])
-        ->when($request->has('organizer'), function($query) {
-            $query->whereRelation('organizer', 'email', request()->organizer);
-        })
-        ->when($request->has('type'), function($query) {
-            $query->whereRelation('type', 'id', request()->type);
-        })
-        ->when($request->has('category'), function($query) {
-            $query->whereRelation('category', 'id', request()->category);
-        })
-        ->when($request->has('from') && $request->has('to'), function($query) {
-            $start = Carbon::parse(request()->from);
-            $end = Carbon::parse(request()->to);
+            ->with(['organizer', 'category', 'type', 'schedules'])
+            ->when($request->has('organizer'), function ($query) {
+                $query->whereRelation('organizer', 'email', request()->organizer);
+            })
+            ->when($request->has('type'), function ($query) {
+                $query->whereRelation('type', 'id', request()->type);
+            })
+            ->when($request->has('category'), function ($query) {
+                $query->whereRelation('category', 'id', request()->category);
+            })
+            ->when($request->has('from') && $request->has('to'), function ($query) {
+                $start = Carbon::parse(request()->from);
+                $end = Carbon::parse(request()->to);
 
-            $query
-            ->whereHas('start', function($subQuery) use ($start, $end){
-                    $subQuery
-                    ->whereDate('schedule_start','>=',$start->startOfDay())
-                    ->whereDate('schedule_start','<=',$end->endOfDay());
-                })
-            ->whereHas('end', function($subQuery) use ($start, $end){
-                    $subQuery
-                    ->whereDate('schedule_end','>=',$start->startOfDay())
-                    ->whereDate('schedule_end','<=',$end->endOfDay());
-                });
-        })
-        ->get();
+                $query
+                    ->whereHas('start', function ($subQuery) use ($start, $end) {
+                        $subQuery
+                            ->whereDate('schedule_start', '>=', $start->startOfDay())
+                            ->whereDate('schedule_start', '<=', $end->endOfDay());
+                    })
+                    ->whereHas('end', function ($subQuery) use ($start, $end) {
+                        $subQuery
+                            ->whereDate('schedule_end', '>=', $start->startOfDay())
+                            ->whereDate('schedule_end', '<=', $end->endOfDay());
+                    });
+            })
+            ->orderBy(
+                EventSchedule::select('schedule_start')
+                    ->whereColumn('event_id', 'events.id')
+                    ->orderBy('schedule_start')
+                    ->limit(1),
+                'desc'
+            )
+            ->get();
 
         $filter = false;
         switch (true) {

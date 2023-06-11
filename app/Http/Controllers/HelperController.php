@@ -27,7 +27,7 @@ class HelperController extends Controller
     {
         return [
             'suggestAttendees',
-            'downloadEventAttachment'
+            'downloadFile'
         ];
     }
 
@@ -39,15 +39,15 @@ class HelperController extends Controller
     public function suggestAttendees(Request $request)
     {
         $query = User::query()
-            ->where(function($query) use ($request){
+            ->where(function ($query) use ($request) {
                 return $query
-                ->where('email', 'LIKE', "%{$request->keyword}%")
-                ->orWhere(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), 'LIKE', '%' . $request->keyword . '%');
+                    ->where('email', 'LIKE', "%{$request->keyword}%")
+                    ->orWhere(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), 'LIKE', '%' . $request->keyword . '%');
             })
-            ->whereHas('roles', function($query) {
+            ->whereHas('roles', function ($query) {
                 return $query->where('name', 'attendee');
             })
-            ->when($request->has('event_id'), function($query) {
+            ->when($request->has('event_id'), function ($query) {
                 $event = Event::find(request()->event_id)->load('invitations');
                 $invited_emails = $event->invitations->pluck('email');
 
@@ -59,7 +59,7 @@ class HelperController extends Controller
             )
             ->get()
             ->collect()
-            ->transform(function($item) {
+            ->transform(function ($item) {
                 return [
                     'value' => $item['email'],
                     'email' => $item['email'],
@@ -71,9 +71,8 @@ class HelperController extends Controller
         return $query;
     }
 
-    public function downloadEventAttachment(Request $request)
+    public function downloadFile(Request $request)
     {
-       return (new EventServices)->downloadEventAttachment($request->document);
+        return (new EventServices)->downloadAttachment($request->document);
     }
-
 }

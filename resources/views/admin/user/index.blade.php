@@ -27,7 +27,6 @@
 @endsection
 
 @push('scripts')
-    {{-- {!! tableScript('categories') !!} --}}
     <script type="text/javascript">
 
         $(function() {

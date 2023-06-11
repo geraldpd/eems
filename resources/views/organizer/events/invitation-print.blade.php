@@ -1,7 +1,18 @@
 @extends('layouts.organizer')
 
 @section('content')
-    <h1> {{ ucfirst($filter) }} {{ $event->name }} Attendees</h1>
+    <div class="header">
+        @if($event->organizer->organization->logo)
+            <img src="{{ asset($event->organizer->organization->logo_path) }}" alt="logo" class="logo">
+        @endif
+        <div class="text">
+            <h2>{{ $event->organizer->organization->name }}1</h2>
+            <h2>{{ $event->organizer->organization->department }}2</h2>
+            <h5>{{ $event->organizer->address }}3</h5>
+        </div>
+    </div>
+
+    <h2> {{ ucfirst($filter) }} {{ $event->name }} Attendees</h2>
     <p>Print Date: {{ date('M d Y') }}</p>
     </div>
 
@@ -36,4 +47,22 @@
          window.onafterprint = window.close;
          window.print();
     </script>
+@endpush
+
+@push('styles')
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2%;
+        }
+
+        .logo {
+            max-height: 150px;
+            max-width: 200px;
+            float: left;
+            padding-right: 10px;
+        }
+    </style>
 @endpush

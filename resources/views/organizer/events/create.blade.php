@@ -8,7 +8,7 @@
       <li class="breadcrumb-item active" aria-current="page">Add</li>
     </ol>
 
-    <form method="POST" action="{{ route('organizer.events.store') }}">
+    <form method="POST" action="{{ route('organizer.events.store') }}" enctype="multipart/form-data">
       @csrf
 
       <div class="form-group">
@@ -121,19 +121,32 @@
         @endif
       </div>
 
-      <div class="form-group">
-        <label for="location">Location</label>
-        <select name="location" id="location" class="form-control">
-          <option value=""> Select Location </option>
-          <option {{ old('location') == 'venue' ? 'selected' : '' }} value="venue"> Venue </option>
-          <option {{ old('location') == 'online' ? 'selected' : '' }} value="online"> Online </option>
-        </select>
+      <div class="row">
+        <div class="col-md-10 form-group">
+          <label for="location">Location</label>
+          <select name="location" id="location" class="form-control">
+            <option value=""> Select Location </option>
+            <option {{ old('location') == 'venue' ? 'selected' : '' }} value="venue"> Venue </option>
+            <option {{ old('location') == 'online' ? 'selected' : '' }} value="online"> Online </option>
+          </select>
 
-        @if ($errors->has('location'))
-          <small class="help-block text-danger">
-            <strong>{{ $errors->first('location') }}</strong>
-          </small>
-        @endif
+          @if ($errors->has('location'))
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('location') }}</strong>
+            </small>
+          @endif
+        </div>
+
+        <div class=" col-md-2 form-group">
+          <label for="location">Maximum Particpants</label>
+          <input type="number" name="max_participants" id="max_participants" class="form-control" value="{{ old('max_participants') }}" min="1" max="999999">
+
+          @if ($errors->has('max_participants'))
+            <small class="help-block text-danger">
+              <strong>{{ $errors->first('max_participants') }}</strong>
+            </small>
+          @endif
+        </div>
       </div>
 
       <div class="location-additional-field">
@@ -179,13 +192,22 @@
             <tbody>
               @foreach ($documents as $name => $path)
                 <tr title="This document is not yet attached to this event, press the submit button to save it to this events document folder">
-                    <td><a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
+                    <td><a href="{{ route('helpers.download-file', ['document' => $path]) }}" target="_blank" class="text-warning"> {{ $name }} </a></td>
                     <td class="text-center"> <button type="button" data-name="{{ $name }}" class="btn btn-sm btn-secondary remove-document">Remove</button> </td>
                 </tr>
               @endforeach
             </tbody>
           </thead>
         </table>
+      </div>
+
+      <div class="form-group alert alert-secondary">
+        <label for="banner" id="banner_label" class="mx-auto d-block">
+          <img src="https://placehold.co/770x250?text=Your+Event+Banner+Here" alt="Event Banner" id="banner_preview" class="img-responsive" >
+          <h3  id="banner_edit"> Upload Banner </h3>
+          <input type="file" name="banner" id="banner" accept="image/*">
+        </label>
+        <i class="fas fa-info-circle text-secondary" title="for best result, upload images minimum of 770 x 250"></i>
       </div>
 
       <div class="float-right">
@@ -207,6 +229,38 @@
     .schedule_input:invalid {
       color:red;
     }
+
+    #banner {
+        display: none;
+      }
+
+      #banner_preview {
+        /* height: 200px; */
+        width: 100%;
+      }
+
+      #banner_label {
+        position: relative;
+        text-align: center;
+        position: relative;
+      }
+
+      #banner_edit {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display:none;
+      }
+
+      #banner_label:hover #banner_preview{
+        opacity: 0.5;
+        cursor: pointer;
+      }
+
+      #banner_label:hover #banner_edit{
+        display:block;
+      }
   </style>
 @endpush
 
@@ -217,7 +271,7 @@
       csrf: '{{ csrf_token() }}',
       tempdocs: {
         count: {{ count($documents) }},
-        download: "{{ route('helpers.download-event-attachment', ['document' => 'document_path']) }}",
+        download: "{{ route('helpers.download-file', ['document' => 'document_path']) }}",
         store: "{{ route('organizer.tempdocs.store') }}",
         destroy: "{{ route('organizer.tempdocs.destroy') }}"
       },

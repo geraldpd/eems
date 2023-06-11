@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,7 @@ class UserController extends Controller
     public function attendees()
     {
         $attendees = User::with('roles')
-            ->whereHas('roles', function($roles){
+            ->whereHas('roles', function ($roles) {
                 $roles->where('name', 'attendee');
             })
             ->get();
@@ -32,12 +33,20 @@ class UserController extends Controller
     public function organizers()
     {
         $organizers = User::with('roles')
-            ->whereHas('roles', function($roles){
+            ->whereHas('roles', function ($roles) {
                 $roles->where('name', 'organizer');
             })
             ->get();
 
         return view('admin.user.organizers', compact('organizers'));
+    }
+
+    public function approve(Request $request, User $user)
+    {
+        $user->is_approved = true;
+        $user->save();
+
+        return redirect()->back()->with('message', 'User has been approved!');
     }
 
     /**
@@ -67,9 +76,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, User $user)
     {
-        //
+        $user->load('organization');
+        return view('admin.user.show', compact('user'));
     }
 
     /**

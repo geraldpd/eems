@@ -36,17 +36,17 @@ class EventController extends Controller
     public function index()
     {
         $events = Auth::user()->organizedEvents()
-        ->with(['category', 'type'])
-        ->get()
-        ->map(function($event) {
-            return [
-                'id' => $event->id,
-                'title' => $event->name,
-                'start' => $event->start->schedule_start->format('Y-m-d H:i'),
-                'end' => $event->end->schedule_end->format('Y-m-d H:i'),
-                'code' => $event->code,
-            ];
-        });
+            ->with(['category', 'type'])
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'id' => $event->id,
+                    'title' => $event->name,
+                    'start' => $event->start->schedule_start->format('Y-m-d H:i'),
+                    'end' => $event->end->schedule_end->format('Y-m-d H:i'),
+                    'code' => $event->code,
+                ];
+            });
 
         return view('organizer.events.index', compact('events'));
     }
@@ -77,7 +77,7 @@ class EventController extends Controller
         $today = Carbon::now()->format('Y-m-d');
         $period = CarbonPeriod::create($request->start, $request->end)->toArray();
 
-        if($start->copy()->startOfDay() < Carbon::now()->startOfDay()) {
+        if ($start->copy()->startOfDay() < Carbon::now()->startOfDay()) {
             return redirect()->route('organizer.events.index')->with('message', 'Cannot add events on past dates');
         }
 
@@ -110,6 +110,10 @@ class EventController extends Controller
      */
     public function store(StoreRequest $request)
     {
+        if (!canCreateEvent()) {
+            return redirect()->back()->with('message', 'You seem to have reached the maximum number of events you are allowed to creat this month.');
+        }
+
         DB::beginTransaction();
 
         //* all fields
@@ -128,20 +132,34 @@ class EventController extends Controller
 
         //* qrcode
         $event_folder_path = "events/$event->id/";
-        $qrcode_invitation_link = route('events.show', $event->code).'?invite=true';
+        $qrcode_invitation_link = route('events.show', $event->code) . '?invite=true';
 
         File::makeDirectory($event_folder_path, 0777, true);
 
-        QrCode::generate($qrcode_invitation_link, $event_folder_path.'qrcode.svg');
-        Storage::disk('s3')->put($event_folder_path.'qrcode.svg', file_get_contents($event_folder_path.'qrcode.svg'));
+        QrCode::generate($qrcode_invitation_link, $event_folder_path . 'qrcode.svg');
+        Storage::disk('s3')->put($event_folder_path . 'qrcode.svg', file_get_contents($event_folder_path . 'qrcode.svg'));
 
-        $event->qrcode = $event_folder_path.'qrcode.svg';
+        $event->qrcode = $event_folder_path . 'qrcode.svg';
+
+        if ($request->has('banner')) {
+            $extension = $request->file('banner')->getClientOriginalExtension();
+            $path = $request->file('banner')->storeAs(
+                "events/$event->id/",
+                'banner.' . $extension,
+                's3'
+            );
+
+            $event->banner = [
+                'filename' => basename($path),
+                'path' => Storage::disk('s3')->url($path)
+            ];
+        }
 
         $event->save();
 
         //*event schedules
         $event_schedule = [];
-        foreach($request->schedules as $date => $schedule) {
+        foreach ($request->schedules as $date => $schedule) {
 
             $schedule_start = Carbon::parse($schedule['start']);
             $schedule_end = Carbon::parse($schedule['end']);
@@ -212,7 +230,7 @@ class EventController extends Controller
         $event->documents = $event->uploaded_documents;
         $event->temporary_documents = (new EventServices)->getTemporaryDocs();
 
-        return view('organizer.events.edit', compact('event','categories', 'types', 'min_sched'));
+        return view('organizer.events.edit', compact('event', 'categories', 'types', 'min_sched'));
     }
 
     /**
@@ -229,18 +247,18 @@ class EventController extends Controller
             DB::beginTransaction();
 
             //disable editing events that is almost about to start
-            if(in_array($event->schedules->last()->status, ['ONGOING', 'CONCLUDED'])) {
+            if (in_array($event->schedules->last()->status, ['ONGOING', 'CONCLUDED'])) {
                 return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event can no longer be updated.');
             }
 
-            if($event->organizer_id != Auth::user()->id) {
+            if ($event->organizer_id != Auth::user()->id) {
                 return redirect()->route('organizer.events.index')->with('message', "You don't seem to be the organizer for the $event->name event, updating it is not allowed.");
             }
 
             $event->update($request->validated());
 
             $event_schedule = [];
-            foreach($request->schedules as $schedule_id => $schedule) {
+            foreach ($request->schedules as $schedule_id => $schedule) {
                 $schedule_start = Carbon::parse($schedule['schedule_start']);
                 $schedule_end = Carbon::parse($schedule['schedule_end']);
 
@@ -250,15 +268,28 @@ class EventController extends Controller
                 $event_schedule->save();
             }
 
+            if ($request->has('banner')) {
+                $extension = $request->file('banner')->getClientOriginalExtension();
+                $path = $request->file('banner')->storeAs(
+                    "events/$event->id/",
+                    'banner.' . $extension,
+                    's3'
+                );
+
+                $event->banner = [
+                    'filename' => basename($path),
+                    'path' => Storage::disk('s3')->url($path)
+                ];
+                $event->save();
+            }
+
             $this->moveTemporayDocsToEvents($event->id);
 
             DB::commit();
             return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
-
         } catch (\Throwable $th) {
             throw $th;
         }
-
     }
 
     //? RESCHEDULE METHOD
@@ -285,7 +316,7 @@ class EventController extends Controller
         //get temp files
         $documents = (new EventServices)->getTemporaryDocs();
 
-        foreach($documents as $name => $path) {
+        foreach ($documents as $name => $path) {
             Storage::disk('s3')->move(decrypt($path), "events/$event_id/documents/$name");
             //File::move($path['public'], public_path($event_folder_path.'documents/'.$name));
         }
@@ -294,15 +325,15 @@ class EventController extends Controller
     public function fetchScheduleEvents(Request $request)
     {
         $scheduled_events = EventSchedule::query()
-        ->with(['event.category', 'event.type'])
-        ->whereDate('schedule_start', '>=', Carbon::parse($request->start)->startOfDay())
-        ->whereDate('schedule_end', '<=', Carbon::parse($request->end)->endOfDay())
-        ->whereRelation('event', 'organizer_id', Auth::user()->id)
-        ->orderBy('schedule_start')
-        ->get()
-        ->mapToGroups(function ($item, $key) {
-            return [Carbon::parse($item['schedule_start'])->format('Y-m-d') => $item];
-        });
+            ->with(['event.category', 'event.type'])
+            ->whereDate('schedule_start', '>=', Carbon::parse($request->start)->startOfDay())
+            ->whereDate('schedule_end', '<=', Carbon::parse($request->end)->endOfDay())
+            ->whereRelation('event', 'organizer_id', Auth::user()->id)
+            ->orderBy('schedule_start')
+            ->get()
+            ->mapToGroups(function ($item, $key) {
+                return [Carbon::parse($item['schedule_start'])->format('Y-m-d') => $item];
+            });
 
         return response($scheduled_events);
     }

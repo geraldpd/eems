@@ -32,7 +32,9 @@ class UpdateRequest extends FormRequest
             'location' => ['required'],
             'venue' => ['required_if:location,venue'],
             'online' => ['required_if:location,online'],
-            'documents' => ['nullable']
+            'documents' => ['nullable'],
+            'banner' => ['nullable'],
+            'max_participants' => ['required', 'integer', 'min:1', 'max:999999'],
         ];
     }
 }

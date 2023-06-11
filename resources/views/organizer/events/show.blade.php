@@ -25,8 +25,8 @@
                     <a href="{{ route('organizer.events.edit', [$event->code]) }}" class="btn btn-link">Edit</a>
                 @endif
 
-                <a href="{{ route('organizer.invitations.index', [$event->code, $event->start->schedule_start->isPast() ? 'confirmed' : '']) }}" class="btn btn-link">
-                    Invitations
+                <a href="{{ route('organizer.invitations.index', [$event->code, $event->start->schedule_start->isPast() ? 'confirmed' : 'all']) }}" class="btn btn-link">
+                    Bookings
                     @switch(true)
                         @case(!$event->invitations->count() && $event->dynamic_status != 'CONCLUDED')
                             {{-- when there is no one invited yet and has not yet started --}}
@@ -36,8 +36,8 @@
                             @break
                         @case($event->notif_confirmed_attendee_count && $event->dynamic_status != 'CONCLUDED')
                             {{-- when there is no one invited yet and has not yet started --}}
-                            <span class="badge" title="{{ $event->notif_confirmed_attendee_count }} new confirmed attendees">
-                               {{ $event->notif_confirmed_attendee_count }}
+                            <span class="badge badge-warning" title="{{ $event->notif_confirmed_attendee_count }} new confirmed attendees">
+                               {{ $event->notif_confirmed_attendee_count }} new
                             </span>
                             @break
                         @default
@@ -77,16 +77,18 @@
                         Type: <strong>{{ $event->type->name }}</strong>
                         <br>
                         Category: <strong>{{ $event->category->name }}</strong>
+
                     </div>
 
                     <div class="col-md-6">
                         Attended:
                         <strong>
-                            @if($event->dynamic_status == 'CONCLUDED')
-                                {{ $event->attendees->count() }} users <span title="attendance percentage">({{ $event->attendance_percentage }}%)</span>
+                            <span title="{{ $event->booked_participants }} Bookings over {{ $event->max_participants }} max pariticpating slots" class="badge" style="background-color: #ff6600; color: white">{{ $event->booked_participants }} / {{ $event->max_participants }}</span> ({{ $event->attendance_percentage }}%)</span>
+                            {{-- @if($event->dynamic_status == 'CONCLUDED')
+                                <span title="{{ $event->booked_participants }} Bookings over {{ $event->max_participants }} max pariticpating slots" class="badge" style="background-color: #ff6600; color: white">{{ $event->booked_participants }} / {{ $event->max_participants }}</span> ({{ $event->attendance_percentage }}%)</span>
                             @else
-                                TBD
-                            @endif
+                                <span title="To Be Determined">TBD</span>
+                            @endif --}}
                         </strong>
                         <br>
                         Evaluation:
@@ -107,7 +109,7 @@
                         <hr>
                         <h4>Uploaded Documents:</h4>
                     @endif
-                    <a href="{{ route('helpers.download-event-attachment', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
+                    <a href="{{ route('helpers.download-file', ['document' => $path]) }}" target="_blank" class="pt-2 pb-2 mb-1 mt-1 badge badge-secondary">
                         {{ $name }}
                     </a>
                     @if ($loop->last)
