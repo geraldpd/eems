@@ -39,12 +39,28 @@ class EventController extends Controller
             ->with(['category', 'type'])
             ->get()
             ->map(function ($event) {
+
+                switch (true) {
+                    case $event->dynamic_status == 'PENDING':
+                        $color = '#dfe3e6';
+                        break;
+
+                    case $event->dynamic_status == 'ONGOING':
+                        $color = '#e64552';
+                        break;
+
+                    default:
+                        $color = '#57de81';
+                        break;
+                }
                 return [
                     'id' => $event->id,
                     'title' => $event->name,
                     'start' => $event->start->schedule_start->format('Y-m-d H:i'),
                     'end' => $event->end->schedule_end->format('Y-m-d H:i'),
                     'code' => $event->code,
+                    'color' => $color,
+                    'status' => $event->dynamic_status
                 ];
             });
 

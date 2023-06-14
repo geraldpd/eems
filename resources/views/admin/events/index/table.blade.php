@@ -31,7 +31,7 @@
 
     <h1>Events</h1>
 
-    <table id="table" class="table table-bordered table-hover"  width="100%">
+    <table id="table" class="table table-bordered table-hover table-sm"  width="100%">
         <thead class="thead-dark">
             <tr>
                 <th>Organizer</th>
@@ -44,18 +44,22 @@
         <tbody>
             @forelse ($events as $event)
                 <tr id="{{ $event->code }}">
-                    <td>{{ $event->organizer->full_name }}</td>
+                    <td class="align-middle">{{ $event->organizer->full_name }}</td>
                     <td>
-                        <h4>{{ $event->name }}</h4>
+                        <h4>
+                            <a href="{{ route('events.show', [$event->code]) }}" target="_blank">
+                                {{ $event->name }}
+                            </a>
+                        </h4>
                         <hr>
                         <p>Type: {{ $event->type->name }}</p>
                         <p>Category: {{ $event->category->name }}</p>
                     </td>
-                    <td>
+                    <td class="align-middle">
                         @include('partials.event_schedules')
                     </td>
-                    <td>{{ $event->dynamic_status }}</td>
-                    <td>
+                    <td class="align-middle">{{ $event->dynamic_status }}</td>
+                    <td class="align-middle text-center">
                         <a href="{{ route('admin.events.show', [$event->code]) }}">view</a>
                     </td>
                 </tr>

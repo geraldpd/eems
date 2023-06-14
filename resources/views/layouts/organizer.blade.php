@@ -20,6 +20,7 @@
     @stack('styles')
 
     <style>
+
         .nav-orange {
             background-color: #ff6600 !important;
             color: white !important;

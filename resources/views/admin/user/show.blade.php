@@ -13,7 +13,7 @@
       </ol>
 
 
-    <h1>Organizer Profile</h1>
+    <h1>{{ $user->hasRole('organizer') ? 'Organizer' : 'Attendee' }} Profile</h1>
     <hr>
 
       <div class="row">

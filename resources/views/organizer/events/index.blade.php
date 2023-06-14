@@ -70,9 +70,10 @@
     }
 
     .fc .fc-daygrid-day.fc-day-today {
-        background: white !important;
-        border: 3px solid #2c3e50;
+        background: #ff660089 !important;
+        /* border: 3px solid #2c3e50; */
     }
+
 
     @font-face {
         font-family: 'digital7';
