@@ -37,7 +37,7 @@
 						<div class="blog-post">
 							<div class="post-thumb">
 								<a href="{{ route('events.show', [$event->code]) }}">
-									<img src="{{ asset($event->banner_path) }}" alt="post-image" class="img-fluid" style="max-height:222px; width:100%">
+									<img src="{{ $event->banner ? asset($event->banner_path) : 'https://placehold.co/600x400?text=No+Event+Banner' }}" alt="post-image" class="img-fluid" style="height:222px; width:100%; min-width: 360px;">
 								</a>
 							</div>
 							<div class="post-content">
