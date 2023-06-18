@@ -90,6 +90,11 @@
 		</div>
 		<div class="row">
 			@foreach ($topOrganizers as $organizer)
+				@php
+					if($organizer->hasRole('admin') || $organizer->hasRole('attendee')) {
+						continue;
+					}
+				@endphp
 				<div class="col-lg-4 col-md-4 col-sm-12">
 					<div class="speaker-item">
 						<div class="image">
@@ -127,6 +132,11 @@
 		<div class="row">
 
 		@foreach ($topAttendees as $attendee)
+				@php
+					if($organizer->hasRole('admin') || $organizer->hasRole('organizer')) {
+						continue;
+					}
+				@endphp
 				<div class="col-lg-4 col-md-4 col-sm-12">
 					<div class="speaker-item">
 						<div class="image">
