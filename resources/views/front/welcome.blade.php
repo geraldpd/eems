@@ -102,10 +102,10 @@
 							<div class="primary-overlay"></div>
 							<div class="socials">
 								<ul class="list-inline">
-									<li class="list-inline-item text-white"><h2>#{{ $loop->iteration }}</h2></li>
-									<li class="list-inline-item text-white">{{ $organizer->full_name }}</li>
-									<li class="list-inline-item text-white">{{ $organizer->email }}</li>
-									<li class="list-inline-item text-white"><strong>{{ $organizer?->organized_events_count }}</strong> Events Organized</li>
+									<li class="text-white"><h2>#{{ $loop->iteration }}</h2></li>
+									<li class="text-white">{{ $organizer->full_name }}</li>
+									<li class="text-white">{{ $organizer->email }}</li>
+									<li class="text-white"><strong>{{ $organizer?->organized_events_count }}</strong> Events Organized</li>
 								</ul>
 							</div>
 						</div>
@@ -144,10 +144,10 @@
 							<div class="primary-overlay"></div>
 							<div class="socials">
 								<ul class="list-inline">
-									<li class="list-inline-item text-white"><h2>#{{ $loop->iteration }}</h2></li>
-									<li class="list-inline-item text-white">{{ $attendee->full_name }}</li>
-									<li class="list-inline-item text-white">{{ $attendee->email }}</li>
-									<li class="list-inline-item text-white"><strong>{{ $attendee->attended_events_count }}</strong> Events Organized</li>
+									<li class="text-white"><h2>#{{ $loop->iteration }}</h2></li>
+									<li class="text-white">{{ $attendee->full_name }}</li>
+									<li class="text-white">{{ $attendee->email }}</li>
+									<li class="text-white"><strong>{{ $attendee->attended_events_count }}</strong> Events Organized</li>
 								</ul>
 							</div>
 						</div>
