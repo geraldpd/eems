@@ -84,7 +84,7 @@
 			<div class="col-12">
 				<div class="section-title white">
 					<h3>Top <span class="alternate">Organizers</span></h3>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
+					<p>Discover the foremost event organizers renowned for their prolific expertise and unparalleled track record. With their unmatched activity and extensive experience, they are the pinnacle of event management excellence.</p>
 				</div>
 			</div>
 		</div>
@@ -100,13 +100,13 @@
 									<li class="list-inline-item text-white"><h3>{{ $loop->iteration }}</h3></li>
 									<li class="list-inline-item text-white">{{ $organizer->full_name }}</li>
 									<li class="list-inline-item text-white">{{ $organizer->email }}</li>
-									<li class="list-inline-item text-white"><strong>{{ $organizer->organized_events_count }}</strong> Events Organized</li>
+									<li class="list-inline-item text-white"><strong>{{ $organizer?->organized_events_count }}</strong> Events Organized</li>
 								</ul>
 							</div>
 						</div>
 						<div class="content text-center">
 							<h5><a href="single-speaker.html">{{ $organizer->full_name }}</a></h5>
-							<p>{{ $organizer->organization->name }} - {{ $organizer->organization->department }}</p>
+							<p>{{ $organizer?->organization->name }} - {{ $organizer?->organization->department }}</p>
 						</div>
 					</div>
 				</div>
@@ -120,7 +120,7 @@
 				<!-- Section Title -->
 				<div class="section-title white">
 					<h3>Top <span class="alternate">Attendees</span></h3>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
+					<p>Recognize our esteemed community of attendees who have actively participated in numerous events, embodying a passion for engagement and a desire for unforgettable experiences.</p>
 				</div>
 			</div>
 		</div>
