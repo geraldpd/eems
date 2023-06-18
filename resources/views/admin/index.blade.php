@@ -91,7 +91,7 @@
                             $percentage = ($item['data'] / $total) * 100;
                             $item['label'] .= ' ' . number_format($percentage, 2) . '%';
                             return $item;
-                        }, $categoryPie);
+                        }, $typePie);
 
                     @endphp
                     @foreach ($updatedData as $type)
@@ -108,6 +108,11 @@
         <h2>Top Organizers </h2>
 
         @foreach ($topOrganizers as $organizer)
+            @php
+                if($organizer->hasRole('admin') || $organizer->hasRole('attendee')) {
+                    continue;
+                }
+            @endphp
             <div class="col-lg-12 mb-1">
                 <div class="card bg-primary text-white shadow">
                     <div class="card-body">
@@ -129,6 +134,11 @@
     <div class="col-xl-3 col-lg-3">
         <h2>Top Attendees </h2>
         @foreach ($topAttendees as $attendee)
+            @php
+                if($attendee->hasRole('admin') || $attendee->hasRole('organizer')) {
+                    continue;
+                }
+            @endphp
             <div class="col-lg-12 mb-1">
                 <div class="card bg-warning text-white shadow">
                     <div class="card-body">
