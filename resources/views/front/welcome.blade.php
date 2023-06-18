@@ -151,7 +151,7 @@
 									<li class="text-white"><h2>#{{ $loop->iteration }}</h2></li>
 									<li class="text-white">{{ $attendee->full_name }}</li>
 									<li class="text-white">{{ $attendee->email }}</li>
-									<li class="text-white"><strong>{{ $attendee->attended_events_count }}</strong> Events Organized</li>
+									<li class="text-white"><strong>{{ $attendee->attended_events_count }}</strong> Events Attended</li>
 								</ul>
 							</div>
 						</div>
