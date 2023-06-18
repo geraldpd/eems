@@ -89,7 +89,7 @@
 			</div>
 		</div>
 		<div class="row">
-			@foreach ($topOrganizers as $organizer)
+			@forelse ($topOrganizers as $organizer)
 				@php
 					if($organizer->hasRole('admin') || $organizer->hasRole('attendee')) {
 						continue;
@@ -115,7 +115,11 @@
 						</div>
 					</div>
 				</div>
-			@endforeach
+			@empty
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<h2>To Be Decided</h2>
+				</div>
+			@endforelse
 		</div>
 	</div>
 
@@ -131,9 +135,9 @@
 		</div>
 		<div class="row">
 
-		@foreach ($topAttendees as $attendee)
+		@forelse ($topAttendees as $attendee)
 				@php
-					if($organizer->hasRole('admin') || $organizer->hasRole('organizer')) {
+					if($attendee->hasRole('admin') || $attendee->hasRole('organizer')) {
 						continue;
 					}
 				@endphp
@@ -157,7 +161,11 @@
 						</div>
 					</div>
 				</div>
-			@endforeach
+			@empty
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<h2>To Be Decided</h2>
+				</div>
+			@endforelse
 
 		</div>
 	</div>
