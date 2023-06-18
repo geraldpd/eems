@@ -106,7 +106,7 @@
 						</div>
 						<div class="content text-center">
 							<h5><a href="single-speaker.html">{{ $organizer->full_name }}</a></h5>
-							<p>{{ $organizer?->organization->name }} - {{ $organizer?->organization->department }}</p>
+							<p>{{ $organizer?->organization?->name }} - {{ $organizer?->organization?->department }}</p>
 						</div>
 					</div>
 				</div>
