@@ -16,3 +16,5 @@ yarn-error.log
 *.DS_Store
 .DS_Store
 .idea
+public/.DS_Store
+.DS_Store

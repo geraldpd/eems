@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\EventServices;
 
@@ -42,7 +43,18 @@ class FrontController extends Controller
             ->limit(9)
             ->get();
 
-        return view('front.welcome', compact('events'));
+        $topOrganizers = User::withCount('organizedEvents')
+            ->with('organization')
+            ->orderBy('organized_events_count', 'desc')
+            ->take(3)
+            ->get();
+
+        $topAttendees = User::withCount('attendedEvents')
+            ->orderBy('attended_events_count', 'desc')
+            ->take(3)
+            ->get();
+
+        return view('front.welcome', compact('events', 'topOrganizers', 'topAttendees'));
     }
 
     public function home()

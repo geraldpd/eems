@@ -2,10 +2,6 @@
 
 @section('content')
 
-<!--============================
-=            Banner            =
-=============================-->
-
 <section class="banner bg-banner-one overlay">
 	<div class="container">
 		<div class="row">
@@ -25,9 +21,6 @@
 		</div>
 	</div>
 </section>
-
-<!--====  End of Banner  ====-->
-
 
 <section class="news section">
 	<div class="container">
@@ -85,10 +78,80 @@
 	</div>
 </section>
 
+<section class="section speakers bg-speaker overlay-lighter">
+	<div class="container top-organizers">
+		<div class="row">
+			<div class="col-12">
+				<div class="section-title white">
+					<h3>Top <span class="alternate">Organizers</span></h3>
+					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			@foreach ($topOrganizers as $organizer)
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<div class="speaker-item">
+						<div class="image">
+							<img src="{{ asset($organizer->profile_picture_path) }}" style="width:100%; height:336px; " alt="organizer" class="img-fluid">
+							<div class="primary-overlay"></div>
+							<div class="socials">
+								<ul class="list-inline">
+									<li class="list-inline-item text-white"><h3>{{ $loop->iteration }}</h3></li>
+									<li class="list-inline-item text-white">{{ $organizer->full_name }}</li>
+									<li class="list-inline-item text-white">{{ $organizer->email }}</li>
+									<li class="list-inline-item text-white"><strong>{{ $organizer->organized_events_count }}</strong> Events Organized</li>
+								</ul>
+							</div>
+						</div>
+						<div class="content text-center">
+							<h5><a href="single-speaker.html">{{ $organizer->full_name }}</a></h5>
+							<p>{{ $organizer->organization->name }} - {{ $organizer->organization->department }}</p>
+						</div>
+					</div>
+				</div>
+			@endforeach
+		</div>
+	</div>
 
-<!--===========================
-=            About            =
-============================-->
+	<div class="container top-attendees">
+		<div class="row">
+			<div class="col-12">
+				<!-- Section Title -->
+				<div class="section-title white">
+					<h3>Top <span class="alternate">Attendees</span></h3>
+					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+
+		@foreach ($topAttendees as $attendee)
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<div class="speaker-item">
+						<div class="image">
+							<img src="{{ asset($attendee->profile_picture_path) }}" style="width:100%; height:336px; " alt="organizer" class="img-fluid">
+							<div class="primary-overlay"></div>
+							<div class="socials">
+								<ul class="list-inline">
+									<li class="list-inline-item text-white"><h3>{{ $loop->iteration }}</h3></li>
+									<li class="list-inline-item text-white">{{ $attendee->full_name }}</li>
+									<li class="list-inline-item text-white">{{ $attendee->email }}</li>
+									<li class="list-inline-item text-white"><strong>{{ $attendee->attended_events_count }}</strong> Events Organized</li>
+								</ul>
+							</div>
+						</div>
+						<div class="content text-center">
+							<h5><a href="single-speaker.html">{{ $attendee->full_name }}</a></h5>
+							<p>{{ $attendee->attendee_organization_name }} - {{ $attendee->attendee_occupation }}</p>
+						</div>
+					</div>
+				</div>
+			@endforeach
+
+		</div>
+	</div>
+</section>
 
 <section class="section about">
 	<div class="container">
@@ -122,58 +185,4 @@
 		</div>
 	</div>
 </section>
-
-{{--
-<!--====  End of About  ====-->
-
-<!--==============================================
-=            Call to Action Subscribe            =
-===============================================-->
-
-<section class="cta-subscribe bg-subscribe overlay-dark">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-6 mr-auto">
-				<!-- Subscribe Content -->
-				<div class="content">
-					<h3>Subscribe to Our <span class="alternate">Newsletter</span></h3>
-					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit sed do eiusm tempor</p>
-				</div>
-			</div>
-			<div class="col-md-6 ml-auto align-self-center">
-				<!-- Subscription form -->
-				<form action="#" class="row">
-					<div class="col-lg-8 col-md-12">
-						<input type="email" class="form-control main white mb-lg-0" placeholder="Email">
-					</div>
-					<div class="col-lg-4 col-md-12">
-						<div class="subscribe-button">
-							<button class="btn btn-main-md">Subscribe</button>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!--====  End of Call to Action Subscribe  ====-->
-
-<!--================================
-=            Google Map            =
-=================================-->
-<section class="map">
-	<!-- Google Map -->
-	<div id="map" data-latitude="40.712776" data-longitude="-74.005974" data-marker="images/icon/marker.png" data-marker-name="Eventre"></div>
-	<div class="address-block">
-		<h4>Docklands Convention</h4>
-		<ul class="address-list p-0 m-0">
-			<li><i class="fa fa-home"></i><span>Street Address, Location, <br>City, Country.</span></li>
-			<li><i class="fa fa-phone"></i><span>[00] 000 000 000</span></li>
-		</ul>
-		<a href="#" class="btn btn-white-md">Get Direction</a>
-	</div>
-</section>
-<!--====  End of Google Map  ====-->
- --}}
 @endsection
