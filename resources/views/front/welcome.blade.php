@@ -102,7 +102,7 @@
 							<div class="primary-overlay"></div>
 							<div class="socials">
 								<ul class="list-inline">
-									<li class="list-inline-item text-white"><h3>{{ $loop->iteration }}</h3></li>
+									<li class="list-inline-item text-white"><h2>#{{ $loop->iteration }}</h2></li>
 									<li class="list-inline-item text-white">{{ $organizer->full_name }}</li>
 									<li class="list-inline-item text-white">{{ $organizer->email }}</li>
 									<li class="list-inline-item text-white"><strong>{{ $organizer?->organized_events_count }}</strong> Events Organized</li>
@@ -144,7 +144,7 @@
 							<div class="primary-overlay"></div>
 							<div class="socials">
 								<ul class="list-inline">
-									<li class="list-inline-item text-white"><h3>{{ $loop->iteration }}</h3></li>
+									<li class="list-inline-item text-white"><h2>#{{ $loop->iteration }}</h2></li>
 									<li class="list-inline-item text-white">{{ $attendee->full_name }}</li>
 									<li class="list-inline-item text-white">{{ $attendee->email }}</li>
 									<li class="list-inline-item text-white"><strong>{{ $attendee->attended_events_count }}</strong> Events Organized</li>
