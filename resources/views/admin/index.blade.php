@@ -47,7 +47,14 @@
 
                         // Calculate the percentage for each item and append to the label
                         $updatedData = array_map(function ($item) use ($total) {
-                            $percentage = ($item['data'] / $total) * 100;
+
+                            if($item['data'] == 0 && $total == 0) {
+                                $item_total = 0;
+                            } else {
+                                $item_total = $item['data'] / $total;
+                            }
+
+                            $percentage = $item_total * 100;
                             $item['label'] .= ' ' . number_format($percentage, 2) . '%';
                             return $item;
                         }, $categoryPie);
@@ -88,7 +95,14 @@
 
                         // Calculate the percentage for each item and append to the label
                         $updatedData = array_map(function ($item) use ($total) {
-                            $percentage = ($item['data'] / $total) * 100;
+
+                            if($item['data'] == 0 && $total == 0) {
+                                $item_total = 0;
+                            } else {
+                                $item_total = $item['data'] / $total;
+                            }
+
+                            $percentage = $item_total * 100;
                             $item['label'] .= ' ' . number_format($percentage, 2) . '%';
                             return $item;
                         }, $typePie);

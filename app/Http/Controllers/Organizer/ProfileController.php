@@ -32,12 +32,14 @@ class ProfileController extends Controller
             'supporting_documents' => ['nullable', 'array', 'max:3']
         ]);
 
-
         $user = Auth::user();
 
-        $documentCount = count($request->file('supporting_documents')) + count($user->organization->supporting_documents);
-        if ($documentCount > 3) {
-            return redirect()->back()->with('message', 'Error! You can only have 3 supporting documents at a time.');
+        if ($request->has('supporting_documents')) {
+            $documentCount = count($request->file('supporting_documents')) + count($user->organization->supporting_documents);
+
+            if ($documentCount > 3) {
+                return redirect()->back()->with('message', 'Error! You can only have 3 supporting documents at a time.');
+            }
         }
 
         DB::beginTransaction();
