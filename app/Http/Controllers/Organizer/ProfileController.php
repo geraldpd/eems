@@ -35,7 +35,8 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if ($request->has('supporting_documents')) {
-            $documentCount = count($request->file('supporting_documents')) + count($user->organization->supporting_documents);
+            $existingDocuments = count($user->organization?->supporting_documents ?? []);
+            $documentCount = count($request->file('supporting_documents')) + $existingDocuments;
 
             if ($documentCount > 3) {
                 return redirect()->back()->with('message', 'Error! You can only have 3 supporting documents at a time.');
