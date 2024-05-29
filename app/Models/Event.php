@@ -129,7 +129,7 @@ class Event extends Model
     public function attendees()
     {
         return $this->belongsToMany(User::class, 'event_attendees', 'event_id', 'attendee_id')
-            ->withPivot('is_booked', 'is_confirmed', 'id')
+            ->withPivot('is_booked', 'is_confirmed', 'is_disapproved','id')
             ->withTimestamps();
     }
 

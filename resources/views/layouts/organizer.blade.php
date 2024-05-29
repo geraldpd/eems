@@ -39,7 +39,7 @@
             color: #ff6600 !important;
         }
         i {
-            color: #ff6600 !important;
+            color: #ff6600;
         }
         .breadcrumb-item > a{
             color: #ff6600 !important;

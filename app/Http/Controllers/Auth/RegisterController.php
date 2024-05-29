@@ -125,7 +125,8 @@ class RegisterController extends Controller
         if ($data['as'] === 'organizer') {
             $user->organization()->create([
                 'name' => $data['organization_name'],
-                'department' => $data['department']
+                'department' => $data['department'],
+                'organization_type_id' => $data['organization_type']
             ]);
 
             $user->evaluations()->create([

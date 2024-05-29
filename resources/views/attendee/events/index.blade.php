@@ -42,6 +42,8 @@
 
                                     @if ($event->is_confirmed)
                                         <i title="You have accepted the invitation to this event." class="float-right text-success fas fa-check-circle"></i>
+                                    @elseif ($event->is_disapproved)
+                                        <i title="You have been declined to this event." class="float-right text-success fas fa-times"></i>
                                     @endif
                                 </h3>
                             </div>

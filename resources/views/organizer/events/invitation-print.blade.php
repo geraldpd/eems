@@ -6,9 +6,9 @@
             <img src="{{ asset($event->organizer->organization->logo_path) }}" alt="logo" class="logo">
         @endif
         <div class="text">
-            <h2>{{ $event->organizer->organization->name }}1</h2>
-            <h2>{{ $event->organizer->organization->department }}2</h2>
-            <h5>{{ $event->organizer->address }}3</h5>
+            <h2>{{ $event->organizer->organization->name }}</h2>
+            <h2>{{ $event->organizer->organization->department }}</h2>
+            <h5>{{ $event->organizer->address }}</h5>
         </div>
     </div>
 

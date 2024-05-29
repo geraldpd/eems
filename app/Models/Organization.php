@@ -17,6 +17,7 @@ class Organization extends Model
      */
     protected $fillable = [
         'name',
+        'organization_type_id',
         'department',
         'logo',
         'supporting_documents'

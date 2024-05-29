@@ -180,7 +180,20 @@ if (!function_exists('eventBookingIsApproved')) {
 
         $attendee_id = $user_id ? $user_id : Auth::user()->id;
 
-        return EventAttendee::whereEventId($event->id)->whereAttendeeId($attendee_id)->whereIsConfirmed(1)->whereIsBooked(1)->exists();
+        return EventAttendee::whereEventId($event->id)->whereAttendeeId($attendee_id)->whereIsConfirmed(1)->whereIsBooked(1)->whereIsDisapproved(0)->exists();
+    }
+}
+
+if (!function_exists('eventBookingIsDisapproved')) {
+    function eventBookingIsDisapproved(Event $event, $user_id = false)
+    {
+        if (!Auth::check()) {
+            return false;
+        }
+
+        $attendee_id = $user_id ? $user_id : Auth::user()->id;
+
+        return EventAttendee::whereEventId($event->id)->whereAttendeeId($attendee_id)->whereIsBooked(0)->whereIsDisapproved(1)->exists();
     }
 }
 

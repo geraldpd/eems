@@ -12,6 +12,15 @@ class EventAttendee extends Pivot
 
     use HasFactory;
 
+    protected $fillable = [
+        'event_id',
+        'attendee_id',
+        'is_confirmed',
+        'is_booked',
+        'is_disapproved',
+        'is_notified',
+    ];
+
     public function event()
     {
         return $this->belongsTo(Event::class);

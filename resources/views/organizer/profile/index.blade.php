@@ -68,6 +68,13 @@
                 @enderror
             </div>
 
+            <div class="form-group">
+              <label for="address">Address:</label>
+              <textarea id="address" class="form-control @error('address') is-invalid @enderror" name="address" required>{{ old('address') ?? $organizer->address }}</textarea>
+              @error('address')
+                <span class="text-danger">{{ $message }}</span>
+              @enderror
+          </div>
         </div>
       </div>
 
@@ -78,12 +85,12 @@
 
         <div class="col-md-8 col-lg-8 col-sm-12">
           <br>
-          <h2>Other Information</h2>
+          <h2>Organization Information</h2>
           <hr>
 
           <div class="form-group">
               <label for="organization">Organization:</label>
-              <input type="text" name="organization_name" id="organization_name" class="form-control" value="{{ old('organization_name') ?? $organizer->organization->name }}">
+              <input type="text" name="organization_name" id="organization_name" class="form-control" value="{{ old('organization_name') ?? $organizer->organization->name }}" required>
               @error('attendee_organization_name')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
@@ -91,16 +98,8 @@
 
           <div class="form-group">
               <label for="department">Department:</label>
-              <input type="text" name="department" id="department" class="form-control" value="{{ old('department') ?? $organizer->organization->department }}">
+              <input type="text" name="department" id="department" class="form-control" value="{{ old('department') ?? $organizer->organization->department }}"required >
               @error('department')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-          </div>
-
-          <div class="form-group">
-              <label for="address">Address:</label>
-              <textarea id="address" class="form-control @error('address') is-invalid @enderror" name="address" required>{{ old('address') ?? $organizer->address }}</textarea>
-              @error('address')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
           </div>

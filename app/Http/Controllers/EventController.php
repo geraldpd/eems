@@ -112,7 +112,7 @@ class EventController extends Controller
                 EventAttendee::create([
                     'event_id' => $event->id,
                     'attendee_id' => Auth::user()->id,
-                    'is_confirmed' => true,
+                    'is_confirmed' => 1,
                 ]);
 
                 //remove the current user from the invitation, so they dont get sent an email since they are auto conmfirmed
@@ -143,7 +143,7 @@ class EventController extends Controller
 
         $event->save();
 
-        return redirect()->route('events.show', [$event->code])->with('message', 'Successfuly confirmed invitation');
+        return redirect()->route('events.show', [$event->code])->with('message', 'Successfully confirmed invitation');
     }
 
     private function attend(Event $event, $email, $is_qrcode_scanned = false)

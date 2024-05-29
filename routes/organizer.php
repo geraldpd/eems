@@ -38,7 +38,8 @@ Route::group([
         Route::resource('events', EventController::class);
 
         //EVENT INVITATIONS
-        Route::post('events/{event}/invitations/book', [Invitation::class, 'book'])->name('invitations.book');
+        Route::post('events/{event}/invitations/approve-book', [Invitation::class, 'approveBooking'])->name('invitations.approveBooking');
+        Route::post('events/{event}/invitations/disapprove-book', [Invitation::class, 'disapproveBooking'])->name('invitations.disapproveBooking');
         Route::get('events/{event}/invitations/{filter?}', [Invitation::class, 'index'])->name('invitations.index');
         Route::get('events/{event}/invitations/print/{filter?}', [Invitation::class, 'print'])->name('invitations.print');
         Route::get('events/{event}/invitations/{filter}/download', [Invitation::class, 'download'])->name('invitations.download');

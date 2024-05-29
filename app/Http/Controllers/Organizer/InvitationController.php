@@ -9,8 +9,11 @@ use App\Models\EventAttendee;
 use App\Models\Invitation;
 
 use App\Jobs\SendEventInvitation;
+use App\Mail\EventInvitationDecision;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -33,11 +36,11 @@ class InvitationController extends Controller
         return view('organizer.events.invitation', compact('event', 'participants', 'filter'));
     }
 
-    public function book(Event $event, Request $request)
+    public function approveBooking(Event $event, Request $request)
     {
-        $eventattendee = EventAttendee::whereEventId($event->id)->whereAttendeeId($request->attendee_id)->first();
+        $eventAttendee = EventAttendee::whereEventId($event->id)->whereAttendeeId($request->attendee_id)->first();
 
-        if ($eventattendee->is_booked) {
+        if ($eventAttendee->is_booked) {
             return response()->json([
                 'result' => 'fail',
                 'message' => 'Booking already approved!'
@@ -51,8 +54,48 @@ class InvitationController extends Controller
             ]);
         }
 
-        $eventattendee->is_booked = true;
-        $eventattendee->save();
+        $eventAttendee->is_booked = 1;
+        $eventAttendee->is_confirmed = 1;
+        $eventAttendee->is_disapproved = 0;
+        $eventAttendee->save();
+
+        $recipient = User::whereId($request->attendee_id)->first()->email;
+
+        //dd($event, Auth::user()->email, $recipient, 'emails.invitations.approved');
+        Mail::to($recipient)->send(new EventInvitationDecision($event, Auth::user()->email, $recipient, 'emails.invitations.approved', 'Booking Approved'));
+
+        return response()->json([
+            'result' => 'success',
+            'message' => 'successfully_booked'
+        ]);
+    }
+
+    public function disapproveBooking(Event $event, Request $request)
+    {
+        $eventAttendee = EventAttendee::whereEventId($event->id)->whereAttendeeId($request->attendee_id)->first();
+
+        if ($eventAttendee->is_booked) {
+            return response()->json([
+                'result' => 'fail',
+                'message' => 'Booking already approved!'
+            ]);
+        }
+
+        if ($event->booked_participants >= $event->max_participants) {
+            return response()->json([
+                'result' => 'fail',
+                'message' => 'Maximum number of participants has been reached'
+            ]);
+        }
+
+        $eventAttendee->is_booked = 0;
+        $eventAttendee->is_confirmed = 1;
+        $eventAttendee->is_disapproved = 1;
+        $eventAttendee->save();
+
+        $recipient = User::whereId($request->attendee_id)->first()->email;
+
+        Mail::to($recipient)->send(new EventInvitationDecision($event, Auth::user()->email, $recipient, 'emails.invitations.disapproved', 'Booking Disapproved', $request->reason));
 
         return response()->json([
             'result' => 'success',
@@ -131,7 +174,7 @@ class InvitationController extends Controller
         $is_past = $event->start->schedule_start->isPast();
 
         switch ($filter) {
-            case 'booked':
+            case 'approved': //approved
                 $participants = EventAttendee::query()
                     ->whereEventId($event->id)
                     ->whereIsConfirmed(1)
@@ -144,7 +187,25 @@ class InvitationController extends Controller
                             'name' => $participant->attendee->fullname,
                             'created_at' => $participant->created_at,
                             'email' => $participant->attendee->email,
-                            'response' => 'Booked'
+                            'response' => 'Approved'
+                        ];
+                    });
+                break;
+            case 'disapproved': //approved
+                $participants = EventAttendee::query()
+                    ->whereEventId($event->id)
+                    ->whereIsConfirmed(1)
+                    ->whereIsBooked(0)
+                    ->whereIsDisapproved(1)
+                    ->with('attendee')
+                    ->get()
+                    ->map(function ($participant) {
+                        return [
+                            'organization' => $participant->attendee->attendee_organization_name,
+                            'name' => $participant->attendee->fullname,
+                            'created_at' => $participant->created_at,
+                            'email' => $participant->attendee->email,
+                            'response' => 'Disapproved'
                         ];
                     });
                 break;
@@ -181,7 +242,7 @@ class InvitationController extends Controller
                     if (!$invitation->guest) return;
 
                     $confirmedAttendees =  $attendees->filter(function ($invitation) {
-                        return $invitation->getOriginal('pivot_is_booked') === 0;
+                        return $invitation->getOriginal('pivot_is_booked') === 0 && !$invitation->getOriginal('pivot_is_disapproved');
                     })->pluck('email')->all();
 
                     if (in_array($invitation->guest->email, $confirmedAttendees)) {
@@ -227,6 +288,7 @@ class InvitationController extends Controller
             default: //all invited people
                 $participants = $event->invitations->map(function ($invitation) use ($attendees, $is_past, $event) {
 
+                    //not invited
                     if (!$invitation->guest) {
                         return [
                             'organization' => 'N/A',
@@ -237,22 +299,41 @@ class InvitationController extends Controller
                         ];
                     }
 
+                    //invited
                     if (in_array($invitation->guest->email, $attendees->pluck('email')->all())) {
 
-                        $bookedAttendees = EventAttendee::query()
+                        $invited_user_id = $invitation->guest->id;
+
+                        $bookedAttendee = EventAttendee::query()
                             ->whereEventId($event->id)
-                            ->whereIsConfirmed(1)
-                            ->whereIsBooked(1)
-                            ->select('attendee_id')
-                            ->get();
+                            ->whereAttendeeId($invited_user_id)
+                            // ->whereIsConfirmed(1)
+                            // ->whereIsBooked(1)
+                            //->select(['attendee_id', 'is_confirmed', 'is_disapproved'])
+                            ->first();
+
+                        switch (true) {
+                            case $bookedAttendee->is_confirmed && $bookedAttendee->is_booked:
+                                $response = 'Approved';
+                                break;
+
+                            case $bookedAttendee->is_confirmed && $bookedAttendee->is_disapproved:
+                                $response = 'Disapproved';
+                                break;
+
+                            default:
+                                $response = 'Confirmed';
+                                break;
+                        }
 
                         return [
-                            'attendee_id' => $invitation->guest->id,
+                            'attendee_id' => $invited_user_id,
                             'organization' => $invitation->guest->attendee_organization_name,
                             'name' => $invitation->guest->fullname,
                             'created_at' => $invitation->created_at,
                             'email' => $invitation->email,
-                            'response' => in_array($invitation->guest->id, $bookedAttendees->pluck('attendee_id')->toArray()) ? 'Booked' : 'Confirmed'
+                            //'response' => in_array($invited_user_id, $bookedAttendees->pluck('attendee_id')->toArray()) ? 'Approved' : 'Confirmed'
+                            'response' => $response
                         ];
                     }
 

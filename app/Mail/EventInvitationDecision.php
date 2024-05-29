@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class EventInvitation extends Mailable
+class EventInvitationDecision extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -26,27 +26,35 @@ class EventInvitation extends Mailable
 
     public $recipient;
 
-    public $invitation_link;
+    public $markdown;
+
+    public $subject;
+
+    public $reason;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Event $event, $sender, $recipient)
+    public function __construct(Event $event, $sender, $recipient, $markdown, $subject, $reason = '')
     {
+        $this->reason = $reason;
+
+        $this->subject = $subject;
+
+        $this->markdown = $markdown;
+
         $this->event = $event->load([
             'organizer',
             'category'
         ]);
 
         //$this->sender = $sender;
-        $this->sender = env('MAIL_USERNAME', 'info.eduvent.ph@gmail.com');
+        $this->sender = 'info.eduvent.ph@gmail.com';
         $this->senderName = User::whereEmail($sender)->first()->full_name;
 
         $this->recipient = $recipient; // email of the recipient
-
-        $this->invitation_link = eventHelperSetInvitationLink($event, $recipient);
     }
 
     /**
@@ -57,7 +65,9 @@ class EventInvitation extends Mailable
     public function build()
     {
         return $this
+            ->subject($this->subject)
             ->from($this->sender, env('APP_NAME', 'EventHEI'))
-            ->markdown('emails.events.invitation');
+            //->markdown('emails.events.invitation');
+            ->markdown($this->markdown);
     }
 }

@@ -38,7 +38,8 @@
                         </button>
 
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            <a class="dropdown-item {{ $filter == 'booked' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/booked">Booked</a>
+                            <a class="dropdown-item {{ $filter == 'approved' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/approved">Approved</a>
+                            <a class="dropdown-item {{ $filter == 'disapproved' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/disapproved">Disapproved</a>
                             <a class="dropdown-item {{ $filter == 'confirmed' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/confirmed">Confirmed</a>
                             <a class="dropdown-item {{ $filter == 'declined' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/declined">Declined</a>
 
@@ -46,15 +47,15 @@
                                 <a class="dropdown-item {{ !in_array($filter, ['confirmed', 'declined']) ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/all">All</a>
                             @else
                                 <a class="dropdown-item {{ $filter == 'pending' ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/pending">Pending</a>
-                                <a class="dropdown-item {{ !in_array($filter, ['booked', 'confirmed', 'declined', 'pending']) ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/all">All</a>
+                                <a class="dropdown-item {{ !in_array($filter, ['approved', 'disapproved', 'confirmed', 'declined', 'pending']) ? 'active' : ''}}" href="{{ route('organizer.invitations.index', [$event->code]) }}/all">All</a>
                             @endif
                         </div>
                     </div>
 
                     @php
                         $filterable = $event->end->schedule_end->isPast()
-                                    ? ['booked', 'confirmed', 'declined', 'all', '']
-                                    : ['booked', 'confirmed', 'declined', 'all','pending', ''];
+                                    ? ['approved', 'disapproved', 'confirmed', 'declined', 'all', '']
+                                    : ['approved', 'disapproved', 'confirmed', 'declined', 'all','pending', ''];
                     @endphp
 
                     @if(in_array($filter, $filterable))
@@ -113,7 +114,7 @@
                             <th>Name</th>
                             <th>Organization</th>
                             @if (! $event->end->schedule_end->isPast())
-                                <th>Booking</th>
+                                <th>Action</th>
                             @endif
                         </small>
                     </thead>
@@ -128,8 +129,12 @@
                                 @if (! $event->end->schedule_end->isPast())
                                     <td class="text-center">
                                         @if (($participant['response'] == 'Confirmed') && ($event->booked_participants < $event->max_participants))
-                                            <button class="btn btn-sm btn-light approve-booking" data-attendee_id="{{ $participant['attendee_id'] }}">
-                                                <i class="fas fa-check"></i> Approve Booking
+                                            <button class="btn btn-lg btn-light approve-booking" data-attendee_id="{{ $participant['attendee_id'] }}">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+
+                                            <button class="btn btn-lg btn-secondary disapprove-booking"  data-attendee_id="{{ $participant['attendee_id'] }}">
+                                                <i style="color:white" class="fas fa-times"></i>
                                             </button>
                                         @endif
                                     </td>
@@ -270,7 +275,8 @@
             event_is_past: '{{ false }}',
             routes: {
                 suggest_attendees : '{{ route('helpers.suggest_attendees') }}',
-                book : '{{ route('organizer.invitations.book', [$event->code]) }}',
+                approve : '{{ route('organizer.invitations.approveBooking', [$event->code]) }}',
+                disapprove : '{{ route('organizer.invitations.disapproveBooking', [$event->code]) }}',
             },
             event: {
                 id: {{ $event->id }},

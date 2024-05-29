@@ -40,7 +40,7 @@ class FrontController extends Controller
                 'has_attended'      => false,
                 'order'             => 'desc',
             ])
-            ->limit(9)
+            //->limit(9)
             ->get();
 
         $topOrganizers = User::withCount('organizedEvents')

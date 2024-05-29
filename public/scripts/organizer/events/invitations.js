@@ -159,39 +159,98 @@ $(function () {
 
     $(".approve-booking").on("click", function () {
         let attendee_id = $(this).data("attendee_id");
+
         Swal.fire({
             icon: "question",
             title: "Are you sure you want to approve this Booking?",
-            showCancelButton: true,
+            showCancelButton: false,
             confirmButtonText: "Approve Booking",
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                axios
-                    .post(config.routes.book, {
-                        attendee_id: attendee_id,
-                    })
-                    .then(function (response) {
-                        if (response.data.result == "success") {
-                            window.Swal.fire(
-                                "Booking has been Approved!",
-                                "success"
-                            );
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
-                        } else {
-                            window.Swal.fire(
-                                "Ooops",
-                                response.data.message,
-                                "info"
-                            );
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false,
+            preConfirm: () => {
+                Swal.showLoading();
+                return axios.post(config.routes.approve, {
+                    attendee_id: attendee_id,
+                    action: 'approve'
+                }).then(response => {
+                    if (response.data.result == "success") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "Booking has been Approved!",
+                            timer: 1000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: "Ooops",
+                            text: response.data.message
+                        });
+                    }
+                }).catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Error",
+                        text: "Something went wrong!"
                     });
+                    console.log(error);
+                });
             }
         });
     });
+
+    $(".disapprove-booking").on("click", function () {
+        let attendee_id = $(this).data("attendee_id");
+
+        Swal.fire({
+            icon: "warning",
+            input: "text",
+            title: "Are you sure you want to disapprove this Booking?",
+            customClass: {
+                confirmButton: 'btn btn-danger',
+            },
+            inputPlaceholder: 'Please provide reason for disapproval',
+            buttonsStyling: false,
+            showCancelButton: false, // Allow cancellation for better UX
+            confirmButtonText: "Disapprove Booking",
+            showLoaderOnConfirm: true,
+            preConfirm: (reason) => {
+
+                return axios.post(config.routes.disapprove, {
+                    attendee_id: attendee_id,
+                    action: 'disapprove',
+                    reason: reason
+                }).then(response => {
+                    if (response.data.result == "success") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "Booking has been Disapproved!",
+                            timer: 1000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: "Ooops",
+                            text: response.data.message
+                        });
+                    }
+                }).catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Error",
+                        text: "Something went wrong!"
+                    });
+                    console.log(error);
+                });
+            }
+        });
+    });
+
 });
