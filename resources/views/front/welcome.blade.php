@@ -61,7 +61,7 @@
                     <div class="col-lg-4 col-md-4 col-sm-12">
                         <div class="speaker-item">
                             <div class="image">
-                                <img src="{{ asset($organizer->profile_picture_path) }}" style="width:100%; height:336px; " alt="organizer" class="img-fluid">
+                                <img src="{{ asset($organizer->profile_picture_path) }}" style="width:100%; height:250px;" alt="organizer" class="img-fluid">
                                 <div class="primary-overlay"></div>
                                 <div class="socials">
                                     <ul class="list-inline">
@@ -109,7 +109,7 @@
                     <div class="col-lg-4 col-md-4 col-sm-12">
                         <div class="speaker-item">
                             <div class="image">
-                                <img src="{{ asset($attendee->profile_picture_path) }}" style="width:100%; height:336px; " alt="organizer" class="img-fluid">
+                                <img src="{{ asset($attendee->profile_picture_path) }}" style="width:100%; height:250px;" alt="organizer" class="img-fluid">
                                 <div class="primary-overlay"></div>
                                 <div class="socials">
                                     <ul class="list-inline">
