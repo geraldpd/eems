@@ -173,6 +173,9 @@
                                     <h3>{{ $event->name }}</h3>
 
                                 </div>
+
+                                <span title="{{ $event->booked_participants }} Bookings over {{ $event->max_participants }} max pariticpating slots" class="badge mt-3 mb-3" style="background-color: #ff6600; color: white">{{ $event->booked_participants }} Participants / {{ $event->max_participants }} Slots</span></span>
+
                                 <div class="post-meta">
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
