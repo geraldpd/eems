@@ -114,7 +114,7 @@
                     </a>
                     @if ($loop->last)
                     <br>
-                        <sub>Uploaded documents will only be available for the events attendees.</sub>
+                        {{-- <sub>Uploaded documents will only be available for the events attendees.</sub> --}}
                         <br>
                     @endif
                 @empty
