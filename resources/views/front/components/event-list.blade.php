@@ -8,7 +8,7 @@
 
         <div class="col-md-4">
             <a href="{{ route('events.show', [$event->code]) }}">
-                <img src="{{ $event->banner ? asset($event->banner_path) : 'https://placehold.co/600x400?text=No+Event+Banner' }}" alt="post-image" class="img-fluid  rounded-start" style="height:200px;">
+                <img src="{{ $event->banner ? asset($event->banner_path) : 'https://placehold.co/600x400?text=No+Event+Banner' }}" alt="Event Banner" class="img-fluid  rounded-start" style="height:200px;">
             </a>
         </div>
 
@@ -23,6 +23,9 @@
                     @endif
                 </h3>
                 <div>
+
+                    <span title="{{ $event->booked_participants }} Bookings over {{ $event->max_participants }} max pariticpating slots" class="badge mt-3 mb-3" style="background-color: #ff6600; color: white">{{ $event->booked_participants }} Participants / {{ $event->max_participants }} Slots</span></span>
+
                     <ul class="list-inline">
                         <li class="list-inline-item">
                             <i class="fa fa-microphone"></i>
