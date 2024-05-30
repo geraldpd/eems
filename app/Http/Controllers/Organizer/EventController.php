@@ -190,7 +190,8 @@ class EventController extends Controller
         }
         EventSchedule::insert($event_schedule);
 
-        $this->moveTemporayDocsToEvents($event->id);
+        $event->documents = $this->moveTemporaryDocsToEvents($event->id);
+        $event->save();
 
         File::deleteDirectory(public_path('events')); // deletes events folder inside the public folder, since qrcode is moved to S3 folder instead`
 
@@ -299,7 +300,8 @@ class EventController extends Controller
                 $event->save();
             }
 
-            $this->moveTemporayDocsToEvents($event->id);
+            $event->documents = $this->moveTemporaryDocsToEvents($event->id);
+            $event->save();
 
             DB::commit();
             return redirect()->route('organizer.events.show', [$event->code])->with('message', 'Event Successfully Updated');
@@ -327,15 +329,32 @@ class EventController extends Controller
         //
     }
 
-    private function moveTemporayDocsToEvents($event_id)
+    private function moveTemporaryDocsToEvents($event_id)
     {
-        //get temp files
+        // get temp files
         $documents = (new EventServices)->getTemporaryDocs();
 
+        $eventDocuments = [];
+
         foreach ($documents as $name => $path) {
-            Storage::disk('s3')->move(decrypt($path), "events/$event_id/documents/$name");
-            //File::move($path['public'], public_path($event_folder_path.'documents/'.$name));
+            $destinationPath = "events/$event_id/documents/$name";
+            $eventDocuments[] = $destinationPath;
+
+            try {
+                if (!Storage::disk('s3')->exists($destinationPath)) {
+                    Storage::disk('s3')->move(decrypt($path), $destinationPath);
+                } else {
+                    // Optionally, handle the scenario where the file already exists
+                    // For example, log the event or generate a unique name for the new file
+                    \Log::info("File already exists at path: $destinationPath");
+                    continue;
+                }
+            } catch (\Exception $e) {
+                \Log::error("Failed to move file from " . decrypt($path) . " to $destinationPath. Error: " . $e->getMessage());
+            }
         }
+
+        return $eventDocuments;
     }
 
     public function fetchScheduleEvents(Request $request)

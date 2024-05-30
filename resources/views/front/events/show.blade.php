@@ -208,8 +208,8 @@
                                     {!! $event->description !!}
                                 </div>
 
-                                @auth
-                                    @if (eventBookingIsConfirmed($event) && eventBookingIsApproved($event))
+                                {{-- @auth
+                                    @if (eventBookingIsConfirmed($event) && eventBookingIsApproved($event)) --}}
                                         @forelse ($event->uploaded_documents as $name => $path)
                                             @if ($loop->first)
                                                 <div class="post-title">
@@ -226,8 +226,9 @@
                                             @endif
                                         @empty
                                         @endforelse
-                                    @endif
-                                @endauth
+                                    {{-- foreach ($documents as $name => $path) {
+
+ --}}
 
                             </div>
                         </article>

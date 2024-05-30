@@ -144,7 +144,7 @@ class EventServices
             return [];
         }
 
-        $event_document_path = "events/$event_id/documents";
+        $event_document_path = "events/$event->id/documents";
         $documents = Storage::disk('s3')->allFiles($event_document_path);
 
         return collect($documents)
