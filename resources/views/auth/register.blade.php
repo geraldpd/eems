@@ -273,7 +273,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    </ul>
+                    <h4>1. Personal information we collect and keep</h4>
+                    <p>We collect, use and keep your personal information, which include but are not limited, to the following:</p>
+                        <ul>
+                            <li>Personal Information</li>
+                            <li>Higher Education Institutions Information</li>
+                            <li>Event Details </li>
+                        </ul>
 
                     <h4>2. With whom your data is shared</h4>
                     <p>We do not share your personal information with third parties except in the following circumstances:</p>
@@ -298,8 +304,8 @@
                 </div>
 
                 <div class="footer text-center mb-2 mt-2">
-                    <button type="submit" form="register" class="btn btn-main-md">
-                        Aggree and Register
+                    <button type="submit" form="register" class="btn btn-main-md agree-register">
+                        Agree and Register
                     </button>
                 </div>
             </div>
@@ -311,6 +317,11 @@
             $(document).ready(function() {
                 $('.copy-right-modal-trigger').on('click', function() {
                     $('#copy-right-modal').modal("show");
+                })
+
+                $('.agree-register').on('click', function() {
+                    $(this).attr('disabled', true)
+                    $('#register').submit();
                 })
             })
         </script>
