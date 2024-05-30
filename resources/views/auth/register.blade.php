@@ -267,12 +267,17 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5">Copy Privacy Notice</h1>
+                    <h1 class="modal-title fs-5">Welcome to {{ env('APP_NAME') }}!</h1>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+
+                    <p>In accordance with the Data Privacy Act of 2012 (Republic Act No. 10173) to protect and respect the confidentiality and privacy of the data and information. We value your privacy and are committed in protecting your personal information. This explains how we collect, use and disclose and safeguard your information when you use the {{ env('APP_NAME') }}.</p>
+
+                    <br>
+
                     <h4>1. Personal information we collect and keep</h4>
                     <p>We collect, use and keep your personal information, which include but are not limited, to the following:</p>
                         <ul>
@@ -287,11 +292,12 @@
                         <li>With your consent.</li>
                         <li>To service providers and partners who assist us in operating the EMS.</li>
                         <li>To comply with legal obligations, court orders or government requests.</li>
-                        <li>To protect the rights, property, or safety of EventHEI, our users, and others.</li>
+                        <li>To protect the rights, property, or safety of {{ env('APP_NAME') }}, our users, and others.</li>
                     </ul>
 
                     <h4>3. Data Security</h4>
-                    <p>Your personal information is stored in secured databases. We implement appropriate technical and organizational measures to safeguard your personal information against unauthorized access, alteration, disclosure, or destruction.
+                    <p>
+                        Your personal information is stored in secured databases. We implement appropriate technical and organizational measures to safeguard your personal information against unauthorized access, alteration, disclosure, or destruction.
                     </p>
 
                     <h4>4. Changes to this Privacy Notice</h4>
@@ -300,7 +306,7 @@
                     <h4>5. Contact us</h4>
                     <p>You may email <a href="mailto:eventhei@gmail.com">eventhei@gmail.com</a> if you have questions about the Data privacy Act and when you need to request a copy of your personal documents.</p>
 
-                    <p>I acknowledge that I have read and understood the EventHEI Data Privacy Notice. I agree to the processing of my personal data in accordance with the Data Privacy Policy.</p>
+                    <p>I acknowledge that I have read and understood the {{ env('APP_NAME') }} Data Privacy Notice. I agree to the processing of my personal data in accordance with the Data Privacy Policy.</p>
                 </div>
 
                 <div class="footer text-center mb-2 mt-2">
